@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/iviettechpr55?createDatabaseIfNotExist=true
+    username: root
+    password: r00t
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update # or create, validate, none
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
