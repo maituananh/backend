@@ -6,6 +6,7 @@ import com.spring.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,7 +16,14 @@ public class ProductService {
     private ProductRepository productRepository;
 
     public List<ProductDto> getAll() {
-        return productRepository.findAll().stream().map(ProductDto::new).toList();
+        List<ProductEntity> productEntities = productRepository.findAll();
+
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (ProductEntity productEntity : productEntities) {
+            productDtos.add(new ProductDto(productEntity));
+        }
+
+        return productDtos;
     }
 
     public ProductDto createProduct(ProductDto productDto) {
