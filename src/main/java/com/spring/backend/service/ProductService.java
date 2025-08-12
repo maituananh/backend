@@ -36,4 +36,35 @@ public class ProductService {
 
         return new ProductDto(entitySaved);
     }
+
+    public ProductDto getById(Long id) {
+        ProductEntity productEntity = productRepository.findById(id).get();
+        return new ProductDto(productEntity);
+    }
+
+    public List<ProductDto> search(String name) {
+        List<ProductEntity> productEntities = productRepository.findByNameLikeIgnoreCase(name);
+
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (ProductEntity productEntity : productEntities) {
+            productDtos.add(new ProductDto(productEntity));
+        }
+        return productDtos;
+    }
+
+
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
+    }
+
+    public ProductDto updateById(Long id, ProductDto productDto) {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setId(id);
+        productEntity.setName(productDto.getName());
+        productEntity.setDescription(productDto.getDescription());
+        productEntity.setPrice(productDto.getPrice());
+
+        ProductEntity productUpdated = productRepository.save(productEntity);
+        return new ProductDto(productUpdated);
+    }
 }

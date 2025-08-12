@@ -24,4 +24,25 @@ public class ProductController {
     public List<ProductDto> getAll() {
         return productService.getAll();
     }
+
+    @GetMapping("/{id}")
+    public ProductDto getById(@PathVariable("id") Long id) {
+        return productService.getById(id);
+    }
+
+    @GetMapping("/search")
+    public List<ProductDto> searchProduct(@RequestParam("name") String name) {
+        return productService.search(name);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Long id) {
+        productService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ProductDto updateById(@PathVariable("id") Long id,
+                           @RequestBody ProductDto productDto) {
+        return productService.updateById(id, productDto);
+    }
 }
