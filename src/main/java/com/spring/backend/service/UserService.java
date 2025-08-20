@@ -38,8 +38,8 @@ public class UserService {
         return new UserDto(saveUser);
     }
 
-    public UserDto getByIdCard(long cardId) {
-        UserEntity productUser = userRepository.fineByIdCard(String.valueOf(cardId));
+    public UserDto getByIdCard(Long id) {
+        UserEntity productUser = userRepository.findById(id).get();
         return new UserDto(productUser);
     }
 
@@ -54,8 +54,8 @@ public class UserService {
         return userDto;
     }
 
-    public void delete(Long cardId) {
-        userRepository.deleteById(cardId);
+    public void delete(Long id) {
+        userRepository.deleteById(id);
     }
 
     public UserDto updateUser(Long id, UserDto userDto) {

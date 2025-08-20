@@ -1,6 +1,8 @@
 package com.spring.backend.controller;
 
 import com.spring.backend.dto.UserDto;
+import com.spring.backend.entity.UserEntity;
+import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,8 @@ import java.util.List;
 public class ProductUser {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping
     public UserDto createUser(@RequestBody UserDto userDto) {
@@ -27,7 +31,7 @@ public class ProductUser {
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
+    public UserDto getUserById(@PathVariable("id") Long id) {
         return userService.getByIdCard(id);
     }
 
