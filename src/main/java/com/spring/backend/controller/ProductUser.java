@@ -26,21 +26,23 @@ public class ProductUser {
         return userService.getAll();
     }
 
-    @GetMapping("/{idCard}")
-    public UserDto getUserById(@PathVariable String cardId) {
-     //   return userService.getByIdCard(Long.parseLong(cardId));
+    @GetMapping("/{id}")
+    public UserDto getUserById(@PathVariable Long id) {
+        return userService.getByIdCard(id);
     }
 
     @GetMapping("/searchName")
     public List<UserDto> searchUserByName(@RequestParam("name") String name) {
-     //   return Collections.singletonList(userService.searchName(name));
+        return userService.searchName(name);
     }
-    @DeleteMapping("/{idCard}")
-    public void deleteUserById(@PathVariable String cardId) {
-        userService.delete(Long.parseLong(cardId));
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable Long id) {
+        userService.delete(id);
     }
+
     @PutMapping("/{id}")
-    public  UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
-        return userService.updateUser(id,userDto);
+    public UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
+        return userService.updateUser(id, userDto);
     }
 }
