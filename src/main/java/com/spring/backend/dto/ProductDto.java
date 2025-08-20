@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,13 +15,18 @@ import lombok.Setter;
 public class ProductDto {
     private Long id;
     private String name;
-    private String description;
     private Double price;
+    private Instant startDay;
+    private Instant endDate;
+    private String type;
 
     public ProductDto(ProductEntity productEntity) {
         this.id = productEntity.getId();
         this.name = productEntity.getName();
-        this.description = productEntity.getDescription();
         this.price = productEntity.getPrice();
+        this.startDay = productEntity.getStartDay();
+        this.endDate = productEntity.getEndDate();
+        this.type = productEntity.getType();
+
     }
 }
