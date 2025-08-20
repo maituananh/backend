@@ -2,15 +2,16 @@ spring:
   application:
     name: backend
   datasource:
-    url: jdbc:mysql://localhost:3306/iviettechpr55?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/pawn?createDatabaseIfNotExist=true
     username: root
-    password: r00t
+    password: Anhkiet_2004
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update # or create, validate, none
+      ddl-auto: create # or create, validate, none
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
 server:

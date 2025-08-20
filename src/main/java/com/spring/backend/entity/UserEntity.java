@@ -6,15 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
-@Table(name = "product")
+@Table(name = "users")
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductEntity {
+public class UserEntity {
 
     @Id
     @Column(name = "id")
@@ -24,17 +22,17 @@ public class ProductEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "price")
-    private Double price;
+    @Column(name = "age")
+    private int age;
 
-    @Column(name = "startDay")
-    private Instant startDay;
+    @Column(name = "email")
+    private String email;
 
-    @Column(name = "endDate")
-    private Instant endDate;
+    @Column(name = "idCard")
+    private String idCard;
 
-    @Column(name = "type")
-    private String type;
+    @Column(name = "phone")
+    private String phone;
 
 
 }
