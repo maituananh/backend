@@ -29,10 +29,9 @@ public class UserEntity {
     private String email;
 
     @Column(name = "card_id")
-    private String card_id;
+    private String cardId;
 
     @Column(name = "phone")
     private String phone;
-
 
 }

@@ -15,13 +15,13 @@ public class UserDto {
     private String name;
     private int age;
     private String phone;
-    private String card_id;
+    private String cardId;
 
     public UserDto(UserEntity user) {
         this.email = user.getEmail();
         this.name = user.getName();
         this.age = user.getAge();
         this.phone = user.getPhone();
-        this.card_id = user.getCard_id();
+        this.cardId = user.getCardId();
     }
 }
