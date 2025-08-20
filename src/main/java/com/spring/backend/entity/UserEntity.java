@@ -28,8 +28,8 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "idCard")
-    private String idCard;
+    @Column(name = "card_id")
+    private String card_id;
 
     @Column(name = "phone")
     private String phone;

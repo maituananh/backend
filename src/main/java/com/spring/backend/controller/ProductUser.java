@@ -27,8 +27,8 @@ public class ProductUser {
     }
 
     @GetMapping("/{idCard}")
-    public UserDto getUserById(@PathVariable String idCard) {
-      //  return userService.getByIdCard(Long.parseLong(idCard));
+    public UserDto getUserById(@PathVariable String card_id) {
+     //   return userService.getByIdCard(Long.parseLong(card_id));
     }
 
     @GetMapping("/searchName")
@@ -36,8 +36,8 @@ public class ProductUser {
      //   return Collections.singletonList(userService.searchName(name));
     }
     @DeleteMapping("/{idCard}")
-    public void deleteUserById(@PathVariable String idCard) {
-        userService.delete(Long.parseLong(idCard));
+    public void deleteUserById(@PathVariable String card_id) {
+        userService.delete(Long.parseLong(card_id));
     }
     @PutMapping("/{id}")
     public  UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {

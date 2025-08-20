@@ -17,6 +17,6 @@ public interface ProductRepositoryUser extends JpaRepository<UserEntity, Long> {
 
     UserEntity findByPhone(String phone);
 
-    UserEntity fineByIdCard(String idCard);
+    UserEntity fineByIdCard(String card_id);
 
 }

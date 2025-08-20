@@ -30,15 +30,15 @@ public class UserService {
         userEntity.setName(userDto.getName());
         userEntity.setAge(userDto.getAge());
         userEntity.setPhone(userDto.getPhone());
-        userEntity.setIdCard(userDto.getIdCard());
+        userEntity.setCard_id(userDto.getCard_id());
 
         UserEntity saveUser = productRepositoryUser.save(userEntity);
 
         return new UserDto(saveUser);
     }
 
-    public UserDto getByIdCard(long idCard) {
-        UserEntity productUser = productRepositoryUser.fineByIdCard(String.valueOf(idCard));
+    public UserDto getByIdCard(long card_id) {
+        UserEntity productUser = productRepositoryUser.fineByIdCard(String.valueOf(card_id));
         return new UserDto(productUser);
     }
 
@@ -52,8 +52,8 @@ public class UserService {
         return (UserDto) userDto;
     }
 
-    public void delete(Long idCard) {
-        productRepositoryUser.deleteById(idCard);
+    public void delete(Long card_id) {
+        productRepositoryUser.deleteById(card_id);
     }
 
     public UserDto updateUser(Long id, UserDto userDto) {
@@ -62,7 +62,7 @@ public class UserService {
         userEntity.setName(userDto.getName());
         userEntity.setAge(userDto.getAge());
         userEntity.setPhone(userDto.getPhone());
-        userEntity.setIdCard(userDto.getIdCard());
+        userEntity.setCard_id(userDto.getCard_id());
 
         UserEntity saveUser = productRepositoryUser.save(userEntity);
 
