@@ -3,6 +3,7 @@ package com.spring.backend.controller;
 import com.spring.backend.dto.ProductDto;
 import com.spring.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,8 +32,11 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductDto> searchProduct(@RequestParam("name") String name) {
-        return productService.search(name);
+    public Page<ProductDto> searchProduct(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("name") String name) {
+        return productService.search(name, page, size);
     }
 
     @DeleteMapping("/{id}")

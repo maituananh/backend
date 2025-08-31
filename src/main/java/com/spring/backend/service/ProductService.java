@@ -4,6 +4,10 @@ import com.spring.backend.dto.ProductDto;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -42,14 +46,18 @@ public class ProductService {
         return new ProductDto(productEntity);
     }
 
-    public List<ProductDto> search(String name) {
-        List<ProductEntity> productEntities = productRepository.findByNameLikeIgnoreCase(name);
+    public Page<ProductDto> search(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProductEntity> pageProductEntity = productRepository.findByNameLikeIgnoreCase(name, pageable);
 
         List<ProductDto> productDtos = new ArrayList<>();
-        for (ProductEntity productEntity : productEntities) {
+        for (ProductEntity productEntity : pageProductEntity.getContent()) {
             productDtos.add(new ProductDto(productEntity));
         }
-        return productDtos;
+
+        return new PageImpl<>(productDtos,
+                pageable,
+                pageProductEntity.getTotalElements());
     }
 
 
