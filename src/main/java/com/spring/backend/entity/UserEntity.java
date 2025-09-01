@@ -1,37 +1,38 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Table(name = "users")
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column private String username;
 
-    @Column(name = "age")
-    private int age;
+  @Column private String password;
 
-    @Column(name = "email")
-    private String email;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "card_id")
-    private String cardId;
+  @Column(name = "age")
+  private int age;
 
-    @Column(name = "phone")
-    private String phone;
+  @Column(name = "email")
+  private String email;
 
+  @Column(name = "card_id")
+  private String cardId;
+
+  @Column(name = "phone")
+  private String phone;
 }
