@@ -1,18 +1,23 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: backend
   datasource:
-    url: jdbc:mysql://localhost:3306/pawn?createDatabaseIfNotExist=true
-    username: root
-    password: Anhkiet_2004
+#    mysql -u root -p pawn
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/pawn?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:Anhkiet_2004}
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update # or create, validate, none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+  security:
+    secret-key: ${JWT_SECRET_KEY:a89c31e68731757d7100da93c2e301b36ee46383f8f951784bae6817ae8fa6c5d0488aca222143ab3f8bb0d7fe74ace3c1817a00e96ef2d91ef767242469cb76d705356db74e5c9df85d51de35b8037d2582b016b7c4ebdf42115ab6ff60e57fce9fdce188e39449c2c9815a0e058d6b459d00f2d149ec1181081307fac682c4f03ab073169d4c1c391cc8e5e92b49e1ce8ce2e73742}
 
 server:
-  port: 8080
+  port: ${BE_PORT:8080}
