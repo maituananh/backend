@@ -1,4 +1,4 @@
-package com.spring.backend.dto;
+package com.spring.backend.dto.user;
 
 import com.spring.backend.entity.UserEntity;
 import lombok.AllArgsConstructor;

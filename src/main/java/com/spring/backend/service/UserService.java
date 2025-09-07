@@ -1,6 +1,6 @@
 package com.spring.backend.service;
 
-import com.spring.backend.dto.UserDto;
+import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.repository.UserRepository;
 import java.util.ArrayList;

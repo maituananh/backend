@@ -1,13 +1,12 @@
-package com.spring.backend.controller;
+package com.spring.backend.controller.user;
 
-import com.spring.backend.dto.UserDto;
+import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/users")
 public class UserController {
   @Autowired private UserService userService;
