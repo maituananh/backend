@@ -30,15 +30,7 @@ public class ProductService {
 
   public ProductDto createProduct(ProductDto productDto) {
     ProductEntity productEntity = new ProductEntity();
-    productEntity.setName(productDto.getName());
-    productEntity.setPrice(productDto.getPrice());
-    productEntity.setStartDay(productDto.getStartDay());
-    productEntity.setEndDate(productDto.getEndDate());
-    productEntity.setType(productDto.getType());
-
-    ProductEntity entitySaved = productRepository.save(productEntity);
-
-    return new ProductDto(entitySaved);
+      return getProductDto(productDto, productEntity);
   }
 
   public ProductDto getById(Long id) {
@@ -66,13 +58,17 @@ public class ProductService {
   public ProductDto updateById(Long id, ProductDto productDto) {
     ProductEntity productEntity = new ProductEntity();
     productEntity.setId(id);
-    productEntity.setName(productDto.getName());
-    productEntity.setPrice(productDto.getPrice());
-    productEntity.setStartDay(productDto.getStartDay());
-    productEntity.setEndDate(productDto.getEndDate());
-    productEntity.setType(productDto.getType());
-
-    ProductEntity productUpdated = productRepository.save(productEntity);
-    return new ProductDto(productUpdated);
+      return getProductDto(productDto, productEntity);
   }
+
+    private ProductDto getProductDto(ProductDto productDto, ProductEntity productEntity) {
+        productEntity.setName(productDto.getName());
+        productEntity.setPrice(productDto.getPrice());
+        productEntity.setStartDay(productDto.getStartDay());
+        productEntity.setEndDate(productDto.getEndDate());
+        productEntity.setType(productDto.getType());
+
+        ProductEntity productUpdated = productRepository.save(productEntity);
+        return new ProductDto(productUpdated);
+    }
 }
