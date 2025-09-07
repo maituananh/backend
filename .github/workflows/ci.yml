@@ -1,0 +1,48 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "anhkiet-branch" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Login Dockerhub
+      env:
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        DOCKER_IMAGE_NAME: ${{secrets.DOCKER_IMAGE_NAME}}
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+
+    - name: Push to Dockerhub
+      run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+
+#  deploy:
+#    runs-on: self-hosted
+#    needs: build
+#    if: github.ref == 'refs/heads/anhkiet-branch'
+#
+#    steps:
+#      - name: Pull Docker image
+#        run: sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+#
+#      - name: Delete old container if existed
+#        run: sudo docker rm -f ${{secrets.DOCKER_CONTAINER_NAME}} || true
+#
+#      - name: Run Docker container
+#        run: |
+#          sudo docker run -d -p ${{secrets.SERVER_PORT}}:${{secrets.SERVER_PORT}} \
+#            -e DB_HOST=${{ secrets.DB_HOST }} \
+#            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+#            --name ${{secrets.DOCKER_CONTAINER_NAME}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}
