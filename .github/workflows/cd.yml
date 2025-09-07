@@ -9,7 +9,12 @@ jobs:
   debug:
     runs-on: ubuntu-24.04
     steps:
-      - run: echo "Triggered by ${{ github.event.workflow_run.head_branch }}"
+      - name: debug
+        run: echo "Triggered by ${{ github.event.workflow_run.head_branch }}"
+
+      - name: Who am i?
+        run: who
+
   deploy:
     timeout-minutes: 5
     runs-on: self-hosted
@@ -17,9 +22,6 @@ jobs:
     steps:
       - name: Start deploy
         run: echo "🚀 Start deploy..."
-
-      - name: Who am i?
-        run: who
 
       - name: Pull Docker image
         run: sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
