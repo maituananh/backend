@@ -5,7 +5,6 @@ on:
     workflows: ["CI Pipeline"]
     types:
       - completed
-    branches: ["anhkiet-branch"]
 
 jobs:
   build:
