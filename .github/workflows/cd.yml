@@ -8,7 +8,10 @@ on:
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.head_branch == 'anhkiet-branch' }}
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'pull_request') &&
+      github.event.workflow_run.head_branch == 'anhkiet-branch'
     runs-on: self-hosted
 
     steps:
