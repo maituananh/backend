@@ -14,24 +14,23 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserEntity {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "age")
-    private int age;
+  @Column(name = "age")
+  private int age;
 
-    @Column(name = "email")
-    private String email;
+  @Column(name = "email")
+  private String email;
 
-    @Column(name = "card_id")
-    private String cardId;
+  @Column(name = "card_id")
+  private String cardId;
 
-    @Column(name = "phone")
-    private String phone;
-
+  @Column(name = "phone")
+  private String phone;
 }
