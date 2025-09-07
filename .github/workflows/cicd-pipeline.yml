@@ -7,9 +7,16 @@ on:
     branches: [ "*" ]
 
 jobs:
-
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR Title
+        uses: kontrolplane/pull-request-title-validator@v1.5.0 # Replace with your chosen action
+        with:
+          types: "feat,fix,chore,docs,style,refactor,perf,test,build,ci"
+          scopes: ".*" # Allow any scope, or define specific ones
   build:
-
+    needs: validate
     runs-on: ubuntu-24.04
 
     steps:
