@@ -27,3 +27,18 @@ jobs:
 
     - name: Push to Dockerhub
       run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    if: github.ref == 'refs/heads/anhkiet-branch'
+
+    steps:
+      - name: Pull Docker image
+        run: sudo docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+
+      - name: Delete old container if existed
+        run: sudo docker rm -f ${{secrets.DOCKER_CONTAINER_NAME}} || true
+
+      - name: Run Docker container
+        run: sudo docker run -d -p ${{secrets.SERVER_PORT}}:${{secrets.SERVER_PORT}} --name ${{secrets.DOCKER_CONTAINER_NAME}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}
