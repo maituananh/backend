@@ -8,11 +8,11 @@ on:
 
 jobs:
   debug:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - run: echo "Triggered by ${{ github.event.workflow_run.head_branch }}"
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'anhkiet-branch' }}
+#    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'anhkiet-branch' }}
     runs-on: self-hosted
 
     steps:
