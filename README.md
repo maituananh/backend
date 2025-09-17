@@ -9,3 +9,8 @@ How to do CI/CD?
 2. Create developer user: sudo addUser developer
 3. Allow docker for developer user: sudo usermod -aG docker developer
 4. Run github-runner by background: nohup ./run.sh > runner.log 2>&1 &
+
+How to login?
+1: Request by POST: http://localhost:8080/api/auth/token
+2: Enter body { "username": "admin", "password": "admin" }
+3: Get accessToken and refreshToken

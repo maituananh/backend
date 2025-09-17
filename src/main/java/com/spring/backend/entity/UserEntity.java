@@ -1,15 +1,13 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Table(name = "users")
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
@@ -18,6 +16,12 @@ public class UserEntity {
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(name = "username")
+  private String username;
+
+  @Column(name = "password")
+  private String password;
 
   @Column(name = "name")
   private String name;

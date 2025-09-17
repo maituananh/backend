@@ -1,4 +1,4 @@
-package com.spring.backend.dto;
+package com.spring.backend.dto.product;
 
 import com.spring.backend.entity.ProductEntity;
 import java.time.Instant;

@@ -1,6 +1,6 @@
 package com.spring.backend.service;
 
-import com.spring.backend.dto.ProductDto;
+import com.spring.backend.dto.product.ProductDto;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.repository.ProductRepository;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class ProductService {
 
   public ProductDto createProduct(ProductDto productDto) {
     ProductEntity productEntity = new ProductEntity();
-      return getProductDto(productDto, productEntity);
+    return getProductDto(productDto, productEntity);
   }
 
   public ProductDto getById(Long id) {
@@ -58,17 +58,17 @@ public class ProductService {
   public ProductDto updateById(Long id, ProductDto productDto) {
     ProductEntity productEntity = new ProductEntity();
     productEntity.setId(id);
-      return getProductDto(productDto, productEntity);
+    return getProductDto(productDto, productEntity);
   }
 
-    private ProductDto getProductDto(ProductDto productDto, ProductEntity productEntity) {
-        productEntity.setName(productDto.getName());
-        productEntity.setPrice(productDto.getPrice());
-        productEntity.setStartDay(productDto.getStartDay());
-        productEntity.setEndDate(productDto.getEndDate());
-        productEntity.setType(productDto.getType());
+  private ProductDto getProductDto(ProductDto productDto, ProductEntity productEntity) {
+    productEntity.setName(productDto.getName());
+    productEntity.setPrice(productDto.getPrice());
+    productEntity.setStartDay(productDto.getStartDay());
+    productEntity.setEndDate(productDto.getEndDate());
+    productEntity.setType(productDto.getType());
 
-        ProductEntity productUpdated = productRepository.save(productEntity);
-        return new ProductDto(productUpdated);
-    }
+    ProductEntity productUpdated = productRepository.save(productEntity);
+    return new ProductDto(productUpdated);
+  }
 }

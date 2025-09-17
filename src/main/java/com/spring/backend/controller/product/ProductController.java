@@ -1,6 +1,6 @@
-package com.spring.backend.controller;
+package com.spring.backend.controller.product;
 
-import com.spring.backend.dto.ProductDto;
+import com.spring.backend.dto.product.ProductDto;
 import com.spring.backend.service.ProductService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/products")
 public class ProductController {
 
