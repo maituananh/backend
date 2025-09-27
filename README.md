@@ -48,9 +48,10 @@ Start the server
   ./gradlew bootRun
 ```
 ## Run Locally
+AUTHENTICATION API
 
 - Login:
-`curl --location 'http://localhost:8080/api/auth/token' \
+`curl --location --request POST 'http://localhost:8080/api/auth/token' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: JSESSIONID=14C1B55026808D21AEA99858E483CEA8' \
 --data '{
@@ -66,13 +67,33 @@ Start the server
 
 - Renew token:
   `
-curl --location 'http://localhost:8080/api/auth/refresh-token' \
+  curl --location --request POST 'http://localhost:8080/api/auth/refresh-token' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: JSESSIONID=14C1B55026808D21AEA99858E483CEA8' \
 --data '{
     "refreshToken": "refresh-token"
 }'
-  `
+
+PRODUCT API
+
+- Create product
+`curl --location --request POST 'http://localhost:8080/api/products' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Authorization: access-token' \
+--header 'Cookie: JSESSIONID=23F6878A229C193A3B655A821147BB9C' \
+--data '{
+    "name": "product1",
+    "price": 12.2,
+    "startDay": "2025-08-09T00:00:00Z",
+    "endDate": "2025-08-09T00:00:00Z",
+    "type": "abc"
+}'
+`
+- Get Product
+`curl --location 'http://localhost:8080/api/products' \
+--header 'Authorization: access-token' \
+--header 'Cookie: JSESSIONID=23F6878A229C193A3B655A821147BB9C'
+`
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your application.yml file
