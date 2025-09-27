@@ -49,8 +49,7 @@ Start the server
 ```
 ## Run Locally
 
-- Login
-
+- Login:
 `curl --location 'http://localhost:8080/api/users/token' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -59,12 +58,12 @@ Start the server
 }'
 `
 
-- Logout
+- Logout:
   `curl --location --request POST 'http://localhost:8080/api/auth/logout' \
   --header 'Authorization: Bearer access-token'
   `
 
-- Renew token
+- Renew token:
   `
     curl --location 'http://localhost:8080/api/auth/refresh-token' \
   --header 'Content-Type: application/json' \
