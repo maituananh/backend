@@ -6,10 +6,8 @@ import com.spring.backend.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,6 +40,18 @@ public class ProductService {
     Pageable pageable = PageRequest.of(page, size);
     Page<ProductEntity> pageProductEntity =
         productRepository.findByNameLikeIgnoreCase(name, pageable);
+
+    List<ProductDto> productDtos = new ArrayList<>();
+    for (ProductEntity productEntity : pageProductEntity.getContent()) {
+      productDtos.add(new ProductDto(productEntity));
+    }
+
+    return new PageImpl<>(productDtos, pageable, pageProductEntity.getTotalElements());
+  }
+
+  public Page<ProductDto> searchByType(String type, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("startDay").descending());
+    Page<ProductEntity> pageProductEntity = productRepository.findByType(type, pageable);
 
     List<ProductDto> productDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
