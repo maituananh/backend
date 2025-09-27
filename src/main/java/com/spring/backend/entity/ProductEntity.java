@@ -4,18 +4,17 @@ import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Table(name = "products")
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@SuperBuilder
 public class ProductEntity extends BaseEntity {
+  public ProductEntity() {}
 
   @Column(name = "name")
   private String name;
@@ -41,6 +40,20 @@ public class ProductEntity extends BaseEntity {
   @Column(name = "status")
   private ProductStatus status;
 
-  @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<ImageEntity> images;
+
+  public void addImage(ImageEntity image) {
+    images.add(image);
+    image.setProduct(this);
+  }
+
+  public void setImages(List<ImageEntity> images) {
+    this.images = images;
+    if (images != null) {
+      for (ImageEntity image : images) {
+        image.setProduct(this);
+      }
+    }
+  }
 }

@@ -2,7 +2,7 @@ package com.spring.backend.controller.auth;
 
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.dto.auth.AuthResponseDto;
-import com.spring.backend.dto.auth.LogoutRequestDto;
+import com.spring.backend.dto.auth.RenewTokenRequestDto;
 import com.spring.backend.helper.JwtTokenHelper;
 import com.spring.backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class AuthController {
   }
 
   @PostMapping("/refresh-token")
-  public AuthResponseDto renewToken(@RequestBody LogoutRequestDto requestDto)
+  public AuthResponseDto renewToken(@RequestBody RenewTokenRequestDto requestDto)
       throws BadRequestException {
     return authService.handleRenewToken(requestDto);
   }

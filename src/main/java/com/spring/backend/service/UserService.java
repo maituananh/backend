@@ -7,14 +7,15 @@ import com.spring.backend.enums.UserRole;
 import com.spring.backend.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-  @Autowired private UserRepository userRepository;
+  private final UserRepository userRepository;
 
   public List<UserDto> getAll() {
     List<UserEntity> userEntity = userRepository.findAll();
@@ -27,13 +28,15 @@ public class UserService {
   }
 
   public UserDto createUser(UserDto userDto) {
-    UserEntity userEntity = new UserEntity();
-    userEntity.setEmail(userDto.getEmail());
-    userEntity.setName(userDto.getName());
-    userEntity.setAge(userDto.getAge());
-    userEntity.setPhone(userDto.getPhone());
-    userEntity.setCardId(userDto.getCardId());
-    userEntity.setRole(UserRole.CUSTOMER);
+    UserEntity userEntity =
+        UserEntity.builder()
+            .email(userDto.getEmail())
+            .name(userDto.getName())
+            .age(userDto.getAge())
+            .phone(userDto.getPhone())
+            .cardId(userDto.getCardId())
+            .role(UserRole.CUSTOMER)
+            .build();
 
     UserEntity saveUser = userRepository.save(userEntity);
 
