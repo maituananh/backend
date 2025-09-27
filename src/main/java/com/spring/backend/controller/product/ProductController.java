@@ -36,6 +36,12 @@ public class ProductController {
     return productService.search(name, page, size);
   }
 
+  @GetMapping("/search-by-type")
+  public Page<ProductDto> searchByType(
+      @RequestParam String type, @RequestParam int page, @RequestParam int size) {
+    return productService.searchByType(type, page, size);
+  }
+
   @DeleteMapping("/{id}")
   public void deleteById(@PathVariable("id") Long id) {
     productService.deleteById(id);
