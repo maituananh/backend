@@ -50,8 +50,9 @@ Start the server
 ## Run Locally
 
 - Login:
-`curl --location 'http://localhost:8080/api/users/token' \
+`curl --location 'http://localhost:8080/api/auth/token' \
 --header 'Content-Type: application/json' \
+--header 'Cookie: JSESSIONID=14C1B55026808D21AEA99858E483CEA8' \
 --data '{
     "username": "admin",
     "password": "admin"
@@ -60,16 +61,17 @@ Start the server
 
 - Logout:
   `curl --location --request POST 'http://localhost:8080/api/auth/logout' \
-  --header 'Authorization: Bearer access-token'
+--header 'Authorization: access-token'
   `
 
 - Renew token:
   `
-    curl --location 'http://localhost:8080/api/auth/refresh-token' \
-  --header 'Content-Type: application/json' \
-  --data '{
-      "refreshToken": "access-token"
-  }'
+curl --location 'http://localhost:8080/api/auth/refresh-token' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: JSESSIONID=14C1B55026808D21AEA99858E483CEA8' \
+--data '{
+    "refreshToken": "refresh-token"
+}'
   `
 ## Environment Variables
 
