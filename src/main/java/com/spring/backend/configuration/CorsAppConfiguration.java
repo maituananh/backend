@@ -21,7 +21,7 @@ public class CorsAppConfiguration {
     configuration.addAllowedHeader("*"); // Allowed HTTP methods
     configuration.addAllowedMethod("*"); // Allowed request headers
     configuration.setAllowCredentials(
-        true); // Allow credentials (e.g., cookies, authorization headers)
+        false); // Allow credentials (e.g., cookies, authorization headers)
     configuration.setExposedHeaders(ALLOW_EXPORT_HEADERS); // Headers to expose to the client
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
