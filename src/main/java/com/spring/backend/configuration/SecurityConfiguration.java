@@ -23,7 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfiguration {
 
   private static final String[] WHITE_LIST = {
-    "/api/auth/token", "/api/auth/renew-token", "/api/users/**"
+    "/api/auth/token", "/api/auth/refresh-token"
   };
 
   private final InterceptorConfiguration interceptorConfiguration;
