@@ -5,7 +5,7 @@ spring:
     name: backend
   datasource:
 #    mysql -u root -p pawn
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/pawn?createDatabaseIfNotExist=true
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/pawn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:Anhkiet_2004}
   jpa:

@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+
+  mysql:
+    image: mysql:8.0.0
+    restart: always
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: r00t
+      MYSQL_PASSWORD: r00t
+      MYSQL_DATABASE: pawn
+
+  pawn-service-be:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+#      - SPRING_PROFILES_ACTIVE=mysql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/pawn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=r00t
