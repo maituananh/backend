@@ -3,6 +3,14 @@
 
 This project will build a website (Pawn-service)
 
+## Quick start
+```bash
+ docker-compose up -d
+```
+
+## Swagger
+1. http://localhost:8080/swagger-ui/index.html
+2. /api/auth/token with username and password default admin/admin
 
 ## Acknowledgements
 Backend:
@@ -12,8 +20,6 @@ Backend:
 
 Front-end
 - Reactjs
-
-
 
 ## Documentation
 
