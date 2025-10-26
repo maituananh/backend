@@ -1,11 +1,13 @@
 package com.spring.backend.service;
 
+import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +40,14 @@ public class UserService {
 
   public UserDto getByIdCard(Long id) {
     UserEntity productUser = userRepository.findById(id).get();
+    return new UserDto(productUser);
+  }
+
+  public UserDto getMyInfo() {
+    UserDetailsCustom currentUser =
+        (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    UserEntity productUser = userRepository.findById(currentUser.getId()).get();
     return new UserDto(productUser);
   }
 

@@ -26,6 +26,11 @@ public class UserController {
     return userService.getByIdCard(id);
   }
 
+  @GetMapping("/me")
+  public UserDto getMyInfo() {
+    return userService.getMyInfo();
+  }
+
   @GetMapping("/searchName")
   public List<UserDto> searchUserByName(@RequestParam("name") String name) {
     return userService.searchName(name);
