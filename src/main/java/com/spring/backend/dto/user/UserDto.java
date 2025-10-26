@@ -13,6 +13,7 @@ import lombok.Setter;
 public class UserDto {
   private String email;
   private String name;
+  private String username;
   private int age;
   private String phone;
   private String cardId;
@@ -23,5 +24,6 @@ public class UserDto {
     this.age = user.getAge();
     this.phone = user.getPhone();
     this.cardId = user.getCardId();
+    this.username = user.getUsername();
   }
 }
