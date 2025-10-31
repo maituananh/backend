@@ -134,3 +134,9 @@ How to do CI/CD?
 4. Run github-runner by background: nohup ./run.sh > runner.log 2>&1 &
 ```
 
+## OAUTH2
+Grant_type = CODE
+1. http://localhost:8080/oauth2/authorize?response_type=code&client_id=client&redirect_uri=http://localhost:8081/login/oauth2/code/client&scope=openid
+2. this url will go to login page
+3. enter username and password to authen "who am i?"
+4. re-access step-1 to get code

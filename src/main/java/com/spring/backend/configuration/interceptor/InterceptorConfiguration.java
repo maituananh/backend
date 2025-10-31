@@ -41,9 +41,8 @@ public class InterceptorConfiguration extends OncePerRequestFilter {
     }
 
     token = token.replace(TOKEN_PREFIX, "");
-    String tokenType = jwtTokenHelper.extractTokenType(token);
 
-    if (!ACCESS_TOKEN.equals(tokenType)) {
+    if (!jwtTokenHelper.extractTokenType(token)) {
       throw new BadCredentialsException("Invalid token");
     }
 

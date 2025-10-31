@@ -8,6 +8,7 @@ import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.JwtTokenHelper;
 import com.spring.backend.repository.TokenRepository;
 import com.spring.backend.repository.UserRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -61,12 +62,11 @@ public class AuthService {
   }
 
   private AuthResponseDto generateToken(String username) {
-    String refreshToken = jwtTokenHelper.generateRefreshToken(username);
+    UUID tokenId = UUID.randomUUID();
+    String refreshToken = jwtTokenHelper.generateRefreshToken(username, tokenId);
+    String accessToken = jwtTokenHelper.generateToken(username, tokenId);
 
-    TokenEntity tokenEntity =
-        tokenRepository.save(TokenEntity.builder().refreshToken(refreshToken).build());
-
-    String accessToken = jwtTokenHelper.generateToken(username, tokenEntity.getId());
+    tokenRepository.save(TokenEntity.builder().refreshToken(refreshToken).build());
 
     return AuthResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }
