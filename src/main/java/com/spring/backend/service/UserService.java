@@ -3,6 +3,7 @@ package com.spring.backend.service;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
+import com.spring.backend.enums.UserRole;
 import com.spring.backend.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class UserService {
     userEntity.setAge(userDto.getAge());
     userEntity.setPhone(userDto.getPhone());
     userEntity.setCardId(userDto.getCardId());
+    userEntity.setRole(UserRole.CUSTOMER);
 
     UserEntity saveUser = userRepository.save(userEntity);
 

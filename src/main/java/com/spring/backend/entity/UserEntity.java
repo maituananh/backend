@@ -1,5 +1,6 @@
 package com.spring.backend.entity;
 
+import com.spring.backend.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,17 +11,12 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class UserEntity extends BaseEntity {
 
-  @Id
-  @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @Column(name = "username")
+  @Column(name = "username", unique = true, nullable = false, updatable = false)
   private String username;
 
-  @Column(name = "password")
+  @Column(name = "password", nullable = false)
   private String password;
 
   @Column(name = "name")
@@ -29,12 +25,15 @@ public class UserEntity {
   @Column(name = "age")
   private int age;
 
-  @Column(name = "email")
+  @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "card_id")
+  @Column(name = "card_id", nullable = false, updatable = false)
   private String cardId;
 
-  @Column(name = "phone")
+  @Column(name = "phone", nullable = false)
   private String phone;
+
+  @Column(name = "role", nullable = false)
+  private UserRole role;
 }

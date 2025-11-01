@@ -1,6 +1,7 @@
 package com.spring.backend.configuration.database;
 
 import com.spring.backend.entity.UserEntity;
+import com.spring.backend.enums.UserRole;
 import com.spring.backend.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class InitDB implements CommandLineRunner {
   private final UserRepository userRepository;
 
   @Override
-  public void run(String... args) throws Exception {
+  public void run(String... args) {
     Optional<UserEntity> userEntity = userRepository.findByUsername("admin");
 
     if (userEntity.isEmpty()) {
@@ -26,6 +27,9 @@ public class InitDB implements CommandLineRunner {
               .password(passwordEncoder.encode("admin"))
               .name("admin")
               .email("admin@gmail.com")
+              .phone("123456789")
+              .cardId("044444444444444")
+              .role(UserRole.ADMIN)
               .build());
     }
   }

@@ -27,8 +27,10 @@ public class ProductService {
   }
 
   public ProductDto createProduct(ProductDto productDto) {
-    ProductEntity productEntity = new ProductEntity();
-    return getProductDto(productDto, productEntity);
+    ProductEntity productEntity = toProductDto(productDto);
+
+    ProductEntity productUpdated = productRepository.save(productEntity);
+    return new ProductDto(productUpdated);
   }
 
   public ProductDto getById(Long id) {
@@ -66,19 +68,19 @@ public class ProductService {
   }
 
   public ProductDto updateById(Long id, ProductDto productDto) {
-    ProductEntity productEntity = new ProductEntity();
+    ProductEntity productEntity = toProductDto(productDto);
     productEntity.setId(id);
-    return getProductDto(productDto, productEntity);
+    return new ProductDto(productRepository.save(productEntity));
   }
 
-  private ProductDto getProductDto(ProductDto productDto, ProductEntity productEntity) {
+  private ProductEntity toProductDto(ProductDto productDto) {
+    ProductEntity productEntity = new ProductEntity();
     productEntity.setName(productDto.getName());
     productEntity.setPrice(productDto.getPrice());
     productEntity.setStartDay(productDto.getStartDay());
     productEntity.setEndDate(productDto.getEndDate());
     productEntity.setType(productDto.getType());
 
-    ProductEntity productUpdated = productRepository.save(productEntity);
-    return new ProductDto(productUpdated);
+    return productEntity;
   }
 }
