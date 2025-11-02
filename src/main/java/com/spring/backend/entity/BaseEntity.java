@@ -3,14 +3,20 @@ package com.spring.backend.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
+@SuperBuilder(toBuilder = true)
 @MappedSuperclass
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseEntity implements Serializable {
 
   @Id

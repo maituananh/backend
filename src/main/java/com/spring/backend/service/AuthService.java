@@ -2,7 +2,7 @@ package com.spring.backend.service;
 
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.dto.auth.AuthResponseDto;
-import com.spring.backend.dto.auth.LogoutRequestDto;
+import com.spring.backend.dto.auth.RenewTokenRequestDto;
 import com.spring.backend.entity.TokenEntity;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.JwtTokenHelper;
@@ -45,8 +45,9 @@ public class AuthService {
             });
   }
 
-  public AuthResponseDto handleRenewToken(LogoutRequestDto requestDto) throws BadRequestException {
-    String refreshToken = requestDto.getAccessToken().replace(JwtTokenHelper.TOKEN_PREFIX, "");
+  public AuthResponseDto handleRenewToken(RenewTokenRequestDto requestDto)
+      throws BadRequestException {
+    String refreshToken = requestDto.getRefreshToken().replace(JwtTokenHelper.TOKEN_PREFIX, "");
     TokenEntity tokenEntity = tokenRepository.findByRefreshToken(refreshToken).orElseThrow();
 
     if (StringUtils.isNoneBlank(tokenEntity.getAccessToken())) {

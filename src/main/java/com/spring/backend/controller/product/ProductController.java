@@ -1,6 +1,7 @@
 package com.spring.backend.controller.product;
 
-import com.spring.backend.dto.product.ProductDto;
+import com.spring.backend.dto.product.ProductRequestDto;
+import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.service.ProductService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +15,22 @@ public class ProductController {
   @Autowired private ProductService productService;
 
   @PostMapping
-  public ProductDto createProduct(@RequestBody ProductDto productDto) {
-    return productService.createProduct(productDto);
+  public ProductResponseDto createProduct(@RequestBody ProductRequestDto dto) {
+    return productService.createProduct(dto);
   }
 
   @GetMapping
-  public List<ProductDto> getAll() {
+  public List<ProductResponseDto> getAll() {
     return productService.getAll();
   }
 
   @GetMapping("/{id}")
-  public ProductDto getById(@PathVariable("id") Long id) {
+  public ProductResponseDto getById(@PathVariable("id") Long id) {
     return productService.getById(id);
   }
 
   @GetMapping("/search")
-  public Page<ProductDto> searchProduct(
+  public Page<ProductResponseDto> searchProduct(
       @RequestParam("page") int page,
       @RequestParam("size") int size,
       @RequestParam("name") String name) {
@@ -37,7 +38,7 @@ public class ProductController {
   }
 
   @GetMapping("/search-by-type")
-  public Page<ProductDto> searchByType(
+  public Page<ProductResponseDto> searchByType(
       @RequestParam String type, @RequestParam int page, @RequestParam int size) {
     return productService.searchByType(type, page, size);
   }
@@ -48,7 +49,8 @@ public class ProductController {
   }
 
   @PutMapping("/{id}")
-  public ProductDto updateById(@PathVariable("id") Long id, @RequestBody ProductDto productDto) {
-    return productService.updateById(id, productDto);
+  public ProductResponseDto updateById(
+      @PathVariable("id") Long id, @RequestBody ProductRequestDto dto) {
+    return productService.updateById(id, dto);
   }
 }

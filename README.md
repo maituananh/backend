@@ -27,7 +27,6 @@ Front-end
 
 [Back-end uses anhkiet-branch branch](https://github.com/maituananh/front-app)
 
-
 ## Installation
 
 Clone the project
@@ -114,6 +113,11 @@ Database:
 
 `DB_PASSWORD`
 
+`AWS_S3_ACCESS_KEY`
+
+`AWS_S3_SECRET_KEY`
+
+`AWS_S3_ENDPOINT`
 
 ## Running Tests
 

@@ -3,15 +3,15 @@ package com.spring.backend.entity;
 import com.spring.backend.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Table(name = "users")
 @Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@SuperBuilder
 public class UserEntity extends BaseEntity {
+  public UserEntity() {}
 
   @Column(name = "username", unique = true, nullable = false, updatable = false)
   private String username;

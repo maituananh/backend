@@ -1,30 +1,35 @@
 package com.spring.backend.dto.product;
 
+import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.entity.ProductEntity;
 import java.time.Instant;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDto {
+public class ProductResponseDto {
   private Long id;
   private String name;
   private Double price;
   private Instant startDay;
   private Instant endDate;
   private String type;
+  private List<ImageResponseDto> images;
 
-  public ProductDto(ProductEntity productEntity) {
+  public ProductResponseDto(ProductEntity productEntity) {
     this.id = productEntity.getId();
     this.name = productEntity.getName();
     this.price = productEntity.getPrice();
     this.startDay = productEntity.getStartDay();
     this.endDate = productEntity.getEndDate();
     this.type = productEntity.getType();
+    this.images =
+        productEntity.getImages().stream()
+            .map(i -> ImageResponseDto.builder().id(i.getId()).url(i.getFileName()).build())
+            .toList();
   }
 }

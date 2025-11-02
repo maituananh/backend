@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogoutRequestDto {
+public class RenewTokenRequestDto {
 
-  private String accessToken;
+  private String refreshToken;
 }
