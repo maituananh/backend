@@ -1,5 +1,6 @@
 package com.spring.backend.controller.product;
 
+import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.service.ProductService;
@@ -25,7 +26,7 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public ProductResponseDto getById(@PathVariable("id") Long id) {
+  public ProductDetailResponseDto getById(@PathVariable("id") Long id) {
     return productService.getById(id);
   }
 

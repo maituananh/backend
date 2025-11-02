@@ -2,18 +2,21 @@ package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.image.ImageResponseDto;
+import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.entity.ImageEntity;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.service.mapper.ProductMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -24,48 +27,43 @@ public class ProductService {
   private final S3Adapter s3Adapter;
 
   public List<ProductResponseDto> getAll() {
-    List<ProductEntity> productEntities = productRepository.findAll();
+    List<ProductEntity> entities = productRepository.findAll();
 
-    List<ProductResponseDto> dtos = new ArrayList<>();
-    for (ProductEntity productEntity : productEntities) {
-      List<ImageResponseDto> images =
-          productEntity.getImages().stream()
-              .map(
-                  image ->
-                      ImageResponseDto.builder()
-                          .id(image.getId())
-                          .url(s3Adapter.getUrl(image.getFileName()))
-                          .build())
-              .toList();
-
-      ProductResponseDto dto =
-          ProductResponseDto.builder()
-              .name(productEntity.getName())
-              .price(productEntity.getPrice())
-              .id(productEntity.getId())
-              .type(productEntity.getType())
-              .startDay(productEntity.getStartDay())
-              .endDate(productEntity.getEndDate())
-              .type(productEntity.getType())
-              .images(images)
-              .build();
-
-      dtos.add(dto);
-    }
-
-    return dtos;
+    return entities.stream()
+        .map(
+            p -> {
+              if (CollectionUtils.isEmpty(p.getImages())) {
+                return ProductMapper.toProductResponse(p, null);
+              }
+              String image = s3Adapter.getUrl(p.getImages().getFirst().getFileName());
+              return ProductMapper.toProductResponse(p, image);
+            })
+        .toList();
   }
 
   public ProductResponseDto createProduct(ProductRequestDto dto) {
-    ProductEntity productEntity = toProductEntity(dto);
+    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+
+    ProductEntity productEntity = ProductMapper.toProductEntity(dto, imageEntities);
 
     ProductEntity productUpdated = productRepository.save(productEntity);
     return new ProductResponseDto(productUpdated);
   }
 
-  public ProductResponseDto getById(Long id) {
-    ProductEntity productEntity = productRepository.findById(id).get();
-    return new ProductResponseDto(productEntity);
+  public ProductDetailResponseDto getById(Long id) {
+    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+
+    List<ImageResponseDto> images =
+        productEntity.getImages().stream()
+            .map(
+                i ->
+                    ImageResponseDto.builder()
+                        .url(s3Adapter.getUrl(i.getFileName()))
+                        .id(i.getId())
+                        .build())
+            .toList();
+
+    return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
   public Page<ProductResponseDto> search(String name, int page, int size) {
@@ -98,26 +96,11 @@ public class ProductService {
   }
 
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
-    ProductEntity productEntity = toProductEntity(dto);
-    productEntity.setId(id);
+    //    ProductEntity productEntity = ProductMapper.toProductEntity(dto);
+    //    productEntity.setId(id);
+    //
+    //    return new ProductResponseDto(productRepository.save(productEntity));
 
-    return new ProductResponseDto(productRepository.save(productEntity));
-  }
-
-  private ProductEntity toProductEntity(ProductRequestDto dto) {
-    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
-
-    ProductEntity product =
-        ProductEntity.builder()
-            .name(dto.getName())
-            .price(dto.getPrice())
-            .startDay(dto.getStartDay())
-            .endDate(dto.getEndDate())
-            .type(dto.getType())
-            .build();
-
-    product.setImages(imageEntities);
-
-    return product;
+    return new ProductResponseDto();
   }
 }
