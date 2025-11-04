@@ -18,9 +18,9 @@ public class InitDB implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    Optional<UserEntity> userEntity = userRepository.findByUsername("admin");
+    Optional<UserEntity> adminEntity = userRepository.findByUsername("admin");
 
-    if (userEntity.isEmpty()) {
+    if (adminEntity.isEmpty()) {
       userRepository.save(
           UserEntity.builder()
               .username("admin")
@@ -30,6 +30,21 @@ public class InitDB implements CommandLineRunner {
               .phone("123456789")
               .cardId("044444444444444")
               .role(UserRole.ADMIN)
+              .build());
+    }
+
+    Optional<UserEntity> userEntity = userRepository.findByUsername("user");
+
+    if (userEntity.isEmpty()) {
+      userRepository.save(
+          UserEntity.builder()
+              .username("user")
+              .password(passwordEncoder.encode("user"))
+              .name("user")
+              .email("user@gmail.com")
+              .phone("123456789")
+              .cardId("044444444444444")
+              .role(UserRole.CUSTOMER)
               .build());
     }
   }
