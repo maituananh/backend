@@ -23,9 +23,9 @@ Front-end
 
 ## Documentation
 
-[Front-end uses anhkiet branch](https://github.com/maituananh/front-app)
+[Front-end](https://github.com/maituananh/pawn-service-fe.git)
 
-[Back-end uses anhkiet-branch branch](https://github.com/maituananh/front-app)
+[Back-end uses anhkiet-branch branch](https://github.com/maituananh/backend.git)
 
 ## Installation
 
@@ -53,6 +53,10 @@ Start the server
   ./gradlew bootRun
 ```
 ## Run Locally
+ADMIN account: admin/admin
+
+CUSTOMER account: user/user
+
 AUTHENTICATION API
 
 - Login:
