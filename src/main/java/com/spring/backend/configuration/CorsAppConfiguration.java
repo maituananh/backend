@@ -17,11 +17,11 @@ public class CorsAppConfiguration {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("*"); // Specify allowed origins
-    configuration.addAllowedHeader("*"); // Allowed HTTP methods
-    configuration.addAllowedMethod("*"); // Allowed request headers
-    configuration.setAllowCredentials(
-        false); // Allow credentials (e.g., cookies, authorization headers)
+    configuration.setAllowedOrigins(List.of("*")); // Specify allowed origins
+    configuration.setAllowedHeaders(List.of("*")); // Allowed HTTP methods
+    configuration.setAllowedMethods(
+        List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed request headers
+    configuration.setAllowCredentials(false);
     configuration.setExposedHeaders(ALLOW_EXPORT_HEADERS); // Headers to expose to the client
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
