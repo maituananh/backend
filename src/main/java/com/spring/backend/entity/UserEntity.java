@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 public class UserEntity extends BaseEntity {
   public UserEntity() {}
 
-  @Column(name = "username", unique = true, nullable = false, updatable = false)
+  @Column(name = "username", unique = true, nullable = true, updatable = false)
   private String username;
 
   @Column(name = "password", nullable = false)
@@ -34,6 +34,7 @@ public class UserEntity extends BaseEntity {
   @Column(name = "phone", nullable = false)
   private String phone;
 
-  @Column(name = "role", nullable = false)
+  @Column(name = "`role`", nullable = false)
+  @Enumerated(EnumType.STRING)
   private UserRole role;
 }
