@@ -1,6 +1,6 @@
 package com.spring.backend.dto.category;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.*;
 
 @Getter
@@ -13,8 +13,8 @@ public class CategoryResponseDto {
   private String name;
   private String note;
   private Boolean isActive;
-  private LocalDateTime createdAt;
-  private String createdBy;
-  private LocalDateTime updatedAt;
-  private String updatedBy;
+  private Instant createdAt;
+  private Long createdBy;
+  private Instant updatedAt;
+  private Long updatedBy;
 }

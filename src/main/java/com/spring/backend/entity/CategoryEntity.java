@@ -1,7 +1,7 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -26,14 +26,14 @@ public class CategoryEntity {
   private Boolean isActive;
 
   @Column(name = "created_at")
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   @Column(name = "created_by")
-  private String createdBy;
+  private Long createdBy;
 
   @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+  private Instant updatedAt;
 
   @Column(name = "updated_by")
-  private String updatedBy;
+  private Long updatedBy;
 }

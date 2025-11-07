@@ -3,8 +3,9 @@ package com.spring.backend.service;
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.entity.CategoryEntity;
+import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.CategoryRepository;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ public class CategoryServiceImpl implements CategoryService {
 
   private final CategoryRepository categoryRepository;
 
+  private final UserHelper userHelper;
+
   @Override
   public CategoryResponseDto createCategory(CategoryRequestDto dto) {
 
@@ -24,8 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
             .name(dto.getName())
             .note(dto.getNote())
             .isActive(true)
-            .createdAt(LocalDateTime.now())
-            .createdBy("admin")
+            .createdAt(Instant.now())
+            .createdBy(1L)
             .build();
 
     categoryRepository.save(entity);
@@ -47,9 +50,9 @@ public class CategoryServiceImpl implements CategoryService {
         .note(entity.getNote())
         .isActive(entity.getIsActive())
         .createdAt(entity.getCreatedAt())
-        .createdBy(entity.getCreatedBy())
+        .createdBy(1L)
         .updatedAt(entity.getUpdatedAt())
-        .updatedBy(entity.getUpdatedBy())
+        .updatedBy(1L)
         .build();
   }
 }
