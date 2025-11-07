@@ -26,14 +26,17 @@ public class S3Adapter {
   private final S3Presigner s3Presigner;
 
   @SneakyThrows
-  public UploadFileDto uploadFile(MultipartFile file) {
-    String key = FileUtils.createNewName(file.getOriginalFilename());
+  public UploadFileDto uploadFile(MultipartFile multipartFile) {
+    String key = FileUtils.createNewName(multipartFile.getOriginalFilename());
 
     PutObjectRequest putObjectRequest =
-        PutObjectRequest.builder().bucket(bucketName).key(key).build();
+        PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .contentType(multipartFile.getContentType())
+            .build();
 
-    s3Client.putObject(
-        putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+    s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.getBytes()));
 
     return UploadFileDto.builder().url(getUrl(key)).key(key).build();
   }
