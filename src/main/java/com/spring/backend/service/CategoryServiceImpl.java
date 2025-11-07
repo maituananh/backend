@@ -17,7 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
   private final CategoryRepository categoryRepository;
 
   @Override
-  public CategoryResponseDto createCategory(CategoryRequestDto dto, String createdBy) {
+  public CategoryResponseDto createCategory(CategoryRequestDto dto) {
 
     CategoryEntity entity =
         CategoryEntity.builder()
@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
             .note(dto.getNote())
             .isActive(true)
             .createdAt(LocalDateTime.now())
-            .createdBy(createdBy)
+            .createdBy("admin")
             .build();
 
     categoryRepository.save(entity);

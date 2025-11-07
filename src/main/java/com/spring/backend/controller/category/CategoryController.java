@@ -15,7 +15,7 @@ public class CategoryController {
 
   @PostMapping
   public CategoryResponseDto createCategory(@RequestBody CategoryRequestDto request) {
-    return categoryService.createCategory(request, "admin");
+    return categoryService.createCategory(request);
   }
 
   @GetMapping
