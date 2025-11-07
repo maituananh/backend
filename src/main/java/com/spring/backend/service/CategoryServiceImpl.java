@@ -43,6 +43,32 @@ public class CategoryServiceImpl implements CategoryService {
         .collect(Collectors.toList());
   }
 
+  @Override
+  public CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto) {
+    CategoryEntity entity =
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    entity.setName(dto.getName());
+    entity.setNote(dto.getNote());
+    entity.setUpdatedAt(Instant.now());
+    entity.setUpdatedBy(1L);
+
+    categoryRepository.save(entity);
+    return toResponseDto(entity);
+  }
+
+  @Override
+  public void deleteCategory(Long id) {
+    CategoryEntity entity =
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    categoryRepository.delete(entity);
+  }
+
   private CategoryResponseDto toResponseDto(CategoryEntity entity) {
     return CategoryResponseDto.builder()
         .id(entity.getId())
