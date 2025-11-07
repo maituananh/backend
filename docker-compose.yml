@@ -32,6 +32,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mysql
+      - minio
     restart: always
     ports:
       - "8080:8080"
@@ -40,6 +41,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/pawn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=r00t
+      - AWS_S3_ENDPOINT=http://minio:9000
 
 volumes:
   minio_data:
