@@ -1,6 +1,5 @@
 package com.spring.backend.controller.product;
 
-import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.service.ProductService;
@@ -13,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/products")
 public class ProductController {
 
-  @Autowired private ProductService productService;
+  @Autowired
+  private ProductService productService;
 
   @PostMapping
   public ProductResponseDto createProduct(@RequestBody ProductRequestDto dto) {
@@ -26,7 +26,7 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public ProductDetailResponseDto getById(@PathVariable("id") Long id) {
+  public ProductResponseDto getById(@PathVariable("id") Long id) {
     return productService.getById(id);
   }
 

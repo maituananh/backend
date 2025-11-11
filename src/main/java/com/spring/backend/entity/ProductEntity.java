@@ -1,59 +1,43 @@
 package com.spring.backend.entity;
 
-import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
-@Table(name = "products")
 @Entity
+@Table(name = "product")
 @Getter
 @Setter
-@SuperBuilder
-public class ProductEntity extends BaseEntity {
-  public ProductEntity() {}
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductEntity {
 
-  @Column(name = "name")
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   private String name;
-
-  @Column(name = "price")
-  private double price;
-
-  @Column(name = "startDay")
-  private Instant startDay;
-
-  @Column(name = "endDate")
-  private Instant endDate;
-
-  @Column(name = "type")
+  private String code;
   private String type;
-
-  @Column(name = "description")
+  private Double price;
+  private Double dailyProfit;
+  private Integer quantity;
+  private Instant startedAt;
+  private Instant endAt;
   private String description;
 
-  @Column(name = "quantity")
-  private int quantity;
+  private Long categoryId;
+  private Long customerId;
 
-  @Column(name = "status")
-  private ProductStatus status;
+  private Instant createdAt;
+  private Long createdBy;
+  private Instant updatedAt;
+  private Long updatedBy;
 
-  @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private List<ImageEntity> images;
-
-  public void addImage(ImageEntity image) {
-    images.add(image);
-    image.setProduct(this);
-  }
-
-  public void setImages(List<ImageEntity> images) {
-    this.images = images;
-    if (images != null) {
-      for (ImageEntity image : images) {
-        image.setProduct(this);
-      }
-    }
-  }
+  @ElementCollection
+  @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+  @Column(name = "image_id")
+  private List<Long> imageIds;
 }

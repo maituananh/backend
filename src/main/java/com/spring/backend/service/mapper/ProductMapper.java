@@ -15,12 +15,12 @@ public class ProductMapper {
         ProductEntity.builder()
             .name(dto.getName())
             .price(dto.getPrice())
-            .startDay(dto.getStartDay())
-            .endDate(dto.getEndDate())
+            .startedAt(dto.getStartedAt())
+            .endAt(dto.getEndAt())
             .type(dto.getType())
             .build();
 
-    product.setImages(imageEntities);
+    // product.setImageIds(imageEntities);
 
     return product;
   }
@@ -31,10 +31,10 @@ public class ProductMapper {
         .price(entity.getPrice())
         .id(entity.getId())
         .type(entity.getType())
-        .startDay(entity.getStartDay())
-        .endDate(entity.getEndDate())
+        .startDay(entity.getStartedAt())
+        .endDate(entity.getEndAt())
         .type(entity.getType())
-        .image(image)
+        //   .imageIds(image)
         .build();
   }
 
@@ -45,10 +45,10 @@ public class ProductMapper {
         .price(entity.getPrice())
         .id(entity.getId())
         .type(entity.getType())
-        .startDay(entity.getStartDay())
-        .endDate(entity.getEndDate())
+        .startedAt(entity.getStartedAt())
+        .endAt(entity.getEndAt())
         .type(entity.getType())
-        .images(images)
+        //  .imageIds(images)
         .build();
   }
 }

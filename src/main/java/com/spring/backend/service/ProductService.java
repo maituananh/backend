@@ -1,106 +1,22 @@
 package com.spring.backend.service;
 
-import com.spring.backend.adapter.s3.S3Adapter;
-import com.spring.backend.dto.image.ImageResponseDto;
-import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.repository.ImageRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.service.mapper.ProductMapper;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.domain.Page;
 
-@Service
-@RequiredArgsConstructor
-public class ProductService {
+public interface ProductService {
+  List<ProductResponseDto> getAll();
 
-  private final ProductRepository productRepository;
-  private final ImageRepository imageRepository;
-  private final S3Adapter s3Adapter;
+  ProductResponseDto createProduct(ProductRequestDto dto);
 
-  public List<ProductResponseDto> getAll() {
-    List<ProductEntity> entities = productRepository.findAll();
+  ProductResponseDto getById(Long id);
 
-    return entities.stream()
-        .map(
-            p -> {
-              if (CollectionUtils.isEmpty(p.getImages())) {
-                return ProductMapper.toProductResponse(p, null);
-              }
-              String image = s3Adapter.getUrl(p.getImages().getFirst().getFileName());
-              return ProductMapper.toProductResponse(p, image);
-            })
-        .toList();
-  }
+  Page<ProductResponseDto> search(String name, int page, int size);
 
-  public ProductResponseDto createProduct(ProductRequestDto dto) {
-    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+  Page<ProductResponseDto> searchByType(String type, int page, int size);
 
-    ProductEntity productEntity = ProductMapper.toProductEntity(dto, imageEntities);
+  void deleteById(Long id);
 
-    ProductEntity productUpdated = productRepository.save(productEntity);
-    return new ProductResponseDto(productUpdated);
-  }
-
-  public ProductDetailResponseDto getById(Long id) {
-    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
-
-    List<ImageResponseDto> images =
-        productEntity.getImages().stream()
-            .map(
-                i ->
-                    ImageResponseDto.builder()
-                        .url(s3Adapter.getUrl(i.getFileName()))
-                        .id(i.getId())
-                        .build())
-            .toList();
-
-    return ProductMapper.toProductDetailResponse(productEntity, images);
-  }
-
-  public Page<ProductResponseDto> search(String name, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    Page<ProductEntity> pageProductEntity =
-        productRepository.findByNameLikeIgnoreCase(name, pageable);
-
-    List<ProductResponseDto> productResponseDtos = new ArrayList<>();
-    for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(new ProductResponseDto(productEntity));
-    }
-
-    return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
-  }
-
-  public Page<ProductResponseDto> searchByType(String type, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("startDay").descending());
-    Page<ProductEntity> pageProductEntity = productRepository.findByType(type, pageable);
-
-    List<ProductResponseDto> productResponseDtos = new ArrayList<>();
-    for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(new ProductResponseDto(productEntity));
-    }
-
-    return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
-  }
-
-  public void deleteById(Long id) {
-    productRepository.deleteById(id);
-  }
-
-  public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
-    //    ProductEntity productEntity = ProductMapper.toProductEntity(dto);
-    //    productEntity.setId(id);
-    //
-    //    return new ProductResponseDto(productRepository.save(productEntity));
-
-    return new ProductResponseDto();
-  }
+  ProductResponseDto updateById(Long id, ProductRequestDto dto);
 }

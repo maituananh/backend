@@ -1,6 +1,5 @@
 package com.spring.backend.dto.product;
 
-import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.entity.ProductEntity;
 import java.time.Instant;
 import java.util.List;
@@ -14,22 +13,42 @@ import lombok.*;
 public class ProductDetailResponseDto {
   private Long id;
   private String name;
-  private Double price;
-  private Instant startDay;
-  private Instant endDate;
+  private String code;
   private String type;
-  private List<ImageResponseDto> images;
+  private Double price;
+  private Double dailyProfit;
+  private Integer quantity;
+  private Instant startedAt;
+  private Instant endAt;
+  private String description;
+
+  private Long categoryId;
+  private Long customerId;
+  private List<Long> imageIds;
+
+  private Instant createdAt;
+  private Long createdBy;
+  private Instant updatedAt;
+  private Long updatedBy;
 
   public ProductDetailResponseDto(ProductEntity productEntity) {
     this.id = productEntity.getId();
     this.name = productEntity.getName();
-    this.price = productEntity.getPrice();
-    this.startDay = productEntity.getStartDay();
-    this.endDate = productEntity.getEndDate();
+    this.code = productEntity.getCode();
     this.type = productEntity.getType();
-    this.images =
-        productEntity.getImages().stream()
-            .map(i -> ImageResponseDto.builder().id(i.getId()).url(i.getFileName()).build())
-            .toList();
+    this.price = productEntity.getPrice();
+    this.dailyProfit = productEntity.getDailyProfit();
+    this.quantity = productEntity.getQuantity();
+    this.startedAt = productEntity.getStartedAt();
+    this.endAt = productEntity.getEndAt();
+    this.description = productEntity.getDescription();
+    this.customerId = productEntity.getCustomerId();
+    this.categoryId = productEntity.getCategoryId();
+    this.createdAt = productEntity.getCreatedAt();
+    this.createdBy = productEntity.getCreatedBy();
+    this.updatedAt = productEntity.getUpdatedAt();
+    this.updatedBy = productEntity.getUpdatedBy();
+
+    this.imageIds = productEntity.getImageIds();
   }
 }

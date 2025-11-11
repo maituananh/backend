@@ -1,30 +1,31 @@
 package com.spring.backend.dto.product;
 
-import com.spring.backend.entity.ProductEntity;
 import java.time.Instant;
+import java.util.List;
 import lombok.*;
 
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponseDto {
   private Long id;
   private String name;
-  private Double price;
+  private String code;
+  private String type;
+  private double price;
+  private Double dailyProfit;
+  private int quantity;
   private Instant startDay;
   private Instant endDate;
-  private String type;
-  private String image;
+  private String description;
+  private Long categoryId;
+  private Long customerId;
+  private List<Long> imageIds;
 
-  public ProductResponseDto(ProductEntity productEntity) {
-    this.id = productEntity.getId();
-    this.name = productEntity.getName();
-    this.price = productEntity.getPrice();
-    this.startDay = productEntity.getStartDay();
-    this.endDate = productEntity.getEndDate();
-    this.type = productEntity.getType();
-    this.image = productEntity.getImages().getFirst().getFileName();
-  }
+  private Instant createdAt;
+  private Long createdBy;
+  private Instant updatedAt;
+  private Long updatedBy;
 }
