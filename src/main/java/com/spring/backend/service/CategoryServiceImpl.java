@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public List<CategoryResponseDto> getAllCategories() {
-    return categoryRepository.findAll().stream()
+    return categoryRepository.findByIsActiveIsTrue().stream()
         .map(this::toResponseDto)
         .collect(Collectors.toList());
   }
