@@ -66,7 +66,10 @@ public class CategoryServiceImpl implements CategoryService {
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
 
-    categoryRepository.delete(entity);
+    entity.setIsActive(false);
+    entity.setUpdatedAt(Instant.now());
+    entity.setUpdatedBy(1L);
+    categoryRepository.save(entity);
   }
 
   private CategoryResponseDto toResponseDto(CategoryEntity entity) {
