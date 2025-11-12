@@ -38,9 +38,38 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public List<CategoryResponseDto> getAllCategories() {
-    return categoryRepository.findAll().stream()
+    return categoryRepository.findByIsActiveIsTrue().stream()
         .map(this::toResponseDto)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto) {
+    CategoryEntity entity =
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    entity.setName(dto.getName());
+    entity.setNote(dto.getNote());
+    entity.setUpdatedAt(Instant.now());
+    entity.setUpdatedBy(1L);
+
+    categoryRepository.save(entity);
+    return toResponseDto(entity);
+  }
+
+  @Override
+  public void deleteCategory(Long id) {
+    CategoryEntity entity =
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    entity.setIsActive(false);
+    entity.setUpdatedAt(Instant.now());
+    entity.setUpdatedBy(1L);
+    categoryRepository.save(entity);
   }
 
   private CategoryResponseDto toResponseDto(CategoryEntity entity) {
