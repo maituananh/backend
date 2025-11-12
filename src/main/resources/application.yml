@@ -9,6 +9,7 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:Anhkiet_2004}
   jpa:
+    auditor-aware-ref: JpaAuditingConfig
     show-sql: false
     hibernate:
       ddl-auto: update # or create, validate, none

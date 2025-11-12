@@ -34,7 +34,7 @@ public class JwtTokenHelper {
         .subject(username)
         .claims(Map.of(TOKEN_TYPE, ACCESS_TOKEN, TOKEN_ID, tokenId))
         .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(DateUtils.getTime(5))
+        .expiration(DateUtils.getTime(200))
         .signWith(getSignInKey())
         .compact();
   }
@@ -44,7 +44,7 @@ public class JwtTokenHelper {
         .subject(username)
         .claim(TOKEN_TYPE, REFRESH_TOKEN)
         .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(DateUtils.getTime(7))
+        .expiration(DateUtils.getTime(203))
         .signWith(getSignInKey())
         .compact();
   }
