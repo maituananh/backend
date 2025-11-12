@@ -2,6 +2,7 @@ package com.spring.backend.controller.product;
 
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
+import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.service.ProductService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
