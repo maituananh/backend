@@ -1,6 +1,5 @@
 package com.spring.backend.dto.product;
 
-import com.spring.backend.entity.ProductEntity;
 import java.time.Instant;
 import lombok.*;
 
@@ -17,14 +16,5 @@ public class ProductResponseDto {
   private Instant endDate;
   private String type;
   private String image;
-
-  public ProductResponseDto(ProductEntity productEntity) {
-    this.id = productEntity.getId();
-    this.name = productEntity.getName();
-    this.price = productEntity.getPrice();
-    this.startDay = productEntity.getStartDay();
-    this.endDate = productEntity.getEndDate();
-    this.type = productEntity.getType();
-    this.image = productEntity.getImages().getFirst().getFileName();
-  }
+  private String code;
 }

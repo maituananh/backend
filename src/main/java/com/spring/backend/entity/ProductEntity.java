@@ -38,10 +38,22 @@ public class ProductEntity extends BaseEntity {
   private int quantity;
 
   @Column(name = "status")
+  @Enumerated(EnumType.STRING)
   private ProductStatus status;
 
   @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<ImageEntity> images;
+
+  @Column(name = "daily_profit")
+  private Double dailyProfit;
+
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "category_id")
+  private CategoryEntity category;
+
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "customer_id")
+  private UserEntity customer;
 
   public void addImage(ImageEntity image) {
     images.add(image);

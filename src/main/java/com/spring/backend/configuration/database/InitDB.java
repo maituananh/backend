@@ -3,6 +3,7 @@ package com.spring.backend.configuration.database;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
 import com.spring.backend.repository.UserRepository;
+import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -45,6 +46,7 @@ public class InitDB implements CommandLineRunner {
               .phone("123456789")
               .cardId("044444444444444")
               .role(UserRole.CUSTOMER)
+              .createdAt(Instant.now())
               .build());
     }
   }

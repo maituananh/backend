@@ -4,6 +4,7 @@ import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.service.ProductService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,7 @@ public class ProductController {
   @Autowired private ProductService productService;
 
   @PostMapping
-  public ProductResponseDto createProduct(@RequestBody ProductRequestDto dto) {
+  public ProductResponseDto createProduct(@RequestBody @Valid ProductRequestDto dto) {
     return productService.createProduct(dto);
   }
 
