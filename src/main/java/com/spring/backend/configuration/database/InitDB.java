@@ -21,6 +21,7 @@ public class InitDB implements CommandLineRunner {
     Optional<UserEntity> adminEntity = userRepository.findByUsername("admin");
 
     if (adminEntity.isEmpty()) {
+
       userRepository.save(
           UserEntity.builder()
               .username("admin")

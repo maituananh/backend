@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public void deleteCategory(Long id) {
+  public void disableCategory(Long id) {
     CategoryEntity entity =
         categoryRepository
             .findById(id)
