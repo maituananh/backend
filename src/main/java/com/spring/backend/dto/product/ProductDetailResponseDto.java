@@ -18,6 +18,7 @@ public class ProductDetailResponseDto {
   private Instant startDay;
   private Instant endDate;
   private String type;
+  private String code;
   private List<ImageResponseDto> images;
 
   public ProductDetailResponseDto(ProductEntity productEntity) {
@@ -27,6 +28,7 @@ public class ProductDetailResponseDto {
     this.startDay = productEntity.getStartDay();
     this.endDate = productEntity.getEndDate();
     this.type = productEntity.getType();
+    this.code = productEntity.getCode();
     this.images =
         productEntity.getImages().stream()
             .map(i -> ImageResponseDto.builder().id(i.getId()).url(i.getFileName()).build())

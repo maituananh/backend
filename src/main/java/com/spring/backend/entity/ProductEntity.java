@@ -31,6 +31,9 @@ public class ProductEntity extends BaseEntity {
   @Column(name = "type")
   private String type;
 
+  @Column(name = "code")
+  private String code;
+
   @Column(name = "description")
   private String description;
 
