@@ -1,6 +1,7 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -21,4 +22,7 @@ public class CategoryEntity extends BaseEntity {
 
   @Column(name = "is_active")
   private Boolean isActive;
+
+  @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<ProductEntity> products;
 }

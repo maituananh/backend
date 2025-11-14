@@ -1,7 +1,8 @@
 package com.spring.backend.dto.product;
 
-import com.spring.backend.entity.BaseEntity;
-import com.spring.backend.entity.ProductEntity;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,20 +16,32 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProductRequestDto {
   private Long id;
-  private String name;
-  private Double price;
-  private Instant startDay;
-  private Instant endDate;
-  private String type;
-  private List<Long> imageIds;
 
-  public ProductRequestDto(ProductEntity productEntity) {
-    this.id = productEntity.getId();
-    this.name = productEntity.getName();
-    this.price = productEntity.getPrice();
-    this.startDay = productEntity.getStartDay();
-    this.endDate = productEntity.getEndDate();
-    this.type = productEntity.getType();
-    this.imageIds = productEntity.getImages().stream().map(BaseEntity::getId).toList();
-  }
+  @NotBlank private String name;
+
+  @Min(1)
+  private Double price;
+
+  @NotNull private String type;
+
+  @Min(1)
+  @NotNull
+  private Double dailyProfit;
+
+  @NotNull private Integer quantity;
+
+  @NotNull private Instant startedAt;
+
+  @NotNull private Instant endAt;
+
+  @NotNull private Long categoryId;
+
+  private String description;
+
+  @NotNull private Long customerId;
+
+  @NotNull private String code;
+
+  //    @Size(min = 4, max = 4)
+  @NotNull private List<Long> imageIds;
 }

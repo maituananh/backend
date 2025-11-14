@@ -2,6 +2,7 @@ package com.spring.backend.entity;
 
 import com.spring.backend.enums.UserRole;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -37,4 +38,7 @@ public class UserEntity extends BaseEntity {
   @Column(name = "`role`", nullable = false)
   @Enumerated(EnumType.STRING)
   private UserRole role;
+
+  @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<ProductEntity> products;
 }

@@ -5,10 +5,14 @@ import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
+import com.spring.backend.entity.CategoryEntity;
 import com.spring.backend.entity.ImageEntity;
 import com.spring.backend.entity.ProductEntity;
+import com.spring.backend.entity.UserEntity;
+import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.ProductMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,8 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class ProductService {
 
+  private final CategoryRepository categoryRepository;
+  private final UserRepository userRepository;
   private final ProductRepository productRepository;
   private final ImageRepository imageRepository;
   private final S3Adapter s3Adapter;
@@ -35,7 +41,7 @@ public class ProductService {
               if (CollectionUtils.isEmpty(p.getImages())) {
                 return ProductMapper.toProductResponse(p, null);
               }
-              String image = s3Adapter.getUrl(p.getImages().getFirst().getFileName());
+              String image = getImage(p.getImages().getFirst().getFileName());
               return ProductMapper.toProductResponse(p, image);
             })
         .toList();
@@ -43,11 +49,15 @@ public class ProductService {
 
   public ProductResponseDto createProduct(ProductRequestDto dto) {
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+    UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
 
-    ProductEntity productEntity = ProductMapper.toProductEntity(dto, imageEntities);
+    ProductEntity productEntity =
+        ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
 
     ProductEntity productUpdated = productRepository.save(productEntity);
-    return new ProductResponseDto(productUpdated);
+    return ProductMapper.toProductResponse(
+        productUpdated, getImage(imageEntities.getFirst().getFileName()));
   }
 
   public ProductDetailResponseDto getById(Long id) {
@@ -73,7 +83,7 @@ public class ProductService {
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(new ProductResponseDto(productEntity));
+      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, null));
     }
 
     return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
@@ -85,7 +95,7 @@ public class ProductService {
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(new ProductResponseDto(productEntity));
+      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, null));
     }
 
     return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
@@ -102,5 +112,9 @@ public class ProductService {
     //    return new ProductResponseDto(productRepository.save(productEntity));
 
     return new ProductResponseDto();
+  }
+
+  private String getImage(String fileName) {
+    return s3Adapter.getUrl(fileName);
   }
 }
