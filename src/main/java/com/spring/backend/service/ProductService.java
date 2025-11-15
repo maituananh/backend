@@ -106,12 +106,37 @@ public class ProductService {
   }
 
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
-    //    ProductEntity productEntity = ProductMapper.toProductEntity(dto);
-    //    productEntity.setId(id);
-    //
-    //    return new ProductResponseDto(productRepository.save(productEntity));
+    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
 
-    return new ProductResponseDto();
+    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+
+    UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+
+    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+
+    productEntity.setName(dto.getName());
+    productEntity.setPrice(dto.getPrice());
+    productEntity.setStartDay(dto.getStartedAt());
+    productEntity.setEndDate(dto.getEndAt());
+    productEntity.setType(dto.getType());
+    productEntity.setDescription(dto.getDescription());
+    productEntity.setQuantity(dto.getQuantity());
+    productEntity.setCategory(categoryEntity);
+    productEntity.setCustomer(userEntity);
+    productEntity.setImages(imageEntities);
+
+    if (dto.getCode() != null) {
+      productEntity.setCode(dto.getCode());
+    }
+
+    ProductEntity saved = productRepository.save(productEntity);
+
+    String imageUrl = null;
+    if (!imageEntities.isEmpty()) {
+      imageUrl = getImage(imageEntities.getFirst().getFileName());
+    }
+
+    return ProductMapper.toProductResponse(saved, imageUrl);
   }
 
   private String getImage(String fileName) {
