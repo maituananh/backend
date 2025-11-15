@@ -125,37 +125,37 @@ public class ProductService {
     productRepository.deleteById(id);
   }
 
-  @Transactional
-  public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
-    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
-    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
-    UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
-    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+    @Transactional
+    public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
+        ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+        CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+        UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+        List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
 
-    productEntity.setName(dto.getName());
-    productEntity.setPrice(dto.getPrice());
-    productEntity.setStartDay(dto.getStartedAt());
-    productEntity.setEndDate(dto.getEndAt());
-    productEntity.setType(dto.getType());
-    productEntity.setDescription(dto.getDescription());
-    productEntity.setQuantity(dto.getQuantity());
-    productEntity.setCategory(categoryEntity);
-    productEntity.setCustomer(userEntity);
-    productEntity.setImages(imageEntities);
+        productEntity.setName(dto.getName());
+        productEntity.setPrice(dto.getPrice());
+        productEntity.setStartDay(dto.getStartedAt());
+        productEntity.setEndDate(dto.getEndAt());
+        productEntity.setType(dto.getType());
+        productEntity.setDescription(dto.getDescription());
+        productEntity.setQuantity(dto.getQuantity());
+        productEntity.setCategory(categoryEntity);
+        productEntity.setCustomer(userEntity);
+        productEntity.setImages(imageEntities);
 
-    if (dto.getCode() != null) {
-      productEntity.setCode(dto.getCode());
+        if (dto.getCode() != null) {
+            productEntity.setCode(dto.getCode());
+        }
+
+        ProductEntity saved = productRepository.save(productEntity);
+
+        String imageUrl = null;
+        if (!imageEntities.isEmpty()) {
+            imageUrl = getImage(imageEntities.getFirst().getFileName());
+        }
+
+        return ProductMapper.toProductResponse(saved, imageUrl);
     }
-
-    ProductEntity saved = productRepository.save(productEntity);
-
-    String imageUrl = null;
-    if (!imageEntities.isEmpty()) {
-      imageUrl = getImage(imageEntities.getFirst().getFileName());
-    }
-
-    return ProductMapper.toProductResponse(saved, imageUrl);
-  }
 
   private String getImage(String fileName) {
     return s3Adapter.getUrl(fileName);
