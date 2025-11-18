@@ -1,6 +1,8 @@
 package com.spring.backend.controller.user;
 
+import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.user.UserDto;
+import com.spring.backend.service.ProductService;
 import com.spring.backend.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class UserController {
   @Autowired private UserService userService;
+  @Autowired private ProductService productService;
 
   @PostMapping
   public UserDto createUser(@RequestBody UserDto userDto) {
@@ -44,5 +47,10 @@ public class UserController {
   @PutMapping("/{id}")
   public UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
     return userService.updateUser(id, userDto);
+  }
+
+  @GetMapping("/{userId}/products")
+  public List<ProductResponseDto> getProductsByUserId(@PathVariable Long userId) {
+    return productService.getProductsByUserId(userId);
   }
 }
