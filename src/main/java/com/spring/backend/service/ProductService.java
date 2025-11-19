@@ -20,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductService {
 
   private final CategoryRepository categoryRepository;
@@ -47,6 +49,7 @@ public class ProductService {
         .toList();
   }
 
+  @Transactional
   public ProductResponseDto createProduct(ProductRequestDto dto) {
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -117,17 +120,16 @@ public class ProductService {
     return product;
   }
 
+  @Transactional
   public void deleteById(Long id) {
     productRepository.deleteById(id);
   }
 
+  @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
-
     CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
-
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
-
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
 
     productEntity.setName(dto.getName());
