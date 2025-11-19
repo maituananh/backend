@@ -143,9 +143,9 @@ public class ProductService {
         productEntity.setCustomer(userEntity);
         productEntity.setImages(imageEntities);
 
-        if (dto.getCode() != null) {
-            productEntity.setCode(dto.getCode());
-        }
+    if (dto.getCode() != null) {
+      productEntity.setCode(dto.getCode());
+    }
 
         ProductEntity saved = productRepository.save(productEntity);
 
