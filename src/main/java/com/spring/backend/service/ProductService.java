@@ -101,6 +101,22 @@ public class ProductService {
     return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
   }
 
+  public List<ProductResponseDto> getProductsByUserId(Long userId) {
+    List<ProductEntity> products = productRepository.findByCustomerId(userId);
+
+    List<ProductResponseDto> product = new ArrayList<>();
+
+    for (ProductEntity p : products) {
+      String image = null;
+      if (!p.getImages().isEmpty()) {
+        image = getImage(p.getImages().getFirst().getFileName());
+      }
+      product.add(ProductMapper.toProductResponse(p, image));
+    }
+
+    return product;
+  }
+
   public void deleteById(Long id) {
     productRepository.deleteById(id);
   }
