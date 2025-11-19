@@ -1,14 +1,11 @@
 package com.spring.backend.dto.user;
 
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
@@ -19,14 +16,4 @@ public class UserDto {
   private String phone;
   private String cardId;
   private UserRole role;
-
-  public UserDto(UserEntity user) {
-    this.email = user.getEmail();
-    this.name = user.getName();
-    this.age = user.getAge();
-    this.phone = user.getPhone();
-    this.cardId = user.getCardId();
-    this.username = user.getUsername();
-    this.role = user.getRole();
-  }
 }
