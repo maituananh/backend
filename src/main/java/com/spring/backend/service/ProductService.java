@@ -20,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductService {
 
   private final CategoryRepository categoryRepository;
@@ -47,6 +49,7 @@ public class ProductService {
         .toList();
   }
 
+  @Transactional
   public ProductResponseDto createProduct(ProductRequestDto dto) {
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -117,17 +120,41 @@ public class ProductService {
     return product;
   }
 
+  @Transactional
   public void deleteById(Long id) {
     productRepository.deleteById(id);
   }
 
+  @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
-    //    ProductEntity productEntity = ProductMapper.toProductEntity(dto);
-    //    productEntity.setId(id);
-    //
-    //    return new ProductResponseDto(productRepository.save(productEntity));
+    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+    UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
 
-    return new ProductResponseDto();
+    productEntity.setName(dto.getName());
+    productEntity.setPrice(dto.getPrice());
+    productEntity.setStartDay(dto.getStartedAt());
+    productEntity.setEndDate(dto.getEndAt());
+    productEntity.setType(dto.getType());
+    productEntity.setDescription(dto.getDescription());
+    productEntity.setQuantity(dto.getQuantity());
+    productEntity.setCategory(categoryEntity);
+    productEntity.setCustomer(userEntity);
+    productEntity.setImages(imageEntities);
+
+    if (dto.getCode() != null) {
+      productEntity.setCode(dto.getCode());
+    }
+
+    ProductEntity saved = productRepository.save(productEntity);
+
+    String imageUrl = null;
+    if (!imageEntities.isEmpty()) {
+      imageUrl = getImage(imageEntities.getFirst().getFileName());
+    }
+
+    return ProductMapper.toProductResponse(saved, imageUrl);
   }
 
   private String getImage(String fileName) {
