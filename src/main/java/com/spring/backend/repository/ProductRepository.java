@@ -1,6 +1,7 @@
 package com.spring.backend.repository;
 
 import com.spring.backend.entity.ProductEntity;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
   Page<ProductEntity> findByType(
       String type,
       Pageable pageable); // lấy danh sách sản phẩm theo loại , có phân trang và sắp xếp
+
+  List<ProductEntity> findByCustomerId(Long customerId);
 }
