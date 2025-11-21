@@ -15,7 +15,7 @@ public class CategoryResponseDto {
   private String note;
   private Boolean isActive;
   private Instant createdAt;
-  private Long createdBy;
+  private Object createdBy;
   private Instant updatedAt;
   private Long updatedBy;
 
