@@ -8,6 +8,7 @@ import com.spring.backend.BaseIntegrationTest;
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
+import com.spring.backend.repository.TokenRepository;
 import com.spring.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 class AuthControllerTest extends BaseIntegrationTest {
 
   @Autowired private UserRepository userRepository;
+  @Autowired private TokenRepository tokenRepository;
   @Autowired private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setUp() {
+    tokenRepository.deleteAll();
     userRepository.deleteAll();
     UserEntity user = new UserEntity();
     user.setUsername("testuser");

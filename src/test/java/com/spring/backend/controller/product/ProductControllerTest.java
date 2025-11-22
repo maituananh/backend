@@ -10,6 +10,7 @@ import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.repository.TokenRepository;
 import com.spring.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ class ProductControllerTest extends BaseIntegrationTest {
   @Autowired private ProductRepository productRepository;
   @Autowired private CategoryRepository categoryRepository;
   @Autowired private UserRepository userRepository;
+  @Autowired private TokenRepository tokenRepository;
   @Autowired private PasswordEncoder passwordEncoder;
 
   private CategoryEntity category;
@@ -32,6 +34,7 @@ class ProductControllerTest extends BaseIntegrationTest {
   void setUp() {
     productRepository.deleteAll();
     categoryRepository.deleteAll();
+    tokenRepository.deleteAll();
     userRepository.deleteAll();
 
     category = new CategoryEntity();
@@ -58,6 +61,8 @@ class ProductControllerTest extends BaseIntegrationTest {
   @Test
   @WithMockUser(username = "testuser")
   void createProduct_shouldReturnProduct() throws Exception {
+    productRepository.deleteAll();
+
     ProductRequestDto request = new ProductRequestDto();
     request.setName("Phone");
     request.setPrice(500.0);

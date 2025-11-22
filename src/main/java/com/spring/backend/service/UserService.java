@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   public List<UserDto> getAll() {
     List<UserEntity> userEntity = userRepository.findAll();
@@ -29,6 +31,7 @@ public class UserService {
 
   public UserDto createUser(UserDto userDto) {
     UserEntity userEntity = UserMapper.toEntity(userDto);
+    userEntity.setPassword(passwordEncoder.encode("password"));
     UserEntity saveUser = userRepository.save(userEntity);
 
     return UserMapper.toUserDto(saveUser);
@@ -63,14 +66,14 @@ public class UserService {
   }
 
   public UserDto updateUser(Long id, UserDto userDto) {
-    //        UserEntity userEntity = new UserEntity();
-    //        userEntity.setEmail(userDto.getEmail());
-    //        userEntity.setName(userDto.getName());
-    //        userEntity.setAge(userDto.getAge());
-    //        userEntity.setPhone(userDto.getPhone());
-    //        userEntity.setCardId(userDto.getCardId());
+    // UserEntity userEntity = new UserEntity();
+    // userEntity.setEmail(userDto.getEmail());
+    // userEntity.setName(userDto.getName());
+    // userEntity.setAge(userDto.getAge());
+    // userEntity.setPhone(userDto.getPhone());
+    // userEntity.setCardId(userDto.getCardId());
     //
-    //        UserEntity saveUser = userRepository.save(userEntity);
+    // UserEntity saveUser = userRepository.save(userEntity);
 
     return null;
   }
