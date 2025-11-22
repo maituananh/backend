@@ -3,8 +3,8 @@ package com.spring.backend.service;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
 import com.spring.backend.repository.UserRepository;
+import com.spring.backend.service.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,30 +22,21 @@ public class UserService {
 
     List<UserDto> userDto = new ArrayList<>();
     for (UserEntity productEntity : userEntity) {
-      userDto.add(new UserDto(productEntity));
+      userDto.add(UserMapper.toUserDto(productEntity));
     }
     return userDto;
   }
 
   public UserDto createUser(UserDto userDto) {
-    UserEntity userEntity =
-        UserEntity.builder()
-            .email(userDto.getEmail())
-            .name(userDto.getName())
-            .age(userDto.getAge())
-            .phone(userDto.getPhone())
-            .cardId(userDto.getCardId())
-            .role(UserRole.CUSTOMER)
-            .build();
-
+    UserEntity userEntity = UserMapper.toEntity(userDto);
     UserEntity saveUser = userRepository.save(userEntity);
 
-    return new UserDto(saveUser);
+    return UserMapper.toUserDto(saveUser);
   }
 
   public UserDto getByIdCard(Long id) {
-    UserEntity productUser = userRepository.findById(id).get();
-    return new UserDto(productUser);
+    UserEntity productUser = userRepository.findById(id).orElseThrow();
+    return UserMapper.toUserDto(productUser);
   }
 
   public UserDto getMyInfo() {
@@ -53,7 +44,7 @@ public class UserService {
         (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     UserEntity productUser = userRepository.findById(currentUser.getId()).get();
-    return new UserDto(productUser);
+    return UserMapper.toUserDto(productUser);
   }
 
   public List<UserDto> searchName(String name) {
@@ -61,7 +52,7 @@ public class UserService {
 
     List<UserDto> userDto = new ArrayList<>();
     for (UserEntity userEntity : userEntities) {
-      userDto.add(new UserDto(userEntity));
+      userDto.add(UserMapper.toUserDto(userEntity));
     }
 
     return userDto;
