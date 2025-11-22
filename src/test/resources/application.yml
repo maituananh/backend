@@ -1,0 +1,23 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: root
+    password: Anhkiet_2004
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update # or create, validate, none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+aws:
+  s3:
+    access-key: minioadmin
+    secret-key: minioadmin
+    endpoint: http://localhost:9000
+    bucket: pawn-service
