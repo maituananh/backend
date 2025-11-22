@@ -15,7 +15,8 @@ public class CategoryResponseDto {
   private String note;
   private Boolean isActive;
   private Instant createdAt;
-  private Object createdBy;
+  private Long createdBy;
+  private String createdByUser;
   private Instant updatedAt;
   private Long updatedBy;
 
@@ -26,6 +27,7 @@ public class CategoryResponseDto {
     this.isActive = entity.getIsActive();
     this.createdAt = entity.getCreatedAt();
     this.createdBy = entity.getCreatedBy();
+    this.createdByUser = entity.getCreatedByUser();
     this.updatedAt = entity.getUpdatedAt();
     this.updatedBy = entity.getUpdatedBy();
   }

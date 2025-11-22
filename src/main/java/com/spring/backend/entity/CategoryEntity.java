@@ -23,6 +23,9 @@ public class CategoryEntity extends BaseEntity {
   @Column(name = "is_active")
   private Boolean isActive;
 
+  @Column(name = "created_by_user")
+  private String createdByUser;
+
   @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<ProductEntity> products;
 }

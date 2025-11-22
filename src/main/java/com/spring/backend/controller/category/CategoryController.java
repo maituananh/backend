@@ -29,14 +29,10 @@ public class CategoryController {
         .map(
             category -> {
               CategoryResponseDto dto = new CategoryResponseDto(category);
-              if (category.getCreatedBy() != null) {
-                userRepository
-                    .findById(category.getCreatedBy())
-                    .ifPresent(
-                        user -> {
-                          dto.setCreatedBy(user.getName());
-                        });
-              }
+
+              userRepository
+                  .findById(category.getCreatedBy())
+                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
               return dto;
             })
         .collect(Collectors.toList());
