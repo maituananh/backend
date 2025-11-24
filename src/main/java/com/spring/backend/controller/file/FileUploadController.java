@@ -21,4 +21,9 @@ public class FileUploadController {
 
   @GetMapping
   public void getFile() {}
+
+  @DeleteMapping("/{id}")
+  public void deleteFile(@PathVariable Long id) {
+    fileUploadService.deleteFile(id);
+  }
 }

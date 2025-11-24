@@ -27,4 +27,22 @@ public class FileUploadService {
 
     return new ImageResponseDto(imageEntity);
   }
+
+  @Transactional
+  public void deleteFile(Long id) {
+    ImageEntity image =
+        imageRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Image not found: " + id));
+
+    if (image.getProductId() != null) {
+      throw new RuntimeException("Cannot delete image because it still exists in products");
+    }
+
+    if (image.getFileName() != null) {
+      s3Adapter.deleteFile(image.getFileName());
+    }
+
+    imageRepository.delete(image);
+  }
 }

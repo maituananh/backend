@@ -16,6 +16,9 @@ public class ImageEntity extends BaseEntity {
   @JoinColumn(name = "product_id")
   private ProductEntity product;
 
+  @Column(name = "product_id", insertable = false, updatable = false)
+  private Long productId;
+
   @Column(name = "file_name")
   private String fileName;
 }

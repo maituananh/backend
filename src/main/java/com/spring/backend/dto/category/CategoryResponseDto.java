@@ -27,7 +27,7 @@ public class CategoryResponseDto {
     this.isActive = entity.getIsActive();
     this.createdAt = entity.getCreatedAt();
     this.createdBy = entity.getCreatedBy();
-    this.createdByUser = entity.getCreatedByUser();
+    // this.createdByUser = entity.getCreatedByUser();
     this.updatedAt = entity.getUpdatedAt();
     this.updatedBy = entity.getUpdatedBy();
   }

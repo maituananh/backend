@@ -53,4 +53,8 @@ public class S3Adapter {
 
     return s3Presigner.presignGetObject(getObjectPresignRequest).url().toString();
   }
+
+  public void deleteFile(String key) {
+    s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
+  }
 }
