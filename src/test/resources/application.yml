@@ -1,0 +1,35 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DATABASE_TO_UPPER=false
+    username: root
+    password: Anhkiet_2004
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update # or create, validate, none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  security:
+    secret-key: a89c31e68731757d7100da93c2e301b36ee46383f8f951784bae6817ae8fa6c5d0488aca222143ab3f8bb0d7fe74ace3c1817a00e96ef2d91ef767242469cb76d705356db74e5c9df85d51de35b8037d2582b016b7c4ebdf42115ab6ff60e57fce9fdce188e39449c2c9815a0e058d6b459d00f2d149ec1181081307fac682c4f03ab073169d4c1c391cc8e5e92b49e1ce8ce2e73742
+
+aws:
+  s3:
+    access-key: minioadmin
+    secret-key: minioadmin
+    endpoint: http://localhost:9000
+    bucket: pawn-service
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
