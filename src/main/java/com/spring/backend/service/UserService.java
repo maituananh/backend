@@ -47,15 +47,57 @@ public class UserService {
     return UserMapper.toUserDto(productUser);
   }
 
-  public List<UserDto> searchName(String name) {
-    List<UserEntity> userEntities = userRepository.findByNameLikeIgnoreCase(name);
+  public List<UserDto> searchUser(
+      String name, String email, String phone, String cardId, String username) {
+    List<UserEntity> usersEntities = userRepository.findAll();
 
-    List<UserDto> userDto = new ArrayList<>();
-    for (UserEntity userEntity : userEntities) {
-      userDto.add(UserMapper.toUserDto(userEntity));
+    if (name != null && !name.isEmpty()) {
+      usersEntities =
+          usersEntities.stream()
+              .filter(
+                  u ->
+                      u.getName() != null && u.getName().toLowerCase().contains(name.toLowerCase()))
+              .toList();
     }
 
-    return userDto;
+    if (email != null && !email.isEmpty()) {
+      usersEntities =
+          usersEntities.stream()
+              .filter(
+                  u ->
+                      u.getEmail() != null
+                          && u.getEmail().toLowerCase().contains(email.toLowerCase()))
+              .toList();
+    }
+
+    if (phone != null && !phone.isEmpty()) {
+      usersEntities =
+          usersEntities.stream()
+              .filter(u -> u.getPhone() != null && u.getPhone().contains(phone))
+              .toList();
+    }
+
+    if (cardId != null && !cardId.isEmpty()) {
+      usersEntities =
+          usersEntities.stream()
+              .filter(
+                  u ->
+                      u.getCardId() != null
+                          && u.getCardId().toLowerCase().contains(cardId.toLowerCase()))
+              .toList();
+    }
+
+    if (username != null && !username.isEmpty()) {
+      usersEntities =
+          usersEntities.stream()
+              .filter(
+                  u ->
+                      u.getUsername() != null
+                          && u.getUsername().toLowerCase().contains(username.toLowerCase()))
+              .toList();
+    }
+
+    return usersEntities.stream().map(UserMapper::toUserDto).toList();
   }
 
   public void delete(Long id) {

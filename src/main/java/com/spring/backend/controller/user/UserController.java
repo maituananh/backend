@@ -24,7 +24,7 @@ public class UserController {
     return userService.getAll();
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/id/{id}")
   public UserDto getUserById(@PathVariable("id") Long id) {
     return userService.getByIdCard(id);
   }
@@ -34,9 +34,14 @@ public class UserController {
     return userService.getMyInfo();
   }
 
-  @GetMapping("/searchName")
-  public List<UserDto> searchUserByName(@RequestParam("name") String name) {
-    return userService.searchName(name);
+  @GetMapping("/search")
+  public List<UserDto> searchUsers(
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) String email,
+      @RequestParam(required = false) String phone,
+      @RequestParam(required = false) String cardId,
+      @RequestParam(name = "username", required = false) String username) {
+    return userService.searchUser(name, email, phone, cardId, username);
   }
 
   @DeleteMapping("/{id}")
