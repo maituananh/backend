@@ -8,10 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -35,17 +33,6 @@ public class GlobalExceptionHandler {
 
     log.warn("❗ Validation error: {}", fieldErrors);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-  }
-
-  @ExceptionHandler(BadCredentialsException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
-      BadCredentialsException ex) {
-    Map<String, Object> body = new HashMap<>();
-    body.put("status", HttpStatus.UNAUTHORIZED.value());
-    body.put("error", "🚨 Unauthorized");
-    body.put("message", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
   }
 
   // 🧱 Catch all known exceptions
