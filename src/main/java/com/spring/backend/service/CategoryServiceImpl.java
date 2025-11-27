@@ -4,8 +4,7 @@ import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.entity.CategoryEntity;
 import com.spring.backend.repository.CategoryRepository;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.spring.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class CategoryServiceImpl implements CategoryService {
 
   private final CategoryRepository categoryRepository;
+  private final UserRepository userRepository;
 
   @Override
   public CategoryResponseDto createCategory(CategoryRequestDto dto) {
@@ -27,10 +27,19 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public List<CategoryResponseDto> getAllCategories() {
-    return categoryRepository.findByIsActiveIsTrue().stream()
-        .map(CategoryResponseDto::new)
-        .collect(Collectors.toList());
+  public CategoryResponseDto getCategoryByName(String name) {
+    CategoryEntity entity =
+        categoryRepository
+            .findByNameIgnoreCase(name)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    CategoryResponseDto dto = new CategoryResponseDto(entity);
+
+    userRepository
+        .findById(entity.getCreatedBy())
+        .ifPresent(user -> dto.setCreatedByUser(user.getName()));
+
+    return dto;
   }
 
   @Override

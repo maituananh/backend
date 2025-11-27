@@ -5,7 +5,6 @@ import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.CategoryService;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,12 @@ public class CategoryController {
   }
 
   @GetMapping
-  public List<CategoryResponseDto> getAllCategories() {
+  public Object getCategories(@RequestParam(required = false) String name) {
+    if (name != null && !name.isEmpty()) {
+      CategoryResponseDto dto = categoryService.getCategoryByName(name);
+      return dto;
+    }
+
     return categoryRepository.findAll().stream()
         .map(
             category -> {
@@ -33,6 +37,7 @@ public class CategoryController {
               userRepository
                   .findById(category.getCreatedBy())
                   .ifPresent(user -> dto.setCreatedByUser(user.getName()));
+
               return dto;
             })
         .collect(Collectors.toList());
