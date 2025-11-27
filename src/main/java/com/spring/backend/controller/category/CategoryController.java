@@ -24,23 +24,24 @@ public class CategoryController {
 
   @GetMapping
   public Object getCategories(@RequestParam(required = false) String name) {
+
     if (name != null && !name.isEmpty()) {
       CategoryResponseDto dto = categoryService.getCategoryByName(name);
       return dto;
     }
 
     return categoryRepository.findAll().stream()
-            .map(
-                    category -> {
-                      CategoryResponseDto dto = new CategoryResponseDto(category);
+        .map(
+            category -> {
+              CategoryResponseDto dto = new CategoryResponseDto(category);
 
-                      userRepository
-                              .findById(category.getCreatedBy())
-                              .ifPresent(user -> dto.setCreatedByUser(user.getName()));
+              userRepository
+                  .findById(category.getCreatedBy())
+                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
 
-                      return dto;
-                    })
-            .collect(Collectors.toList());
+              return dto;
+            })
+        .collect(Collectors.toList());
   }
 
   @PutMapping("/{id}")

@@ -5,6 +5,8 @@ import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.entity.CategoryEntity;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,22 @@ public class CategoryServiceImpl implements CategoryService {
         .ifPresent(user -> dto.setCreatedByUser(user.getName()));
 
     return dto;
+  }
+
+  @Override
+  public List<CategoryResponseDto> getAllCategories() {
+    return categoryRepository.findAll().stream()
+        .map(
+            category -> {
+              CategoryResponseDto dto = new CategoryResponseDto(category);
+
+              userRepository
+                  .findById(category.getCreatedBy())
+                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
+
+              return dto;
+            })
+        .collect(Collectors.toList());
   }
 
   @Override
