@@ -30,17 +30,17 @@ public class CategoryController {
     }
 
     return categoryRepository.findAll().stream()
-        .map(
-            category -> {
-              CategoryResponseDto dto = new CategoryResponseDto(category);
+            .map(
+                    category -> {
+                      CategoryResponseDto dto = new CategoryResponseDto(category);
 
-              userRepository
-                  .findById(category.getCreatedBy())
-                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
+                      userRepository
+                              .findById(category.getCreatedBy())
+                              .ifPresent(user -> dto.setCreatedByUser(user.getName()));
 
-              return dto;
-            })
-        .collect(Collectors.toList());
+                      return dto;
+                    })
+            .collect(Collectors.toList());
   }
 
   @PutMapping("/{id}")
