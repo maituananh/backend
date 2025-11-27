@@ -6,6 +6,7 @@ import com.spring.backend.service.ProductService;
 import com.spring.backend.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +25,7 @@ public class UserController {
     return userService.getAll();
   }
 
-  @GetMapping("/id/{id}")
+  @GetMapping("/{id}")
   public UserDto getUserById(@PathVariable("id") Long id) {
     return userService.getByIdCard(id);
   }
@@ -35,13 +36,15 @@ public class UserController {
   }
 
   @GetMapping("/search")
-  public List<UserDto> searchUsers(
+  public Page<UserDto> searchUsers(
       @RequestParam(required = false) String name,
       @RequestParam(required = false) String email,
       @RequestParam(required = false) String phone,
       @RequestParam(required = false) String cardId,
-      @RequestParam(name = "username", required = false) String username) {
-    return userService.searchUser(name, email, phone, cardId, username);
+      @RequestParam(required = false) String username,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size) {
+    return userService.searchUser(name, email, phone, cardId, username, page, size);
   }
 
   @DeleteMapping("/{id}")

@@ -8,6 +8,11 @@ import com.spring.backend.service.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -47,57 +52,17 @@ public class UserService {
     return UserMapper.toUserDto(productUser);
   }
 
-  public List<UserDto> searchUser(
-      String name, String email, String phone, String cardId, String username) {
-    List<UserEntity> usersEntities = userRepository.findAll();
+  public Page<UserDto> searchUser(
+      String name, String email, String phone, String cardId, String username, int page, int size) {
+    Specification<UserEntity> spec = UserRepository.search(name, email, phone, cardId, username);
+    Pageable pageable = PageRequest.of(page, size);
 
-    if (name != null && !name.isEmpty()) {
-      usersEntities =
-          usersEntities.stream()
-              .filter(
-                  u ->
-                      u.getName() != null && u.getName().toLowerCase().contains(name.toLowerCase()))
-              .toList();
-    }
+    Page<UserEntity> usersEntities = userRepository.findAll(spec, pageable);
 
-    if (email != null && !email.isEmpty()) {
-      usersEntities =
-          usersEntities.stream()
-              .filter(
-                  u ->
-                      u.getEmail() != null
-                          && u.getEmail().toLowerCase().contains(email.toLowerCase()))
-              .toList();
-    }
+    List<UserDto> userDtos =
+        usersEntities.getContent().stream().map(UserMapper::toUserDto).toList();
 
-    if (phone != null && !phone.isEmpty()) {
-      usersEntities =
-          usersEntities.stream()
-              .filter(u -> u.getPhone() != null && u.getPhone().contains(phone))
-              .toList();
-    }
-
-    if (cardId != null && !cardId.isEmpty()) {
-      usersEntities =
-          usersEntities.stream()
-              .filter(
-                  u ->
-                      u.getCardId() != null
-                          && u.getCardId().toLowerCase().contains(cardId.toLowerCase()))
-              .toList();
-    }
-
-    if (username != null && !username.isEmpty()) {
-      usersEntities =
-          usersEntities.stream()
-              .filter(
-                  u ->
-                      u.getUsername() != null
-                          && u.getUsername().toLowerCase().contains(username.toLowerCase()))
-              .toList();
-    }
-
-    return usersEntities.stream().map(UserMapper::toUserDto).toList();
+    return new PageImpl<>(userDtos, pageable, usersEntities.getTotalElements());
   }
 
   public void delete(Long id) {
