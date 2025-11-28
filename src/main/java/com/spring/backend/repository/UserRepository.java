@@ -23,23 +23,23 @@ public interface UserRepository
       List<Predicate> predicates = new ArrayList<>();
 
       if (name != null) {
-        predicates.add(cb.equal(root.get("name"), name));
+        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
       }
 
       if (email != null) {
-        predicates.add(cb.equal(root.get("email"), email));
+        predicates.add(cb.like(root.get("email"), "%" + email + "%"));
       }
 
       if (phone != null) {
-        predicates.add(cb.equal(root.get("phone"), phone));
+        predicates.add(cb.like(root.get("phone"), "%" + phone + "%"));
       }
 
       if (cardId != null) {
-        predicates.add(cb.equal(root.get("card_id"), cardId));
+        predicates.add(cb.like(root.get("card_id"), "%" + cardId + "%"));
       }
 
       if (username != null) {
-        predicates.add(cb.equal(root.get("username"), username));
+        predicates.add(cb.like(root.get("username"), "%" + username + "%"));
       }
 
       return cb.and(predicates.toArray(new Predicate[0]));
