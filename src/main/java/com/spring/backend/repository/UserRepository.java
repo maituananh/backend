@@ -35,7 +35,7 @@ public interface UserRepository
       }
 
       if (cardId != null) {
-        predicates.add(cb.like(root.get("card_id"), "%" + cardId + "%"));
+        predicates.add(cb.like(root.get("cardId"), "%" + cardId + "%"));
       }
 
       if (username != null) {
