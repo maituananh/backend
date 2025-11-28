@@ -8,6 +8,11 @@ import com.spring.backend.service.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -47,15 +52,17 @@ public class UserService {
     return UserMapper.toUserDto(productUser);
   }
 
-  public List<UserDto> searchName(String name) {
-    List<UserEntity> userEntities = userRepository.findByNameLikeIgnoreCase(name);
+  public Page<UserDto> searchUser(
+      String name, String email, String phone, String cardId, String username, int page, int size) {
+    Specification<UserEntity> spec = UserRepository.search(name, email, phone, cardId, username);
+    Pageable pageable = PageRequest.of(page, size);
 
-    List<UserDto> userDto = new ArrayList<>();
-    for (UserEntity userEntity : userEntities) {
-      userDto.add(UserMapper.toUserDto(userEntity));
-    }
+    Page<UserEntity> usersEntities = userRepository.findAll(spec, pageable);
 
-    return userDto;
+    List<UserDto> userDtos =
+        usersEntities.getContent().stream().map(UserMapper::toUserDto).toList();
+
+    return new PageImpl<>(userDtos, pageable, usersEntities.getTotalElements());
   }
 
   public void delete(Long id) {
