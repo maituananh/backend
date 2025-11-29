@@ -3,11 +3,17 @@ package com.spring.backend.service;
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.entity.CategoryEntity;
+import com.spring.backend.entity.UserEntity;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.UserRepository;
+import com.spring.backend.service.mapper.CategoryMapper;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,23 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     categoryRepository.save(entity);
 
-    return new CategoryResponseDto(entity);
-  }
-
-  @Override
-  public CategoryResponseDto getCategoryByName(String name) {
-    CategoryEntity entity =
-        categoryRepository
-            .findByNameIgnoreCase(name)
-            .orElseThrow(() -> new RuntimeException("Category not found"));
-
-    CategoryResponseDto dto = new CategoryResponseDto(entity);
-
-    userRepository
-        .findById(entity.getCreatedBy())
-        .ifPresent(user -> dto.setCreatedByUser(user.getName()));
-
-    return dto;
+    return CategoryMapper.toCategoryDto(entity, null);
   }
 
   @Override
@@ -49,15 +39,56 @@ public class CategoryServiceImpl implements CategoryService {
     return categoryRepository.findAll().stream()
         .map(
             category -> {
-              CategoryResponseDto dto = new CategoryResponseDto(category);
+              UserEntity userEntity = null;
+              if (category.getCreatedBy() != null) {
+                userEntity = userRepository.findById(category.getCreatedBy()).orElse(null);
+              }
 
-              userRepository
-                  .findById(category.getCreatedBy())
-                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
-
-              return dto;
+              return CategoryMapper.toCategoryDto(category, userEntity);
             })
-        .collect(Collectors.toList());
+        .toList();
+  }
+
+  @Override
+  public List<CategoryResponseDto> searchByName(String name) {
+    Specification<CategoryEntity> spec = CategoryRepository.search(name);
+
+    List<CategoryEntity> categories = categoryRepository.findAll(spec);
+
+    return categories.stream()
+        .map(
+            category -> {
+              UserEntity creator = null;
+              if (category.getCreatedBy() != null) {
+                creator = userRepository.findById(category.getCreatedBy()).orElse(null);
+              }
+              return CategoryMapper.toCategoryDto(category, creator);
+            })
+        .toList();
+  }
+
+  @Override
+  public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
+
+    Specification<CategoryEntity> spec = CategoryRepository.search(name);
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<CategoryEntity> categories = categoryRepository.findAll(spec, pageable);
+
+    List<CategoryResponseDto> dtos =
+        categories.getContent().stream()
+            .map(
+                category -> {
+                  UserEntity creator = null;
+                  if (category.getCreatedBy() != null) {
+                    creator = userRepository.findById(category.getCreatedBy()).orElse(null);
+                  }
+                  return CategoryMapper.toCategoryDto(category, creator);
+                })
+            .toList();
+
+    return new PageImpl<>(dtos, pageable, categories.getTotalElements());
   }
 
   @Override

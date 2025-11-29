@@ -2,11 +2,10 @@ package com.spring.backend.controller.category;
 
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.CategoryService;
-import java.util.stream.Collectors;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CategoryController {
   private final CategoryService categoryService;
-  private final CategoryRepository categoryRepository;
-  private final UserRepository userRepository;
 
   @PostMapping
   public CategoryResponseDto createCategory(@RequestBody CategoryRequestDto request) {
@@ -23,25 +20,16 @@ public class CategoryController {
   }
 
   @GetMapping
-  public Object getCategories(@RequestParam(required = false) String name) {
+  public List<CategoryResponseDto> getAllCategories() {
+    return categoryService.getAllCategories();
+  }
 
-    if (name != null && !name.isEmpty()) {
-      CategoryResponseDto dto = categoryService.getCategoryByName(name);
-      return dto;
-    }
-
-    return categoryRepository.findAll().stream()
-        .map(
-            category -> {
-              CategoryResponseDto dto = new CategoryResponseDto(category);
-
-              userRepository
-                  .findById(category.getCreatedBy())
-                  .ifPresent(user -> dto.setCreatedByUser(user.getName()));
-
-              return dto;
-            })
-        .collect(Collectors.toList());
+  @GetMapping("/search")
+  public Page<CategoryResponseDto> searchCategories(
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size) {
+    return categoryService.searchByName(name, page, size);
   }
 
   @PutMapping("/{id}")

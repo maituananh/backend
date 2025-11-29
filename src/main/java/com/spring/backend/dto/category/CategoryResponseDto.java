@@ -1,5 +1,6 @@
 package com.spring.backend.dto.category;
 
+import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.CategoryEntity;
 import java.time.Instant;
 import lombok.*;
@@ -16,7 +17,7 @@ public class CategoryResponseDto {
   private Boolean isActive;
   private Instant createdAt;
   private Long createdBy;
-  private String createdByUser;
+  private UserDto createdByUser;
   private Instant updatedAt;
   private Long updatedBy;
 
