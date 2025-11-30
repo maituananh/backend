@@ -30,6 +30,8 @@ public class InitDB implements CommandLineRunner {
               .email("admin@gmail.com")
               .phone("123456789")
               .cardId("044444444444444")
+              .address("admin123")
+              .gender("female")
               .role(UserRole.ADMIN)
               .build());
     }
@@ -45,6 +47,8 @@ public class InitDB implements CommandLineRunner {
               .email("user@gmail.com")
               .phone("123456789")
               .cardId("044444444444444")
+              .address("admin123")
+              .gender("female")
               .role(UserRole.CUSTOMER)
               .createdAt(Instant.now())
               .build());

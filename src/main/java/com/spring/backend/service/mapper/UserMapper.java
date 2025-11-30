@@ -16,6 +16,8 @@ public class UserMapper {
         .age(userDto.getAge())
         .phone(userDto.getPhone())
         .cardId(userDto.getCardId())
+        .address(userDto.getAddress())
+        .gender(userDto.getGender())
         .role(UserRole.CUSTOMER)
         .build();
   }
@@ -28,6 +30,8 @@ public class UserMapper {
         .age(entity.getAge())
         .phone(entity.getPhone())
         .cardId(entity.getCardId())
+        .address(entity.getAddress())
+        .gender(entity.getGender())
         .role(entity.getRole())
         .build();
   }

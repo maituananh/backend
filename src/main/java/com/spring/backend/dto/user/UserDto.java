@@ -15,5 +15,7 @@ public class UserDto {
   private int age;
   private String phone;
   private String cardId;
+  private String address;
+  private String gender;
   private UserRole role;
 }
