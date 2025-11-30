@@ -49,7 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
         .toList();
   }
 
-  @Override
   public List<CategoryResponseDto> searchByName(String name) {
     Specification<CategoryEntity> spec = CategoryRepository.search(name);
 
@@ -102,7 +101,7 @@ public class CategoryServiceImpl implements CategoryService {
     entity.setNote(dto.getNote());
 
     categoryRepository.save(entity);
-    return new CategoryResponseDto(entity);
+    return CategoryMapper.toCategoryDto(entity, null);
   }
 
   @Override
