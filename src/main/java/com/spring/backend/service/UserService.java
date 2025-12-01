@@ -70,15 +70,21 @@ public class UserService {
   }
 
   public UserDto updateUser(Long id, UserDto userDto) {
-    //        UserEntity userEntity = new UserEntity();
-    //        userEntity.setEmail(userDto.getEmail());
-    //        userEntity.setName(userDto.getName());
-    //        userEntity.setAge(userDto.getAge());
-    //        userEntity.setPhone(userDto.getPhone());
-    //        userEntity.setCardId(userDto.getCardId());
-    //
-    //        UserEntity saveUser = userRepository.save(userEntity);
+    UserEntity userEntity =
+        userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-    return null;
+    userEntity.setEmail(userDto.getEmail());
+    userEntity.setName(userDto.getName());
+    userEntity.setAge(userDto.getAge());
+    userEntity.setPhone(userDto.getPhone());
+    userEntity.setCardId(userDto.getCardId());
+    userEntity.setAddress(userDto.getAddress());
+    userEntity.setGender(userDto.getGender());
+    userEntity.setUsername(userDto.getUsername());
+    userEntity.setRole(userDto.getRole());
+
+    UserEntity updatedUser = userRepository.save(userEntity);
+
+    return UserMapper.toUserDto(updatedUser);
   }
 }
