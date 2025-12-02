@@ -9,6 +9,11 @@ import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.CategoryMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,6 +47,30 @@ public class CategoryServiceImpl implements CategoryService {
               return CategoryMapper.toCategoryDto(category, userEntity);
             })
         .toList();
+  }
+
+  @Override
+  public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
+
+    Specification<CategoryEntity> spec = CategoryRepository.search(name);
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<CategoryEntity> categories = categoryRepository.findAll(spec, pageable);
+
+    List<CategoryResponseDto> dtos =
+        categories.getContent().stream()
+            .map(
+                category -> {
+                  UserEntity creator = null;
+                  if (category.getCreatedBy() != null) {
+                    creator = userRepository.findById(category.getCreatedBy()).orElse(null);
+                  }
+                  return CategoryMapper.toCategoryDto(category, creator);
+                })
+            .toList();
+
+    return new PageImpl<>(dtos, pageable, categories.getTotalElements());
   }
 
   @Override

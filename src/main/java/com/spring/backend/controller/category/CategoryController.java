@@ -5,6 +5,7 @@ import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.service.CategoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,14 @@ public class CategoryController {
   @GetMapping
   public List<CategoryResponseDto> getAllCategories() {
     return categoryService.getAllCategories();
+  }
+
+  @GetMapping("/search")
+  public Page<CategoryResponseDto> searchCategories(
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size) {
+    return categoryService.searchByName(name, page, size);
   }
 
   @PutMapping("/{id}")

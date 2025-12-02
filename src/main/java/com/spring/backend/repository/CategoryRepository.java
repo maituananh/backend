@@ -1,12 +1,19 @@
 package com.spring.backend.repository;
 
 import com.spring.backend.entity.CategoryEntity;
-import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+public interface CategoryRepository
+    extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
 
-  List<CategoryEntity> findByIsActiveIsTrue();
+  static Specification<CategoryEntity> search(String name) {
+    return (root, query, cb) -> {
+      if (name == null || name.isEmpty()) return cb.conjunction();
+      return cb.like(root.get("name"), "%" + name + "%");
+    };
+  }
 }
