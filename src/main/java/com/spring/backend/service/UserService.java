@@ -15,9 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
   private final UserRepository userRepository;
@@ -32,6 +34,7 @@ public class UserService {
     return userDto;
   }
 
+  @Transactional
   public UserDto createUser(UserDto userDto) {
     UserEntity userEntity = UserMapper.toEntity(userDto);
     UserEntity saveUser = userRepository.save(userEntity);
@@ -65,24 +68,17 @@ public class UserService {
     return new PageImpl<>(userDtos, pageable, usersEntities.getTotalElements());
   }
 
+  @Transactional
   public void delete(Long id) {
     userRepository.deleteById(id);
   }
 
+  @Transactional
   public UserDto updateUser(Long id, UserDto userDto) {
     UserEntity userEntity =
         userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-    userEntity.setEmail(userDto.getEmail());
-    userEntity.setName(userDto.getName());
-    userEntity.setAge(userDto.getAge());
-    userEntity.setPhone(userDto.getPhone());
-    userEntity.setCardId(userDto.getCardId());
-    userEntity.setAddress(userDto.getAddress());
-    userEntity.setGender(userDto.getGender());
-    userEntity.setUsername(userDto.getUsername());
-    userEntity.setRole(userDto.getRole());
-
+    UserMapper.toEntity(userDto, userEntity);
     UserEntity updatedUser = userRepository.save(userEntity);
 
     return UserMapper.toUserDto(updatedUser);

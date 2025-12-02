@@ -22,6 +22,18 @@ public class UserMapper {
         .build();
   }
 
+  public static void toEntity(UserDto userDto, UserEntity userEntity) {
+    userEntity.setEmail(userDto.getEmail());
+    userEntity.setName(userDto.getName());
+    userEntity.setAge(userDto.getAge());
+    userEntity.setPhone(userDto.getPhone());
+    userEntity.setCardId(userDto.getCardId());
+    userEntity.setAddress(userDto.getAddress());
+    userEntity.setGender(userDto.getGender());
+    userEntity.setUsername(userDto.getUsername());
+    userEntity.setRole(userDto.getRole());
+  }
+
   public static UserDto toUserDto(UserEntity entity) {
     return UserDto.builder()
         .email(entity.getEmail())
