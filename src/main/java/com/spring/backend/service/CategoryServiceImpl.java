@@ -91,6 +91,30 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
+  public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
+
+    Specification<CategoryEntity> spec = CategoryRepository.search(name);
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<CategoryEntity> categories = categoryRepository.findAll(spec, pageable);
+
+    List<CategoryResponseDto> dtos =
+        categories.getContent().stream()
+            .map(
+                category -> {
+                  UserEntity creator = null;
+                  if (category.getCreatedBy() != null) {
+                    creator = userRepository.findById(category.getCreatedBy()).orElse(null);
+                  }
+                  return CategoryMapper.toCategoryDto(category, creator);
+                })
+            .toList();
+
+    return new PageImpl<>(dtos, pageable, categories.getTotalElements());
+  }
+
+  @Override
   public CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto) {
     CategoryEntity entity =
         categoryRepository
