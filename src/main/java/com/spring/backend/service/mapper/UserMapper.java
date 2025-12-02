@@ -30,7 +30,6 @@ public class UserMapper {
     userEntity.setCardId(userDto.getCardId());
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
-    userEntity.setUsername(userDto.getUsername());
     userEntity.setRole(userDto.getRole());
   }
 

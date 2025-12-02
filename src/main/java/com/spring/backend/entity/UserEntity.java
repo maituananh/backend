@@ -29,7 +29,7 @@ public class UserEntity extends BaseEntity {
   @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "card_id", nullable = false, updatable = false)
+  @Column(name = "card_id", nullable = false)
   private String cardId;
 
   @Column(name = "phone", nullable = false)
