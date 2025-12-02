@@ -16,8 +16,21 @@ public class UserMapper {
         .age(userDto.getAge())
         .phone(userDto.getPhone())
         .cardId(userDto.getCardId())
+        .address(userDto.getAddress())
+        .gender(userDto.getGender())
         .role(UserRole.CUSTOMER)
         .build();
+  }
+
+  public static void toEntity(UserDto userDto, UserEntity userEntity) {
+    userEntity.setEmail(userDto.getEmail());
+    userEntity.setName(userDto.getName());
+    userEntity.setAge(userDto.getAge());
+    userEntity.setPhone(userDto.getPhone());
+    userEntity.setCardId(userDto.getCardId());
+    userEntity.setAddress(userDto.getAddress());
+    userEntity.setGender(userDto.getGender());
+    userEntity.setRole(userDto.getRole());
   }
 
   public static UserDto toUserDto(UserEntity entity) {
@@ -28,6 +41,8 @@ public class UserMapper {
         .age(entity.getAge())
         .phone(entity.getPhone())
         .cardId(entity.getCardId())
+        .address(entity.getAddress())
+        .gender(entity.getGender())
         .role(entity.getRole())
         .build();
   }
