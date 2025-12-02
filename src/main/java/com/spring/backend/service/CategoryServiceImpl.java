@@ -49,23 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
         .toList();
   }
 
-  public List<CategoryResponseDto> searchByName(String name) {
-    Specification<CategoryEntity> spec = CategoryRepository.search(name);
-
-    List<CategoryEntity> categories = categoryRepository.findAll(spec);
-
-    return categories.stream()
-        .map(
-            category -> {
-              UserEntity creator = null;
-              if (category.getCreatedBy() != null) {
-                creator = userRepository.findById(category.getCreatedBy()).orElse(null);
-              }
-              return CategoryMapper.toCategoryDto(category, creator);
-            })
-        .toList();
-  }
-
   @Override
   public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
 
