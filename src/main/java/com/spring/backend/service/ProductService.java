@@ -9,6 +9,7 @@ import com.spring.backend.entity.CategoryEntity;
 import com.spring.backend.entity.ImageEntity;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.entity.UserEntity;
+import com.spring.backend.enums.ProductStatus;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
@@ -155,6 +156,25 @@ public class ProductService {
     }
 
     return ProductMapper.toProductResponse(saved, imageUrl);
+  }
+
+  @Transactional
+  public ProductResponseDto liquidationProduct(Long id) {
+    ProductEntity productEntity =
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+    productEntity.setStatus(ProductStatus.LIQUIDATION);
+
+    ProductEntity updated = productRepository.save(productEntity);
+
+    String imageUrl = null;
+    if (!updated.getImages().isEmpty()) {
+      imageUrl = getImage(updated.getImages().getFirst().getFileName());
+    }
+
+    return ProductMapper.toProductResponse(updated, imageUrl);
   }
 
   private String getImage(String fileName) {
