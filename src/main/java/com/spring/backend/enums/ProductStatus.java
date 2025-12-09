@@ -8,5 +8,6 @@ public enum ProductStatus {
   IN_PROGRESS,
   EXPIRED,
   RENEW,
+  LIQUIDATION,
   ;
 }

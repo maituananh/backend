@@ -55,4 +55,9 @@ public class ProductController {
       @PathVariable("id") Long id, @RequestBody ProductRequestDto dto) {
     return productService.updateById(id, dto);
   }
+
+  @PatchMapping("/{id}/liquidation")
+  public ProductResponseDto liquidationProduct(@PathVariable Long id) {
+    return productService.liquidationProduct(id);
+  }
 }
