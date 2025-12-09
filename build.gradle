@@ -73,6 +73,9 @@ dependencies {
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // jobrunr
+    implementation "org.jobrunr:jobrunr-spring-boot-3-starter:8.0.2"
+
     // test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
