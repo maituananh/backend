@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ProductService {
 
   private final CategoryRepository categoryRepository;
@@ -201,6 +203,33 @@ public class ProductService {
     }
 
     return ProductMapper.toProductResponse(updated, imageUrl);
+  }
+
+  @Transactional
+  public void updateStatusIsProgress() {
+    LocalDate today = LocalDate.now();
+
+    List<ProductEntity> productEntities =
+        productRepository.findAll(
+            ProductRepository.findByDateAndStatus(
+                "startDate", today.minusDays(2), ProductStatus.NEW));
+
+    productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.IN_PROGRESS));
+
+    productRepository.saveAll(productEntities);
+  }
+
+  @Transactional
+  public void updateStatusIsExpired() {
+    LocalDate today = LocalDate.now();
+
+    List<ProductEntity> productEntities =
+        productRepository.findAll(
+            ProductRepository.findByDateAndStatus("endDate", today, ProductStatus.IN_PROGRESS));
+
+    productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.EXPIRED));
+
+    productRepository.saveAll(productEntities);
   }
 
   private String getImage(String fileName) {
