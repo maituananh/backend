@@ -15,6 +15,7 @@ import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.ProductMapper;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -80,14 +81,26 @@ public class ProductService {
     return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
-  public Page<ProductResponseDto> search(String name, int page, int size) {
+  public Page<ProductResponseDto> search(
+      String name,
+      ProductStatus status,
+      Double price,
+      Instant startDay,
+      Instant endDate,
+      String code,
+      int page,
+      int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<ProductEntity> pageProductEntity =
         productRepository.findByNameLikeIgnoreCase(name, pageable);
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, null));
+      String imageUrl = null;
+      if (productEntity.getImages() != null && !productEntity.getImages().isEmpty()) {
+        imageUrl = getImage(productEntity.getImages().getFirst().getFileName());
+      }
+      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, imageUrl));
     }
 
     return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
