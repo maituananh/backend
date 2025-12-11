@@ -83,8 +83,13 @@ public class CategoryServiceImpl implements CategoryService {
     entity.setName(dto.getName());
     entity.setNote(dto.getNote());
 
+    UserEntity creator = null;
+    if (dto.getIsActive() != null) {
+      creator = userRepository.findById(entity.getCreatedBy()).orElse(null);
+    }
+
     categoryRepository.save(entity);
-    return CategoryMapper.toCategoryDto(entity, null);
+    return CategoryMapper.toCategoryDto(entity, creator);
   }
 
   @Override

@@ -10,4 +10,5 @@ import lombok.*;
 public class CategoryRequestDto {
   private String name;
   private String note;
+  private Boolean isActive;
 }

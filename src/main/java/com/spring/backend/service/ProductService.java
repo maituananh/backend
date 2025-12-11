@@ -56,6 +56,10 @@ public class ProductService {
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
     CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
 
+    if (!categoryEntity.getIsActive()) {
+      throw new RuntimeException("Category is inactive. Cannot create product.");
+    }
+
     ProductEntity productEntity =
         ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
 
@@ -87,7 +91,11 @@ public class ProductService {
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, null));
+      String imageUrl = null;
+      if (productEntity.getImages() != null && !productEntity.getImages().isEmpty()) {
+        imageUrl = getImage(productEntity.getImages().getFirst().getFileName());
+      }
+      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, imageUrl));
     }
 
     return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
@@ -132,6 +140,10 @@ public class ProductService {
     CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+
+    if (!categoryEntity.getIsActive()) {
+      throw new RuntimeException("Category is inactive. Cannot update product.");
+    }
 
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
