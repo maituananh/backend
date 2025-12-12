@@ -35,15 +35,15 @@ public class ProductController {
 
   @GetMapping("/search")
   public Page<ProductResponseDto> searchProduct(
-      @RequestParam("page") int page,
-      @RequestParam("size") int size,
-      @RequestParam("name") String name,
-      @RequestParam("status") ProductStatus status,
-      @RequestParam("price") Double price,
-      @RequestParam("startDay") Instant startDay,
-      @RequestParam("endDate") Instant endDate,
-      @RequestParam("code") String code) {
-    return productService.search(name, status, price, startDay, endDate, code, page, size);
+      @RequestParam(value = "page", required = false) int page,
+      @RequestParam(value = "size", required = false) int size,
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "status", required = false) ProductStatus status,
+      @RequestParam(value = "price", required = false) Double price,
+      @RequestParam(value = "startDay", required = false) Instant startDay,
+      @RequestParam(value = "endDay", required = false) Instant endDay,
+      @RequestParam(value = "code", required = false) String code) {
+    return productService.search(name, status, price, startDay, endDay, code, page, size);
   }
 
   @GetMapping("/search-by-type")

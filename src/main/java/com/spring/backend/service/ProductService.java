@@ -21,6 +21,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -90,9 +91,12 @@ public class ProductService {
       String code,
       int page,
       int size) {
+    Specification<ProductEntity> spec =
+        ProductRepository.search(name, status, price, startDay, endDate, code);
+
     Pageable pageable = PageRequest.of(page, size);
-    Page<ProductEntity> pageProductEntity =
-        productRepository.findByNameLikeIgnoreCase(name, pageable);
+
+    Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
