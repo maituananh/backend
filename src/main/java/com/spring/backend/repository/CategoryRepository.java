@@ -1,6 +1,7 @@
 package com.spring.backend.repository;
 
 import com.spring.backend.entity.CategoryEntity;
+import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,4 +17,6 @@ public interface CategoryRepository
       return cb.like(root.get("name"), "%" + name + "%");
     };
   }
+
+  Optional<CategoryEntity> findByIdAndIsActive(Long id, Boolean isActive);
 }
