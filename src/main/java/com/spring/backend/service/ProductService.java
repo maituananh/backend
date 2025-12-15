@@ -87,12 +87,12 @@ public class ProductService {
       ProductStatus status,
       Double price,
       Instant startDay,
-      Instant endDate,
+      Instant endDay,
       String code,
       int page,
       int size) {
     Specification<ProductEntity> spec =
-        ProductRepository.search(name, status, price, startDay, endDate, code);
+        ProductRepository.search(name, status, price, startDay, endDay, code);
 
     Pageable pageable = PageRequest.of(page, size);
 

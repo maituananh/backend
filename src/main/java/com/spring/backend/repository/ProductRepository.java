@@ -32,7 +32,7 @@ public interface ProductRepository
       ProductStatus status,
       Double price,
       Instant startDay,
-      Instant endDate,
+      Instant endDay,
       String code) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
@@ -49,8 +49,8 @@ public interface ProductRepository
         predicates.add(cb.equal(root.get("price"), price));
       }
 
-      if (startDay != null && endDate != null) {
-        predicates.add(cb.between(root.get("startDay"), startDay, endDate));
+      if (startDay != null && endDay != null) {
+        predicates.add(cb.between(root.get("startDay"), startDay, endDay));
       }
 
       if (code != null && code.isEmpty()) {
