@@ -3,8 +3,10 @@ package com.spring.backend.controller.product;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
+import com.spring.backend.enums.ProductStatus;
 import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,10 +35,15 @@ public class ProductController {
 
   @GetMapping("/search")
   public Page<ProductResponseDto> searchProduct(
-      @RequestParam("page") int page,
-      @RequestParam("size") int size,
-      @RequestParam("name") String name) {
-    return productService.search(name, page, size);
+      @RequestParam(value = "page", required = false) int page,
+      @RequestParam(value = "size", required = false) int size,
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "status", required = false) ProductStatus status,
+      @RequestParam(value = "price", required = false) Double price,
+      @RequestParam(value = "startDay", required = false) Instant startDay,
+      @RequestParam(value = "endDay", required = false) Instant endDay,
+      @RequestParam(value = "code", required = false) String code) {
+    return productService.search(name, status, price, startDay, endDay, code, page, size);
   }
 
   @GetMapping("/search-by-type")

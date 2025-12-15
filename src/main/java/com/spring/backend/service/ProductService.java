@@ -15,11 +15,13 @@ import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.ProductMapper;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -84,10 +86,21 @@ public class ProductService {
     return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
-  public Page<ProductResponseDto> search(String name, int page, int size) {
+  public Page<ProductResponseDto> search(
+      String name,
+      ProductStatus status,
+      Double price,
+      Instant startDay,
+      Instant endDay,
+      String code,
+      int page,
+      int size) {
+    Specification<ProductEntity> spec =
+        ProductRepository.search(name, status, price, startDay, endDay, code);
+
     Pageable pageable = PageRequest.of(page, size);
-    Page<ProductEntity> pageProductEntity =
-        productRepository.findByNameLikeIgnoreCase(name, pageable);
+
+    Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
