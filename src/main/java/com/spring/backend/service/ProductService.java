@@ -15,7 +15,7 @@ import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.ProductMapper;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +86,8 @@ public class ProductService {
       String name,
       ProductStatus status,
       Double price,
-      Instant startDay,
-      Instant endDay,
+      LocalDate startDay,
+      LocalDate endDay,
       String code,
       int page,
       int size) {
@@ -152,8 +152,8 @@ public class ProductService {
 
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
-    productEntity.setStartDay(dto.getStartedAt());
-    productEntity.setEndDate(dto.getEndAt());
+    productEntity.setStartDate(dto.getStartDate());
+    productEntity.setEndDate(dto.getEndDate());
     productEntity.setType(dto.getType());
     productEntity.setDescription(dto.getDescription());
     productEntity.setQuantity(dto.getQuantity());

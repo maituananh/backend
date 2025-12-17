@@ -3,7 +3,7 @@ package com.spring.backend.repository;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.criteria.Predicate;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -31,8 +31,8 @@ public interface ProductRepository
       String name,
       ProductStatus status,
       Double price,
-      Instant startDay,
-      Instant endDay,
+      LocalDate startDate,
+      LocalDate endDate,
       String code) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
@@ -49,8 +49,8 @@ public interface ProductRepository
         predicates.add(cb.equal(root.get("price"), price));
       }
 
-      if (startDay != null && endDay != null) {
-        predicates.add(cb.between(root.get("startDay"), startDay, endDay));
+      if (startDate != null && endDate != null) {
+        predicates.add(cb.between(root.get("startDate"), startDate, endDate));
       }
 
       if (code != null && code.isEmpty()) {
