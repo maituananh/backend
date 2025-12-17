@@ -3,7 +3,7 @@ package com.spring.backend.dto.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,9 +30,9 @@ public class ProductRequestDto {
 
   @NotNull private Integer quantity;
 
-  @NotNull private Instant startedAt;
+  @NotNull private LocalDate startDate;
 
-  @NotNull private Instant endAt;
+  @NotNull private LocalDate endDate;
 
   @NotNull private Long categoryId;
 

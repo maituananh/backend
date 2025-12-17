@@ -6,10 +6,11 @@ import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.enums.ProductStatus;
 import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,10 +41,14 @@ public class ProductController {
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "status", required = false) ProductStatus status,
       @RequestParam(value = "price", required = false) Double price,
-      @RequestParam(value = "startDay", required = false) Instant startDay,
-      @RequestParam(value = "endDay", required = false) Instant endDay,
+      @RequestParam(value = "startDate", required = false)
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate startDate,
+      @RequestParam(value = "endDate", required = false)
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate endDate,
       @RequestParam(value = "code", required = false) String code) {
-    return productService.search(name, status, price, startDay, endDay, code, page, size);
+    return productService.search(name, status, price, startDate, endDate, code, page, size);
   }
 
   @GetMapping("/search-by-type")

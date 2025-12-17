@@ -1,6 +1,6 @@
 package com.spring.backend.dto.product;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import lombok.*;
 
 @Getter
@@ -12,8 +12,8 @@ public class ProductResponseDto {
   private Long id;
   private String name;
   private Double price;
-  private Instant startDay;
-  private Instant endDate;
+  private LocalDate startDate;
+  private LocalDate endDate;
   private String type;
   private String image;
   private String code;

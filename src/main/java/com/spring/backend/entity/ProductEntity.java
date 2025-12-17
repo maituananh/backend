@@ -2,7 +2,7 @@ package com.spring.backend.entity;
 
 import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +22,11 @@ public class ProductEntity extends BaseEntity {
   @Column(name = "price")
   private double price;
 
-  @Column(name = "startDay")
-  private Instant startDay;
+  @Column(name = "start_date")
+  private LocalDate startDate;
 
-  @Column(name = "endDate")
-  private Instant endDate;
+  @Column(name = "end_date")
+  private LocalDate endDate;
 
   @Column(name = "type")
   private String type;
