@@ -32,6 +32,7 @@ public class InitDB implements CommandLineRunner {
               .cardId("044444444444444")
               .address("admin123")
               .gender("female")
+              .isActive(true)
               .role(UserRole.ADMIN)
               .build());
     }
@@ -49,6 +50,7 @@ public class InitDB implements CommandLineRunner {
               .cardId("044444444444444")
               .address("admin123")
               .gender("female")
+              .isActive(true)
               .role(UserRole.CUSTOMER)
               .createdAt(Instant.now())
               .build());

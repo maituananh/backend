@@ -45,6 +45,9 @@ public class UserEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
+  @Column(name = "is_active", nullable = false)
+  private Boolean isActive = true;
+
   @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<ProductEntity> products;
 }
