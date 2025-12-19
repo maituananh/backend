@@ -56,8 +56,10 @@ public class ProductService {
   public ProductResponseDto createProduct(ProductRequestDto dto) {
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
-    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
-
+    CategoryEntity categoryEntity =
+        categoryRepository
+            .findByIdAndIsActive(dto.getCategoryId(), true)
+            .orElseThrow(() -> new RuntimeException("Category is inactive or not found"));
     ProductEntity productEntity =
         ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
 
@@ -146,7 +148,8 @@ public class ProductService {
   @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
-    CategoryEntity categoryEntity = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+    CategoryEntity categoryEntity =
+        categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
 
