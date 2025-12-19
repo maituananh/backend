@@ -90,7 +90,6 @@ public class CategoryServiceImpl implements CategoryService {
       creator = userRepository.findById(entity.getCreatedBy()).orElse(null);
     }
 
-    categoryRepository.save(entity);
     return CategoryMapper.toCategoryDto(entity, creator);
   }
 
