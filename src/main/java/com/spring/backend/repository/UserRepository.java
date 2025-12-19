@@ -16,6 +16,8 @@ public interface UserRepository
 
   Optional<UserEntity> findByUsername(String username);
 
+  long countByIsActiveIsTrue();
+
   static Specification<UserEntity> search(
       String name, String email, String phone, String cardId, String username) {
 
