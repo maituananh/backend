@@ -19,4 +19,5 @@ public class ProductDetailResponseDto {
   private String type;
   private String code;
   private List<ImageResponseDto> images;
+  private Integer quantity;
 }
