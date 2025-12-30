@@ -2,6 +2,7 @@ package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.image.ImageResponseDto;
+import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
@@ -14,6 +15,7 @@ import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
+import com.spring.backend.service.mapper.PageMapper;
 import com.spring.backend.service.mapper.ProductMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -84,19 +86,19 @@ public class ProductService {
     return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
-  public Page<ProductResponseDto> search(
+  public Pagination<ProductResponseDto> search(
       String name,
       ProductStatus status,
       Double price,
       LocalDate startDay,
       LocalDate endDay,
       String code,
-      int page,
-      int size) {
+      Integer page,
+      Integer size) {
     Specification<ProductEntity> spec =
         ProductRepository.search(name, status, price, startDay, endDay, code);
 
-    Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageMapper.getPageable(page, size);
 
     Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
 
@@ -109,7 +111,7 @@ public class ProductService {
       productResponseDtos.add(ProductMapper.toProductResponse(productEntity, imageUrl));
     }
 
-    return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
+    return PageMapper.toPagination(pageProductEntity, productResponseDtos);
   }
 
   public Page<ProductResponseDto> searchByType(String type, int page, int size) {
