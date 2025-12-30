@@ -1,5 +1,6 @@
 package com.spring.backend.controller.product;
 
+import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
@@ -35,9 +36,9 @@ public class ProductController {
   }
 
   @GetMapping("/search")
-  public Page<ProductResponseDto> searchProduct(
-      @RequestParam(value = "page", required = false) int page,
-      @RequestParam(value = "size", required = false) int size,
+  public Pagination<ProductResponseDto> searchProduct(
+      @RequestParam(value = "page", required = false) Integer page,
+      @RequestParam(value = "size", required = false) Integer size,
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "status", required = false) ProductStatus status,
       @RequestParam(value = "price", required = false) Double price,
