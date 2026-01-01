@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 @Repository
 public interface ProductRepository
@@ -21,9 +23,7 @@ public interface ProductRepository
   @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
   Page<ProductEntity> findByNameLikeIgnoreCase(String name, Pageable pageable);
 
-  Page<ProductEntity> findByType(
-      String type,
-      Pageable pageable); // lấy danh sách sản phẩm theo loại , có phân trang và sắp xếp
+  Page<ProductEntity> findByType(String type, Pageable pageable);
 
   List<ProductEntity> findByCustomerId(Long customerId);
 
@@ -33,11 +33,12 @@ public interface ProductRepository
       Double price,
       LocalDate startDate,
       LocalDate endDate,
-      String code) {
+      String code,
+      List<Integer> categoryIds) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      if (name != null) {
+      if (StringUtils.isNotBlank(name)) {
         predicates.add(cb.like(root.get("name"), "%" + name + "%"));
       }
 
@@ -53,8 +54,12 @@ public interface ProductRepository
         predicates.add(cb.between(root.get("startDate"), startDate, endDate));
       }
 
-      if (code != null && code.isEmpty()) {
+      if (StringUtils.isNotBlank(code)) {
         predicates.add(cb.equal(root.get("code"), code));
+      }
+
+      if (!CollectionUtils.isEmpty(categoryIds)) {
+        predicates.add(root.get("category").get("id").in(categoryIds));
       }
 
       return cb.and(predicates.toArray(new Predicate[0]));

@@ -44,7 +44,11 @@ public class ProductEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private ProductStatus status;
 
-  @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(
+      mappedBy = "product",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+      orphanRemoval = true)
   private List<ImageEntity> images;
 
   @Column(name = "daily_profit")
@@ -54,7 +58,7 @@ public class ProductEntity extends BaseEntity {
   @JoinColumn(name = "category_id")
   private CategoryEntity category;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "customer_id")
   private UserEntity customer;
 
