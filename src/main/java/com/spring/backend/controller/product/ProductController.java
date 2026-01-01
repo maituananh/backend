@@ -48,8 +48,10 @@ public class ProductController {
       @RequestParam(value = "endDate", required = false)
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate endDate,
-      @RequestParam(value = "code", required = false) String code) {
-    return productService.search(name, status, price, startDate, endDate, code, page, size);
+      @RequestParam(value = "code", required = false) String code,
+      @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds) {
+    return productService.search(
+        name, status, price, startDate, endDate, code, categoryIds, page, size);
   }
 
   @GetMapping("/search-by-type")

@@ -58,14 +58,17 @@ public class ProductService {
   public ProductResponseDto createProduct(ProductRequestDto dto) {
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+
     CategoryEntity categoryEntity =
         categoryRepository
             .findByIdAndIsActive(dto.getCategoryId(), true)
             .orElseThrow(() -> new RuntimeException("Category is inactive or not found"));
+
     ProductEntity productEntity =
         ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
 
     ProductEntity productUpdated = productRepository.save(productEntity);
+
     return ProductMapper.toProductResponse(
         productUpdated, getImage(imageEntities.getFirst().getFileName()));
   }
@@ -93,10 +96,11 @@ public class ProductService {
       LocalDate startDay,
       LocalDate endDay,
       String code,
+      List<Integer> categoryIds,
       Integer page,
       Integer size) {
     Specification<ProductEntity> spec =
-        ProductRepository.search(name, status, price, startDay, endDay, code);
+        ProductRepository.search(name, status, price, startDay, endDay, code, categoryIds);
 
     Pageable pageable = PageMapper.getPageable(page, size);
 
