@@ -1,5 +1,6 @@
 package com.spring.backend.repository;
 
+import com.spring.backend.dto.dashboard.StatisticProductByMonthDto;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.criteria.Predicate;
@@ -22,6 +23,19 @@ public interface ProductRepository
 
   @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
   Page<ProductEntity> findByNameLikeIgnoreCase(String name, Pageable pageable);
+
+  @Query(
+      """
+  SELECT new com.spring.backend.dto.dashboard.StatisticProductByMonthDto(
+    MONTH(p.startDate),
+    COUNT(p)
+  )
+  FROM ProductEntity p
+  WHERE YEAR(p.startDate) = :year
+  GROUP BY MONTH(p.startDate)
+  ORDER BY MONTH(p.startDate)
+""")
+  List<StatisticProductByMonthDto> statisticProductByMonth(int year);
 
   Page<ProductEntity> findByType(String type, Pageable pageable);
 
