@@ -21,9 +21,6 @@ import org.springframework.util.CollectionUtils;
 public interface ProductRepository
     extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
 
-  @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
-  Page<ProductEntity> findByNameLikeIgnoreCase(String name, Pageable pageable);
-
   @Query(
       """
     SELECT
@@ -39,6 +36,23 @@ public interface ProductRepository
   Page<ProductEntity> findByType(String type, Pageable pageable);
 
   List<ProductEntity> findByCustomerId(Long customerId);
+
+  static Specification<ProductEntity> findByDateAndStatus(
+      final String dateType, final LocalDate localDate, final ProductStatus status) {
+    return (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
+
+      if (localDate != null) {
+        predicates.add(cb.lessThan(root.get(dateType), localDate));
+      }
+
+      if (status != null) {
+        predicates.add(cb.equal(root.get("status"), status));
+      }
+
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
+  }
 
   static Specification<ProductEntity> search(
       String name,
