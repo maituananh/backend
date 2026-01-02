@@ -1,8 +1,11 @@
 package com.spring.backend.service;
 
 import com.spring.backend.dto.dashboard.DashboardResponseDto;
+import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
+import java.time.Year;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +22,12 @@ public class DashboardService {
     long numberOfUserActive = userRepository.countByIsActiveIsTrue();
 
     return new DashboardResponseDto(numberOfProduct, numberOfUser, numberOfUserActive);
+  }
+
+  public List<ProductStatistic> statisticProductsByCurrentYear() {
+
+    int year = Year.now().getValue();
+
+    return productRepository.statisticProductByMonth(year);
   }
 }
