@@ -1,7 +1,7 @@
 package com.spring.backend.repository;
 
-import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.entity.ProductEntity;
+import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;

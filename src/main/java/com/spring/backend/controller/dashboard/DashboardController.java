@@ -21,7 +21,7 @@ public class DashboardController {
     return dashboardService.getStatistic();
   }
 
-  @GetMapping("/statistic-months")
+  @GetMapping("/statistic-products")
   public List<ProductStatistic> statisticProducts() {
     return dashboardService.statisticProductsByCurrentYear();
   }
