@@ -1,13 +1,12 @@
 package com.spring.backend.controller.dashboard;
 
 import com.spring.backend.dto.dashboard.DashboardResponseDto;
-import com.spring.backend.dto.dashboard.StatisticProductByMonthDto;
+import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.service.DashboardService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,8 +21,8 @@ public class DashboardController {
     return dashboardService.getStatistic();
   }
 
-  @GetMapping("/statistic-products")
-  public List<StatisticProductByMonthDto> statisticProducts(@RequestParam int year) {
-    return dashboardService.statisticProductsByCurrentYear(year);
+  @GetMapping("/statistic-months")
+  public List<ProductStatistic> statisticProducts() {
+    return dashboardService.statisticProductsByCurrentYear();
   }
 }

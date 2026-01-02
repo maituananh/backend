@@ -1,9 +1,10 @@
 package com.spring.backend.service;
 
 import com.spring.backend.dto.dashboard.DashboardResponseDto;
-import com.spring.backend.dto.dashboard.StatisticProductByMonthDto;
+import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
+import java.time.Year;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,18 +24,34 @@ public class DashboardService {
     return new DashboardResponseDto(numberOfProduct, numberOfUser, numberOfUserActive);
   }
 
-  public List<StatisticProductByMonthDto> statisticProductsByCurrentYear(int year) {
+  public List<ProductStatistic> statisticProductsByCurrentYear() {
 
-    List<StatisticProductByMonthDto> data = productRepository.statisticProductByMonth(year);
+    int year = Year.now().getValue();
 
-    Map<Integer, Long> map = new HashMap<>();
-    data.forEach(d -> map.put(d.getMonth(), d.getCount()));
+    List<ProductStatistic> data = productRepository.statisticProductByMonth(year);
 
-    List<StatisticProductByMonthDto> result = new ArrayList<>();
+    Map<Integer, Integer> map = new HashMap<>();
+    data.forEach(d -> map.put(d.getMonth(), d.getProductCount()));
+
+    List<ProductStatistic> result = new ArrayList<>();
+
     for (int month = 1; month <= 12; month++) {
-      result.add(new StatisticProductByMonthDto(month, map.getOrDefault(month, 0L)));
-    }
+      final int m = month;
+      int count = map.getOrDefault(m, 0);
 
+      result.add(
+          new ProductStatistic() {
+            @Override
+            public int getMonth() {
+              return m;
+            }
+
+            @Override
+            public int getProductCount() {
+              return count;
+            }
+          });
+    }
     return result;
   }
 }

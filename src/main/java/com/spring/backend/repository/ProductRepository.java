@@ -1,6 +1,6 @@
 package com.spring.backend.repository;
 
-import com.spring.backend.dto.dashboard.StatisticProductByMonthDto;
+import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.criteria.Predicate;
@@ -26,16 +26,15 @@ public interface ProductRepository
 
   @Query(
       """
-  SELECT new com.spring.backend.dto.dashboard.StatisticProductByMonthDto(
-    MONTH(p.startDate),
-    COUNT(p)
-  )
-  FROM ProductEntity p
-  WHERE YEAR(p.startDate) = :year
-  GROUP BY MONTH(p.startDate)
-  ORDER BY MONTH(p.startDate)
-""")
-  List<StatisticProductByMonthDto> statisticProductByMonth(int year);
+    SELECT
+      MONTH(p.startDate) AS month,
+      COUNT(p) AS productCount
+    FROM ProductEntity p
+    WHERE YEAR(p.startDate) = :year
+    GROUP BY MONTH(p.startDate)
+    ORDER BY MONTH(p.startDate)
+  """)
+  List<ProductStatistic> statisticProductByMonth(int year);
 
   Page<ProductEntity> findByType(String type, Pageable pageable);
 
