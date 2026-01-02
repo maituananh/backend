@@ -21,9 +21,6 @@ import org.springframework.util.CollectionUtils;
 public interface ProductRepository
     extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
 
-  @Query("SELECT p FROM ProductEntity p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
-  Page<ProductEntity> findByNameLikeIgnoreCase(String name, Pageable pageable);
-
   @Query(
       """
     SELECT
