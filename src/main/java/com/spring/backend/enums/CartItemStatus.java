@@ -1,6 +1,6 @@
 package com.spring.backend.enums;
 
-public enum CardItemStatus {
+public enum CartItemStatus {
   PAID,
   PENDING
 }

@@ -1,6 +1,6 @@
 package com.spring.backend.entity;
 
-import com.spring.backend.enums.CardItemStatus;
+import com.spring.backend.enums.CartItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -20,11 +20,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(exclude = {"card", "product"})
 @EqualsAndHashCode(callSuper = true)
-public class CardItemEntity extends BaseEntity {
+public class CartItemEntity extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "card_id", nullable = false)
-  private CardEntity card;
+  private CartEntity card;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "product_id", nullable = false)
@@ -38,12 +38,12 @@ public class CardItemEntity extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private CardItemStatus status;
+  private CartItemStatus status;
 
   @PrePersist
   void prePersist() {
     if (status == null) {
-      status = CardItemStatus.PENDING;
+      status = CartItemStatus.PENDING;
     }
     if (quantity == null || quantity <= 0) {
       quantity = 1;

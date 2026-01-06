@@ -1,4 +1,4 @@
-package com.spring.backend.dto.card;
+package com.spring.backend.dto.cart;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CardItemResponseDto {
+public class CartItemResponseDto {
   private Long productId;
   private String productName;
   private Double price;

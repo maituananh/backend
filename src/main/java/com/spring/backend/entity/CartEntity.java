@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(exclude = {"customer", "items"})
 @EqualsAndHashCode(callSuper = true)
-public class CardEntity extends BaseEntity {
+public class CartEntity extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "customer_id", nullable = false)
@@ -30,5 +30,5 @@ public class CardEntity extends BaseEntity {
       orphanRemoval = true,
       fetch = FetchType.LAZY)
   @Builder.Default
-  private List<CardItemEntity> items = new ArrayList<>();
+  private List<CartItemEntity> items = new ArrayList<>();
 }
