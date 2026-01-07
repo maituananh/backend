@@ -16,10 +16,10 @@ public class CartMapper {
         entity.getStatus().name());
   }
 
-  public static CartResponseDto toCardDto(CartEntity card) {
+  public static CartResponseDto toCartDto(CartEntity cart) {
     return new CartResponseDto(
-        card.getId(),
-        card.getCustomer().getId(),
-        card.getItems().stream().map(CartMapper::toItemDto).toList());
+        cart.getId(),
+        cart.getCustomer().getId(),
+        cart.getItems().stream().map(CartMapper::toItemDto).toList());
   }
 }

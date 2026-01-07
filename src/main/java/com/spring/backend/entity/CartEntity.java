@@ -8,9 +8,9 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-    name = "cards",
+    name = "carts",
     uniqueConstraints = @UniqueConstraint(columnNames = "customer_id"),
-    indexes = @Index(name = "idx_card_customer", columnList = "customer_id"))
+    indexes = @Index(name = "idx_cart_customer", columnList = "customer_id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class CartEntity extends BaseEntity {
   private UserEntity customer;
 
   @OneToMany(
-      mappedBy = "card",
+      mappedBy = "cart",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)

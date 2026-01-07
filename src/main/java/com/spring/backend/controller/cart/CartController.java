@@ -8,19 +8,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/cards")
+@RequestMapping("/api/carts")
 @RequiredArgsConstructor
 public class CartController {
 
-  private final CartService cardService;
+  private final CartService cartService;
 
   @PostMapping
-  public CartResponseDto addToCard(@Valid @RequestBody AddToCartRequestDto dto) {
-    return cardService.addToCard(dto);
+  public CartResponseDto addToCart(@Valid @RequestBody AddToCartRequestDto dto) {
+    return cartService.addToCart(dto);
   }
 
-  @GetMapping("/{customerId}")
-  public CartResponseDto getMyCard(@PathVariable Long customerId) {
-    return cardService.getMyCard(customerId);
+  @GetMapping
+  public CartResponseDto getCartByCustomerId() {
+    return cartService.getCartByCustomerId();
   }
 }

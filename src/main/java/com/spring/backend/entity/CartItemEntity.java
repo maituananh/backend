@@ -7,24 +7,24 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-    name = "card_items",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"card_id", "product_id"})},
+    name = "cart_items",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"cart_id", "product_id"})},
     indexes = {
-      @Index(name = "idx_card_item_card", columnList = "card_id"),
-      @Index(name = "idx_card_item_product", columnList = "product_id")
+      @Index(name = "idx_cart_item_cart", columnList = "cart_id"),
+      @Index(name = "idx_cart_item_product", columnList = "product_id")
     })
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(exclude = {"card", "product"})
+@ToString(exclude = {"cart", "product"})
 @EqualsAndHashCode(callSuper = true)
 public class CartItemEntity extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "card_id", nullable = false)
-  private CartEntity card;
+  @JoinColumn(name = "cart_id", nullable = false)
+  private CartEntity cart;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "product_id", nullable = false)

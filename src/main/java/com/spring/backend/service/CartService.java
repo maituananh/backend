@@ -13,23 +13,23 @@ import com.spring.backend.repository.CartRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.CartMapper;
-import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
 
-  private final CartRepository cardRepository;
-  private final CartItemRepository cardItemRepository;
+  private final CartRepository cartRepository;
+  private final CartItemRepository cartItemRepository;
   private final ProductRepository productRepository;
   private final UserRepository userRepository;
   private final UserHelper userHelper;
 
   @Transactional
-  public CartResponseDto addToCard(AddToCartRequestDto dto) {
+  public CartResponseDto addToCart(AddToCartRequestDto dto) {
 
     if (dto.getQuantity() == null || dto.getQuantity() <= 0) {
       throw new RuntimeException("Quantity must be greater than 0");
@@ -40,10 +40,10 @@ public class CartService {
             .findById(customerId)
             .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-    CartEntity card =
-        cardRepository
+    CartEntity cart =
+        cartRepository
             .findByCustomerId(customerId)
-            .orElseGet(() -> cardRepository.save(CartEntity.builder().customer(customer).build()));
+            .orElseGet(() -> cartRepository.save(CartEntity.builder().customer(customer).build()));
 
     ProductEntity product =
         productRepository
@@ -51,7 +51,7 @@ public class CartService {
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
     Optional<CartItemEntity> existingItem =
-        cardItemRepository.findByCard_IdAndProduct_Id(card.getId(), product.getId());
+        cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
     if (existingItem.isPresent()) {
       CartItemEntity item = existingItem.get();
@@ -59,26 +59,28 @@ public class CartService {
     } else {
       CartItemEntity newItem =
           CartItemEntity.builder()
-              .card(card)
+              .cart(cart)
               .product(product)
               .price(product.getPrice())
               .quantity(dto.getQuantity())
               .status(CartItemStatus.PENDING)
               .build();
 
-      card.getItems().add(newItem);
+      cart.getItems().add(newItem);
     }
-    return CartMapper.toCardDto(card);
+    return CartMapper.toCartDto(cart);
   }
 
-  @Transactional
-  public CartResponseDto getMyCard(Long customerId) {
+  @Transactional(readOnly = true)
+  public CartResponseDto getCartByCustomerId() {
 
-    CartEntity card =
-        cardRepository
+    Long customerId = userHelper.getCurrentUserId();
+
+    CartEntity cart =
+        cartRepository
             .findByCustomerId(customerId)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-    return CartMapper.toCardDto(card);
+    return CartMapper.toCartDto(cart);
   }
 }
