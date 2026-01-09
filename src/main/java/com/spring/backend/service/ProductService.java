@@ -41,6 +41,12 @@ public class ProductService {
   private final ImageRepository imageRepository;
   private final S3Adapter s3Adapter;
 
+  private void validateImageIds(List<Long> imageIds) {
+    if (CollectionUtils.isEmpty(imageIds) || imageIds.size() != 4) {
+      throw new IllegalArgumentException("Product must have exactly 4 images");
+    }
+  }
+
   public List<ProductResponseDto> getAll() {
     List<ProductEntity> entities = productRepository.findAll();
 
@@ -159,7 +165,13 @@ public class ProductService {
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+
+    validateImageIds(dto.getImageIds());
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+
+    if (imageEntities.size() != 4) {
+      throw new IllegalArgumentException("Some images not found");
+    }
 
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
@@ -170,6 +182,9 @@ public class ProductService {
     productEntity.setQuantity(dto.getQuantity());
     productEntity.setCategory(categoryEntity);
     productEntity.setCustomer(userEntity);
+    productEntity.setImages(imageEntities);
+
+    productEntity.getImages().clear();
     productEntity.setImages(imageEntities);
 
     if (dto.getCode() != null) {
