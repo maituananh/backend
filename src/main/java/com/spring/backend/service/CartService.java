@@ -72,7 +72,7 @@ public class CartService {
     return CartMapper.toCartDto(cart);
   }
 
-  public CartResponseDto getCartByCustomerId() {
+  public CartResponseDto getMyCart() {
 
     Long customerId = userHelper.getCurrentUserId();
 

@@ -20,7 +20,7 @@ public class CartController {
   }
 
   @GetMapping
-  public CartResponseDto getCartByCustomerId() {
-    return cartService.getCartByCustomerId();
+  public CartResponseDto getMyCart() {
+    return cartService.getMyCart();
   }
 }
