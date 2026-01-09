@@ -15,8 +15,8 @@ services:
     command: server /data --console-address ":9001"
 
   mysql:
-    image: mysql:8.0.0
-    restart: always
+    image: mysql:9.5.0
+    restart: no
     ports:
       - 3306:3306
     expose:
