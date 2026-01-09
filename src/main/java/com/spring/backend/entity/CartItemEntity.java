@@ -39,14 +39,4 @@ public class CartItemEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private CartItemStatus status;
-
-  @PrePersist
-  void prePersist() {
-    if (status == null) {
-      status = CartItemStatus.PENDING;
-    }
-    if (quantity == null || quantity <= 0) {
-      quantity = 1;
-    }
-  }
 }

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -71,7 +72,6 @@ public class CartService {
     return CartMapper.toCartDto(cart);
   }
 
-  @Transactional(readOnly = true)
   public CartResponseDto getCartByCustomerId() {
 
     Long customerId = userHelper.getCurrentUserId();
