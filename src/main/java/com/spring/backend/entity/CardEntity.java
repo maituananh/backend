@@ -1,7 +1,6 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
-import java.time.Instant;
 import lombok.*;
 
 @Entity
@@ -11,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CardsEntity {
+public class CardEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -22,21 +21,4 @@ public class CardsEntity {
 
   @Column(name = "number_of_card", nullable = false, unique = true)
   private String numberOfCard;
-
-  @Column(name = "created_at", updatable = false)
-  private Instant createdAt;
-
-  @Column(name = "updated_at")
-  private Instant updatedAt;
-
-  @PrePersist
-  protected void onCreate() {
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
-  }
-
-  @PreUpdate
-  protected void onUpdate() {
-    this.updatedAt = Instant.now();
-  }
 }
