@@ -41,12 +41,6 @@ public class ProductService {
   private final ImageRepository imageRepository;
   private final S3Adapter s3Adapter;
 
-  private void validateImageIds(List<Long> imageIds) {
-    if (CollectionUtils.isEmpty(imageIds) || imageIds.size() != 4) {
-      throw new IllegalArgumentException("Product must have exactly 4 images");
-    }
-  }
-
   public List<ProductResponseDto> getAll() {
     List<ProductEntity> entities = productRepository.findAll();
 
@@ -166,7 +160,6 @@ public class ProductService {
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
 
-    validateImageIds(dto.getImageIds());
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
 
     if (imageEntities.size() != 4) {
