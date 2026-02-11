@@ -159,7 +159,12 @@ public class ProductService {
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
+
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+
+    if (imageEntities.size() != 4) {
+      throw new IllegalArgumentException("Some images not found");
+    }
 
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
@@ -170,6 +175,9 @@ public class ProductService {
     productEntity.setQuantity(dto.getQuantity());
     productEntity.setCategory(categoryEntity);
     productEntity.setCustomer(userEntity);
+    productEntity.setImages(imageEntities);
+
+    productEntity.getImages().clear();
     productEntity.setImages(imageEntities);
 
     if (dto.getCode() != null) {
