@@ -37,5 +37,10 @@ aws:
     endpoint: ${AWS_S3_ENDPOINT:http://localhost:9000}
     bucket: pawn-service
 
+stripe:
+  secret-key: ${STRIPE_API_KEY:sk_test_xxxxpI0XB5C}
+  success-url: ${STRIPE_SUCCESS_URL:https://mail.google.com}
+  cancel-url: ${STRIPE_CANCEL_URL:https://dashboard.stripe.com}
+
 server:
   port: ${BE_PORT:8080}

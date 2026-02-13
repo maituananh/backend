@@ -39,4 +39,8 @@ public class CartItemEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private CartItemStatus status;
+
+  public Long getTotalItem() {
+    return Math.round(getPrice() * getQuantity());
+  }
 }

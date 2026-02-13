@@ -41,7 +41,7 @@ public class ProductService {
   private final ImageRepository imageRepository;
   private final S3Adapter s3Adapter;
 
-  private void valivalidateProductDate(LocalDate startDate, LocalDate endDate) {
+  private void validateProductDate(LocalDate startDate, LocalDate endDate) {
     LocalDate today = LocalDate.now();
 
     if (startDate == null || endDate == null) {
@@ -75,7 +75,7 @@ public class ProductService {
   @Transactional
   public ProductResponseDto createProduct(ProductRequestDto dto) {
 
-    valivalidateProductDate(dto.getStartDate(), dto.getEndDate());
+    validateProductDate(dto.getStartDate(), dto.getEndDate());
 
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -175,7 +175,7 @@ public class ProductService {
   @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
 
-    valivalidateProductDate(dto.getStartDate(), dto.getEndDate());
+    validateProductDate(dto.getStartDate(), dto.getEndDate());
 
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
     CategoryEntity categoryEntity =
