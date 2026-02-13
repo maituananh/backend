@@ -41,6 +41,22 @@ public class ProductService {
   private final ImageRepository imageRepository;
   private final S3Adapter s3Adapter;
 
+  private void valivalidateProductDate(LocalDate startDate, LocalDate endDate) {
+    LocalDate today = LocalDate.now();
+
+    if (startDate == null || endDate == null) {
+      throw new IllegalArgumentException("Start date and end date must not be null");
+    }
+
+    if (startDate.isBefore(today)) {
+      throw new IllegalArgumentException("Start date must be today or later");
+    }
+
+    if (endDate.isBefore(startDate)) {
+      throw new IllegalArgumentException("End date must be after or equal start date");
+    }
+  }
+
   public List<ProductResponseDto> getAll() {
     List<ProductEntity> entities = productRepository.findAll();
 
@@ -58,6 +74,9 @@ public class ProductService {
 
   @Transactional
   public ProductResponseDto createProduct(ProductRequestDto dto) {
+
+    valivalidateProductDate(dto.getStartDate(), dto.getEndDate());
+
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
 
@@ -155,6 +174,9 @@ public class ProductService {
 
   @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
+
+    valivalidateProductDate(dto.getStartDate(), dto.getEndDate());
+
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
