@@ -18,8 +18,8 @@ public class CardController {
     return cardService.create(dto);
   }
 
-  @GetMapping("/users/{userId}/card-user")
-  public List<CardResponseDto> getCardsByUser(@PathVariable Long userId) {
-    return cardService.getByUserId(userId);
+  @GetMapping("/cards")
+  public List<CardResponseDto> getMyCards() {
+    return cardService.getMyCards();
   }
 }

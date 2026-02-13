@@ -34,20 +34,19 @@ public class CardService {
 
     CardEntity saved = cardRepository.save(entity);
 
-    return CardResponseDto.builder()
-        .id(saved.getId())
-        .number_of_card(saved.getNumberOfCard())
-        .build();
+    return CardResponseDto.builder().id(saved.getId()).numberCard(saved.getNumberOfCard()).build();
   }
 
-  public List<CardResponseDto> getByUserId(Long userId) {
+  public List<CardResponseDto> getMyCards() {
+
+    Long userId = userHelper.getCurrentUserId();
 
     return cardRepository.findByCustomerId(userId).stream()
         .map(
             card ->
                 CardResponseDto.builder()
                     .id(card.getId())
-                    .number_of_card(card.getNumberOfCard())
+                    .numberCard(card.getNumberOfCard())
                     .build())
         .toList();
   }

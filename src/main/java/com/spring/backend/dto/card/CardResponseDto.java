@@ -7,5 +7,5 @@ import lombok.Getter;
 @Builder
 public class CardResponseDto {
   private Long id;
-  private String number_of_card;
+  private String numberCard;
 }
