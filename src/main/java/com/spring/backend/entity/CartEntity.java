@@ -3,6 +3,7 @@ package com.spring.backend.entity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -31,4 +32,14 @@ public class CartEntity extends BaseEntity {
       fetch = FetchType.LAZY)
   @Builder.Default
   private List<CartItemEntity> items = new ArrayList<>();
+
+  public Long getTotalAmount(List<CartItemEntity> cartItemEntities) {
+    return cartItemEntities.stream().mapToLong(CartItemEntity::getTotalItem).sum();
+  }
+
+  public String getCartName(List<CartItemEntity> cartItemEntities) {
+    return cartItemEntities.stream()
+        .map(i -> i.getProduct().getName())
+        .collect(Collectors.joining(", "));
+  }
 }

@@ -11,10 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CardEntity extends BaseEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id", nullable = false)
   private UserEntity customer;
