@@ -67,6 +67,7 @@ public class ProductMapper {
         .quantity(entity.getQuantity())
         .category(CategoryMapper.toCategoryDto(entity.getCategory()))
         .user(UserMapper.toUserDto(entity.getCustomer()))
+        .dailyProfit(entity.getDailyProfit())
         .build();
   }
 }

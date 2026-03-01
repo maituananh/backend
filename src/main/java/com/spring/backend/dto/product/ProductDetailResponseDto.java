@@ -24,4 +24,5 @@ public class ProductDetailResponseDto {
   private Integer quantity;
   private CategoryResponseDto category;
   private UserDto user;
+  private Double dailyProfit;
 }
