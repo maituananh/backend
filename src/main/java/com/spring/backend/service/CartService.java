@@ -2,10 +2,7 @@ package com.spring.backend.service;
 
 import com.spring.backend.dto.cart.AddToCartRequestDto;
 import com.spring.backend.dto.cart.CartResponseDto;
-import com.spring.backend.entity.CartEntity;
-import com.spring.backend.entity.CartItemEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
+import com.spring.backend.entity.*;
 import com.spring.backend.enums.CartItemStatus;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.CartItemRepository;
@@ -13,6 +10,7 @@ import com.spring.backend.repository.CartRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.CartMapper;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,11 +73,27 @@ public class CartService {
   public CartResponseDto getMyCart() {
     Long customerId = userHelper.getCurrentUserId();
 
+    CartEntity cart = cartRepository.findByCustomerId(customerId).orElse(null);
+
+    return cart == null ? null : CartMapper.toCartDto(cart);
+  }
+
+  @Transactional
+  public void deleteItemOnCart(List<Long> productIds) {
+    Long customerId = userHelper.getCurrentUserId();
+
     CartEntity cart =
         cartRepository
             .findByCustomerId(customerId)
-            .orElse(null);
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-    return cart == null ? null : CartMapper.toCartDto(cart);
+    List<CartItemEntity> itemsToRemove =
+        cart.getItems().stream().filter(i -> productIds.contains(i.getProduct().getId())).toList();
+
+    if (itemsToRemove.size() != productIds.size()) {
+      throw new RuntimeException("Some items not found in cart");
+    }
+
+    itemsToRemove.forEach(cart.getItems()::remove);
   }
 }
