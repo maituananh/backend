@@ -142,3 +142,4 @@ How to do CI/CD?
 4. Run github-runner by background: nohup ./run.sh > runner.log 2>&1 &
 ```
 
+cloudflared tunnel --url localhost:8080
