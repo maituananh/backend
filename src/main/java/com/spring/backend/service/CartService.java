@@ -73,14 +73,13 @@ public class CartService {
   }
 
   public CartResponseDto getMyCart() {
-
     Long customerId = userHelper.getCurrentUserId();
 
     CartEntity cart =
         cartRepository
             .findByCustomerId(customerId)
-            .orElseThrow(() -> new RuntimeException("Cart not found"));
+            .orElse(null);
 
-    return CartMapper.toCartDto(cart);
+    return cart == null ? null : CartMapper.toCartDto(cart);
   }
 }
