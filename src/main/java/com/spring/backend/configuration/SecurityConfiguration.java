@@ -27,7 +27,8 @@ public class SecurityConfiguration {
     "/v3/api-docs/**",
     "/swagger-ui/**",
     "/api-docs.yaml",
-    "/api-docs"
+    "/api-docs",
+    "/backend/v3/api-docs/**"
   };
 
   private final InterceptorConfiguration interceptorConfiguration;

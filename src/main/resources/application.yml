@@ -44,3 +44,12 @@ stripe:
 
 server:
   port: ${BE_PORT:8080}
+  forward-headers-strategy: framework
+
+#springdoc:
+#  swagger-ui:
+#    config-url: /backend/v3/api-docs/swagger-config
+#    url: /backend/v3/api-docs
+#    path: /index.html
+#  api-docs:
+#    path: /v3/api-docs
