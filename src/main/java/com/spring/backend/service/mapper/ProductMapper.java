@@ -65,6 +65,7 @@ public class ProductMapper {
         .type(entity.getType())
         .images(images)
         .quantity(entity.getQuantity())
+        .description(entity.getDescription())
         .build();
   }
 }

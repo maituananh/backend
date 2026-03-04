@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentService {
   public PaymentResponseDto createPayment(PaymentRequestDto request) {
-      return null;
+    return null;
   }
 }
