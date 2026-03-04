@@ -43,6 +43,16 @@ services:
       - SPRING_DATASOURCE_PASSWORD=r00t
       - AWS_S3_ENDPOINT=http://minio:9000
 
+  nginx-proxy:
+    image: 'nginx:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'   # Port cho traffic web
+      - '443:443' # Port cho HTTPS
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./deploy/nginx/proxy-params.conf:/etc/nginx/snippets/proxy-params.conf
+
 volumes:
   minio_data:
     driver: local
