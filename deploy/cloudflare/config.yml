@@ -1,0 +1,14 @@
+tunnel: 3375b6de-928e-4196-a6ea-f37637830bb7
+credentials-file: C:\Users\AnhMaiTuan\.cloudflared\3375b6de-928e-4196-a6ea-f37637830bb7.json
+
+ingress:
+  - hostname: api.baotrang.io.vn
+    service: http://localhost:80
+
+  - hostname: minio-ui.baotrang.io.vn
+    service: http://localhost:80
+
+  - hostname: minio.baotrang.io.vn
+    service: http://localhost:80
+
+  - service: http_status:404
