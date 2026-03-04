@@ -1,0 +1,6 @@
+1. cloudflared tunnel login -> select domain added on cloudflare
+2. cloudflared tunnel create <tunnel-name>
+3. Use config.yml
+ 3.1: for ubuntu: copy to /home/<Username>/.cloudflared
+ 3.2: for windows: copy to C:\Users\<Username>\.cloudflared
+4. cloudflared tunnel run <tunnel-name>

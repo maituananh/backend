@@ -1,0 +1,14 @@
+tunnel: <UUID:3375b6de-928e-4196-a6ea-f37637830bb7>
+credentials-file: C:\Users\AnhMaiTuan\.cloudflared\UUID:3375b6de-928e-4196-a6ea-f37637830bb7.json
+
+ingress:
+  - hostname: baotrang.io.vn
+    service: http://localhost:8080
+
+  - hostname: minio-ui.baotrang.io.vn
+    service: http://localhost:9001
+
+  - hostname: minio.baotrang.io.vn
+    service: http://localhost:9000
+
+  - service: http_status:404
