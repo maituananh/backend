@@ -19,6 +19,7 @@ import com.spring.backend.service.mapper.PageMapper;
 import com.spring.backend.service.mapper.ProductMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -182,10 +183,20 @@ public class ProductService {
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
 
-    List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
+    List<ImageEntity> currentImages = productEntity.getImages();
 
-    if (imageEntities.size() != 4) {
-      throw new IllegalArgumentException("Some images not found");
+    if (dto.getImageIds() != null) {
+      List<ImageEntity> newImages = imageRepository.findAllById(dto.getImageIds());
+
+      if (newImages.size() != 4) {
+        throw new IllegalArgumentException("Some images not found");
+      }
+
+      if (!new HashSet<>(currentImages).containsAll(newImages)
+          || currentImages.size() != newImages.size()) {
+        currentImages.clear();
+        currentImages.addAll(newImages);
+      }
     }
 
     productEntity.setName(dto.getName());
@@ -197,23 +208,13 @@ public class ProductService {
     productEntity.setQuantity(dto.getQuantity());
     productEntity.setCategory(categoryEntity);
     productEntity.setCustomer(userEntity);
-    productEntity.setImages(imageEntities);
-
-    productEntity.getImages().clear();
-    productEntity.setImages(imageEntities);
 
     if (dto.getCode() != null) {
       productEntity.setCode(dto.getCode());
     }
 
     ProductEntity saved = productRepository.save(productEntity);
-
-    String imageUrl = null;
-    if (!imageEntities.isEmpty()) {
-      imageUrl = getImage(imageEntities.getFirst().getFileName());
-    }
-
-    return ProductMapper.toProductResponse(saved, imageUrl);
+    return ProductMapper.toProductResponse(saved, null);
   }
 
   @Transactional

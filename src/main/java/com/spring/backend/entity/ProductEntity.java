@@ -47,7 +47,7 @@ public class ProductEntity extends BaseEntity {
   @OneToMany(
       mappedBy = "product",
       fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+      cascade = CascadeType.ALL,
       orphanRemoval = true)
   private List<ImageEntity> images;
 
