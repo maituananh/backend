@@ -32,6 +32,11 @@ public class CategoryController {
     return categoryService.searchByName(name, page, size);
   }
 
+  @GetMapping("/{id}")
+  public CategoryResponseDto getCategoryById(@PathVariable Long id) {
+    return categoryService.getCategoryById(id);
+  }
+
   @PutMapping("/{id}")
   public CategoryResponseDto updateCategory(
       @PathVariable Long id, @RequestBody CategoryRequestDto request) {
