@@ -50,6 +50,23 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
+  public CategoryResponseDto getCategoryById(Long id) {
+
+    CategoryEntity category =
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    UserEntity creator = null;
+
+    if (category.getCreatedBy() != null) {
+      creator = userRepository.findById(category.getCreatedBy()).orElse(null);
+    }
+
+    return CategoryMapper.toCategoryDto(category, creator);
+  }
+
+  @Override
   public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
 
     Specification<CategoryEntity> spec = CategoryRepository.search(name);

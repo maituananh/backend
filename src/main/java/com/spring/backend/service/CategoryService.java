@@ -10,6 +10,8 @@ public interface CategoryService {
 
   List<CategoryResponseDto> getAllCategories();
 
+  CategoryResponseDto getCategoryById(Long id);
+
   Page<CategoryResponseDto> searchByName(String name, int page, int size);
 
   CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto);
