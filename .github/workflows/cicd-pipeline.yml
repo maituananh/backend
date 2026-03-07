@@ -20,36 +20,70 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Login Dockerhub
-      env:
-        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-        DOCKER_IMAGE_NAME: ${{secrets.DOCKER_IMAGE_NAME}}
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+      - uses: actions/checkout@v4
 
-    - name: Push to Dockerhub
-      run: docker push ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
-
-  deploy:
-    runs-on: self-hosted
-    needs: build
-    if: github.ref == 'refs/heads/anhkiet-branch'
-
-    steps:
-      - name: Pull Docker image
-        run: docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
-
-      - name: Delete old container if existed
-        run: docker rm -f ${{secrets.DOCKER_CONTAINER_NAME}} || true
-
-      - name: Run Docker container
+      - name: Login Dockerhub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          docker run -d -p ${{secrets.SERVER_PORT}}:${{secrets.SERVER_PORT}} \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --name ${{secrets.DOCKER_CONTAINER_NAME}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Build Docker Image
+        env:
+          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+        run: |
+          docker build -t $IMAGE:latest .
+
+      - name: Push Docker Image
+        env:
+          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+        run: |
+          docker push $IMAGE:latest
+
+      - name: Delete old Docker Hub tags (keep last 5)
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REPO: ${{ secrets.DOCKER_IMAGE_NAME }}
+        run: |
+          TOKEN=$(curl -s -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" \
+          https://hub.docker.com/v2/users/login/ | jq -r .token)
+  
+          TAGS=$(curl -s \
+          -H "Authorization: JWT $TOKEN" \
+          "https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags?page_size=100" \
+          | jq -r '.results | sort_by(.last_updated) | reverse | .[].name')
+  
+          COUNT=0
+          for TAG in $TAGS; do
+            COUNT=$((COUNT+1))
+  
+            if [ $COUNT -gt 5 ]; then
+              echo "Deleting tag: $TAG"
+              curl -s -X DELETE \
+              -H "Authorization: JWT $TOKEN" \
+              https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags/$TAG/
+            fi
+          done
+
+#  deploy:
+#    runs-on: self-hosted
+#    needs: build
+#    if: github.ref == 'refs/heads/anhkiet-branch'
+#
+#    steps:
+#      - name: Pull Docker image
+#        run: docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}:latest
+#
+#      - name: Delete old container if existed
+#        run: docker rm -f ${{secrets.DOCKER_CONTAINER_NAME}} || true
+#
+#      - name: Run Docker container
+#        run: |
+#          docker run -d -p ${{secrets.SERVER_PORT}}:${{secrets.SERVER_PORT}} \
+#            -e DB_HOST=${{ secrets.DB_HOST }} \
+#            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+#            --name ${{secrets.DOCKER_CONTAINER_NAME}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_IMAGE_NAME}}
