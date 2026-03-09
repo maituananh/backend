@@ -1,6 +1,7 @@
 package com.spring.backend.controller.chat;
 
 import com.spring.backend.dto.chat.ChatRequestDto;
+import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +17,8 @@ public class OpenAIChatController {
   private final OpenAiService openAiService;
 
   @PostMapping
-  public String sendMessage(@RequestBody ChatRequestDto chatRequestDto) {
+  public ChatResponseDto sendMessage(@RequestBody ChatRequestDto chatRequestDto) {
 
-    openAiService.handleRequest(chatRequestDto);
-    return null;
+    return openAiService.handleRequest(chatRequestDto);
   }
 }
