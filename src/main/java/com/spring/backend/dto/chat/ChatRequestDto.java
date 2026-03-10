@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -12,5 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ChatRequestDto {
   private String content;
-  private MultipartFile file;
+  private String fileUrl;
 }

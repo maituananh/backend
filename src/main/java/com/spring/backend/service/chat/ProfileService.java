@@ -1,6 +1,8 @@
 package com.spring.backend.service.chat;
 
 import com.spring.backend.dto.chat.ChatRequestDto;
+import com.spring.backend.dto.chat.ChatResponseDto;
+import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.UserRepository;
@@ -15,11 +17,11 @@ public class ProfileService extends AbstractChatService {
   private final UserHelper userHelper;
 
   @Override
-  public AbstractChatService handle(ChatRequestDto chatRequestDto) {
+  public ChatResponseDto handle(ChatRequestDto chatRequestDto) {
     Long currentUserId = userHelper.getCurrentUserId();
     UserEntity userEntity = userRepository.findById(currentUserId).orElse(null);
 
-    return null;
+    return ProfileChatResponseDto.builder().result("ok").build();
   }
 
   @Override

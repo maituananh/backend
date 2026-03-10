@@ -53,6 +53,19 @@ services:
       - ./deploy/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./deploy/nginx/proxy-params.conf:/etc/nginx/snippets/proxy-params.conf
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - 8000:8000
+      - 50000:50000
+    volumes:
+      - /var/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Để Jenkins gọi Docker máy host
+    restart: unless-stopped
+
 volumes:
   minio_data:
     driver: local

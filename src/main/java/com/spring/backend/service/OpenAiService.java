@@ -1,6 +1,7 @@
 package com.spring.backend.service;
 
 import com.spring.backend.dto.chat.ChatRequestDto;
+import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.service.chat.AbstractChatService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,26 +17,50 @@ public class OpenAiService {
   private final List<AbstractChatService> handlers;
   private final ChatClient chatClient;
 
-  public void handleRequest(ChatRequestDto chatRequestDto) {
+  public ChatResponseDto handleRequest(ChatRequestDto chatRequestDto) {
     String category = classificationQuestions(chatRequestDto.getContent());
 
-    if (category.equals("0")) {
-      throw new RuntimeException("Sorry your question is not support !!");
+    if (category == null) {
+      return ChatResponseDto.errorAnswer();
     }
 
     for (AbstractChatService handler : handlers) {
       if (handler.category().name().equalsIgnoreCase(category)) {
-        handler.handle(chatRequestDto);
+        return handler.handle(chatRequestDto);
       }
     }
+
+    return ChatResponseDto.errorAnswer();
   }
 
   private String classificationQuestions(String userInput) {
     String response =
         chatClient
             .prompt()
-            .system(
-                """
+            .system(PROMPT.formatted(getCategories()))
+            .user(userInput)
+            .call()
+            .content();
+
+    if (response == null || response.equals("0")) {
+      return null;
+    }
+
+    return response.trim();
+  }
+
+  private String getCategories() {
+    StringBuilder categories = new StringBuilder();
+
+    for (AbstractChatService handler : handlers) {
+      categories.append(handler.category()).append(": ").append(handler.description()).append("/n");
+    }
+
+    return categories.toString();
+  }
+
+  private static final String PROMPT =
+      """
                 You are an intelligent AI assistant that performs request classification.
                 Your task is to classify the user's request into one of the predefined categories.
 
@@ -59,22 +84,5 @@ public class OpenAiService {
 
                 Output:
                 - Return exactly one category name from the list OR 0
-                """
-                    .formatted(getCategories()))
-            .user(userInput)
-            .call()
-            .content();
-
-    return response.trim();
-  }
-
-  private String getCategories() {
-    StringBuilder categories = new StringBuilder();
-
-    for (AbstractChatService handler : handlers) {
-      categories.append(handler.category()).append(": ").append(handler.description()).append("/n");
-    }
-
-    return categories.toString();
-  }
+                """;
 }
