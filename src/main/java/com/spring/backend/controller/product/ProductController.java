@@ -4,14 +4,12 @@ import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
-import com.spring.backend.enums.ProductStatus;
+import com.spring.backend.dto.product.ProductSearchDto;
 import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,22 +34,8 @@ public class ProductController {
   }
 
   @GetMapping("/search")
-  public Pagination<ProductResponseDto> searchProduct(
-      @RequestParam(value = "page", required = false) Integer page,
-      @RequestParam(value = "size", required = false) Integer size,
-      @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "status", required = false) ProductStatus status,
-      @RequestParam(value = "price", required = false) Double price,
-      @RequestParam(value = "startDate", required = false)
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-          LocalDate startDate,
-      @RequestParam(value = "endDate", required = false)
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-          LocalDate endDate,
-      @RequestParam(value = "code", required = false) String code,
-      @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds) {
-    return productService.search(
-        name, status, price, startDate, endDate, code, categoryIds, page, size);
+  public Pagination<ProductResponseDto> searchProduct(ProductSearchDto searchDto) {
+    return productService.search(searchDto);
   }
 
   @GetMapping("/search-by-type")

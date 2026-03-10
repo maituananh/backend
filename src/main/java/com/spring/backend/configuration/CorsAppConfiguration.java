@@ -22,7 +22,7 @@ public class CorsAppConfiguration {
     configuration.setAllowedOrigins(List.of("*")); // Specify allowed origins
     configuration.setAllowedHeaders(List.of("*")); // Allowed HTTP methods
     configuration.setAllowedMethods(
-        List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed request headers
+        List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Allowed request headers
     configuration.setAllowCredentials(false);
     configuration.setExposedHeaders(ALLOW_EXPORT_HEADERS); // Headers to expose to the client
 
