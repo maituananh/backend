@@ -37,6 +37,9 @@ public interface ProductRepository
 
   List<ProductEntity> findByCustomerIdAndIsActivedTrue(Long customerId);
 
+  Page<ProductEntity> findByCategoryIdAndStatusAndIdNotAndIsActivedTrue(
+      Long categoryId, ProductStatus status, Long id, Pageable pageable);
+
   static Specification<ProductEntity> findByDateAndStatus(
       final String dateType, final LocalDate localDate, final ProductStatus status) {
     return (root, query, cb) -> {
