@@ -27,15 +27,15 @@ public interface ProductRepository
       MONTH(p.startDate) AS month,
       COUNT(p) AS productCount
     FROM ProductEntity p
-    WHERE YEAR(p.startDate) = :year
+    WHERE YEAR(p.startDate) = :year AND p.isActived = true
     GROUP BY MONTH(p.startDate)
     ORDER BY MONTH(p.startDate)
   """)
   List<ProductStatistic> statisticProductByMonth(int year);
 
-  Page<ProductEntity> findByType(String type, Pageable pageable);
+  Page<ProductEntity> findByTypeAndIsActivedTrue(String type, Pageable pageable);
 
-  List<ProductEntity> findByCustomerId(Long customerId);
+  List<ProductEntity> findByCustomerIdAndIsActivedTrue(Long customerId);
 
   static Specification<ProductEntity> findByDateAndStatus(
       final String dateType, final LocalDate localDate, final ProductStatus status) {
