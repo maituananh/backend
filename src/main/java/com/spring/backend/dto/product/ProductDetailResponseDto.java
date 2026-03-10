@@ -3,6 +3,7 @@ package com.spring.backend.dto.product;
 import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.user.UserDto;
+import com.spring.backend.enums.ProductStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.*;
@@ -27,4 +28,5 @@ public class ProductDetailResponseDto {
   private UserDto user;
   private Double dailyProfit;
   private Boolean isActived;
+  private ProductStatus status;
 }

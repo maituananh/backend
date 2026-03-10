@@ -6,6 +6,7 @@ import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
+import com.spring.backend.dto.product.ProductSearchDto;
 import com.spring.backend.entity.CategoryEntity;
 import com.spring.backend.entity.ImageEntity;
 import com.spring.backend.entity.ProductEntity;
@@ -112,20 +113,18 @@ public class ProductService {
     return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
-  public Pagination<ProductResponseDto> search(
-      String name,
-      ProductStatus status,
-      Double price,
-      LocalDate startDay,
-      LocalDate endDay,
-      String code,
-      List<Integer> categoryIds,
-      Integer page,
-      Integer size) {
+  public Pagination<ProductResponseDto> search(ProductSearchDto searchDto) {
     Specification<ProductEntity> spec =
-        ProductRepository.search(name, status, price, startDay, endDay, code, categoryIds);
+        ProductRepository.search(
+            searchDto.getName(),
+            searchDto.getStatus(),
+            searchDto.getPrice(),
+            searchDto.getStartDate(),
+            searchDto.getEndDate(),
+            searchDto.getCode(),
+            searchDto.getCategoryIds());
 
-    Pageable pageable = PageMapper.getPageable(page, size);
+    Pageable pageable = PageMapper.getPageable(searchDto.getPage(), searchDto.getSize());
 
     Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
 

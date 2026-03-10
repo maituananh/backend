@@ -50,6 +50,7 @@ public class ProductMapper {
         .type(entity.getType())
         .image(image)
         .isActived(entity.getIsActived())
+        .status(entity.getStatus())
         .build();
   }
 
@@ -71,6 +72,7 @@ public class ProductMapper {
         .user(UserMapper.toUserDto(entity.getCustomer()))
         .dailyProfit(entity.getDailyProfit())
         .isActived(entity.getIsActived())
+        .status(entity.getStatus())
         .build();
   }
 }
