@@ -13,7 +13,8 @@ public class CartMapper {
         entity.getProduct().getName(),
         entity.getPrice(),
         entity.getQuantity(),
-        entity.getStatus().name());
+        entity.getStatus().name(),
+        entity.getProduct().getIsActived());
   }
 
   public static CartResponseDto toCartDto(CartEntity cart) {

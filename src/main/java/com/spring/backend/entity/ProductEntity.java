@@ -16,6 +16,10 @@ import lombok.experimental.SuperBuilder;
 public class ProductEntity extends BaseEntity {
   public ProductEntity() {}
 
+  @Column(name = "is_actived")
+  @lombok.Builder.Default
+  private Boolean isActived = true;
+
   @Column(name = "name")
   private String name;
 

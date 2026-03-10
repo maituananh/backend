@@ -59,7 +59,8 @@ public class ProductService {
   }
 
   public List<ProductResponseDto> getAll() {
-    List<ProductEntity> entities = productRepository.findAll();
+    List<ProductEntity> entities =
+        productRepository.findAll().stream().filter(ProductEntity::getIsActived).toList();
 
     return entities.stream()
         .map(
@@ -142,7 +143,8 @@ public class ProductService {
 
   public Page<ProductResponseDto> searchByType(String type, int page, int size) {
     Pageable pageable = PageRequest.of(page, size, Sort.by("startDay").descending());
-    Page<ProductEntity> pageProductEntity = productRepository.findByType(type, pageable);
+    Page<ProductEntity> pageProductEntity =
+        productRepository.findByTypeAndIsActivedTrue(type, pageable);
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
@@ -153,7 +155,7 @@ public class ProductService {
   }
 
   public List<ProductResponseDto> getProductsByUserId(Long userId) {
-    List<ProductEntity> products = productRepository.findByCustomerId(userId);
+    List<ProductEntity> products = productRepository.findByCustomerIdAndIsActivedTrue(userId);
 
     List<ProductResponseDto> product = new ArrayList<>();
 
@@ -170,7 +172,9 @@ public class ProductService {
 
   @Transactional
   public void deleteById(Long id) {
-    productRepository.deleteById(id);
+    ProductEntity product = productRepository.findById(id).orElseThrow();
+    product.setIsActived(false);
+    productRepository.save(product);
   }
 
   @Transactional

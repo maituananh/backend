@@ -26,4 +26,5 @@ public class ProductDetailResponseDto {
   private CategoryResponseDto category;
   private UserDto user;
   private Double dailyProfit;
+  private Boolean isActived;
 }

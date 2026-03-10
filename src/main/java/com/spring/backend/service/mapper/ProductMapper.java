@@ -49,6 +49,7 @@ public class ProductMapper {
         .endDate(entity.getEndDate())
         .type(entity.getType())
         .image(image)
+        .isActived(entity.getIsActived())
         .build();
   }
 
@@ -69,6 +70,7 @@ public class ProductMapper {
         .category(CategoryMapper.toCategoryDto(entity.getCategory()))
         .user(UserMapper.toUserDto(entity.getCustomer()))
         .dailyProfit(entity.getDailyProfit())
+        .isActived(entity.getIsActived())
         .build();
   }
 }
