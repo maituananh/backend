@@ -11,13 +11,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class ProfileChatResponseDto extends ChatResponseDto {
-  private String username;
-  private String name;
-  private int age;
-  private String email;
-  private String cardId;
-  private String phone;
-  private String address;
+public class OICChatResponseDto extends ChatResponseDto {
+  private String idNumber;
+  private String fullName;
+  private String dateOfBirth;
   private String gender;
+  private String nationality;
+  private String placeOfOrigin;
+  private String placeOfResidence;
+  private String expiryDate;
 }

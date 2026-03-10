@@ -1,8 +1,10 @@
 package com.spring.backend.service.mapper;
 
+import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
+import com.spring.backend.service.chat.CategoryAI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -45,6 +47,20 @@ public class UserMapper {
         .address(entity.getAddress())
         .gender(entity.getGender())
         .role(entity.getRole())
+        .build();
+  }
+
+  public static ProfileChatResponseDto toProfileDto(UserEntity entity) {
+    return ProfileChatResponseDto.builder()
+        .email(entity.getEmail())
+        .name(entity.getName())
+        .username(entity.getUsername())
+        .age(entity.getAge())
+        .phone(entity.getPhone())
+        .cardId(entity.getCardId())
+        .address(entity.getAddress())
+        .gender(entity.getGender())
+        .result(String.valueOf(CategoryAI.PROFILE))
         .build();
   }
 }
