@@ -12,6 +12,6 @@ public class ChatResponseDto {
   private String result;
 
   public static ChatResponseDto errorAnswer() {
-    return new ChatResponseDto("Sorry your question is not support !!");
+    return new ChatResponseDto("Sorry your question isn't supported !!");
   }
 }

@@ -52,7 +52,7 @@ public class OCIService extends AbstractChatService {
 
   @Override
   public String description() {
-    return "Using my identify card to extract information to text";
+    return "Use Vietnamese Citizen Identity Cards (CCCD) to create an account.";
   }
 
   private static final String PROMPT =
@@ -62,7 +62,6 @@ public class OCIService extends AbstractChatService {
               Your task is to read the text on the card and extract all visible information.
 
               Rules:
-
               * Only extract information that is clearly visible on the card.
               * Do NOT guess or fabricate missing values.
               * Preserve Vietnamese characters exactly as they appear.
@@ -70,8 +69,10 @@ public class OCIService extends AbstractChatService {
               * Return the result strictly in JSON format.
               * Do not include explanations or additional text.
 
-              Extract the following fields:
+              Fallback rule:
+              * If Vietnamese Citizen Identity Cards (CCCD) are not recognized, return 0.
 
+              Extract the following fields:
               {
               "id_number": "",
               "full_name": "",
@@ -82,6 +83,5 @@ public class OCIService extends AbstractChatService {
               "place_of_residence": "",
               "expiry_date": ""
               }
-
               """;
 }

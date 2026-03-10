@@ -53,7 +53,11 @@ public class OpenAiService {
     StringBuilder categories = new StringBuilder();
 
     for (AbstractChatService handler : handlers) {
-      categories.append(handler.category()).append(": ").append(handler.description()).append("/n");
+      categories
+          .append(handler.category())
+          .append(": ")
+          .append(handler.description())
+          .append(" /n ");
     }
 
     return categories.toString();
