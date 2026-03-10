@@ -113,6 +113,30 @@ public class ProductService {
     return ProductMapper.toProductDetailResponse(productEntity, images);
   }
 
+  public Pagination<ProductResponseDto> getRelatedProducts(Long id, Integer page, Integer size) {
+    ProductEntity product = productRepository.findById(id).orElseThrow();
+    Pageable pageable =
+        PageMapper.getPageable(page, size, Sort.by(Sort.Direction.DESC, "startDate"));
+
+    Page<ProductEntity> pageRelatedProducts =
+        productRepository.findByCategoryIdAndStatusAndIdNotAndIsActivedTrue(
+            product.getCategory().getId(), ProductStatus.LIQUIDATION, id, pageable);
+
+    List<ProductResponseDto> productResponseDtos =
+        pageRelatedProducts.getContent().stream()
+            .map(
+                p -> {
+                  String image = null;
+                  if (!CollectionUtils.isEmpty(p.getImages())) {
+                    image = getImage(p.getImages().getFirst().getFileName());
+                  }
+                  return ProductMapper.toProductResponse(p, image);
+                })
+            .toList();
+
+    return PageMapper.toPagination(pageRelatedProducts, productResponseDtos);
+  }
+
   public Pagination<ProductResponseDto> search(ProductSearchDto searchDto) {
     Specification<ProductEntity> spec =
         ProductRepository.search(

@@ -21,4 +21,10 @@ public class PageMapper {
     return PageRequest.of(
         (page == null || page == 0) ? 0 : page - 1, size == null || size <= 0 ? 10 : size);
   }
+
+  public static Pageable getPageable(
+      final Integer page, final Integer size, org.springframework.data.domain.Sort sort) {
+    return PageRequest.of(
+        (page == null || page == 0) ? 0 : page - 1, size == null || size <= 0 ? 10 : size, sort);
+  }
 }

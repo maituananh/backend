@@ -8,15 +8,15 @@ import com.spring.backend.dto.product.ProductSearchDto;
 import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/products")
+@lombok.RequiredArgsConstructor
 public class ProductController {
 
-  @Autowired private ProductService productService;
+  private final ProductService productService;
 
   @PostMapping
   public ProductResponseDto createProduct(@RequestBody @Valid ProductRequestDto dto) {
@@ -31,6 +31,14 @@ public class ProductController {
   @GetMapping("/{id}")
   public ProductDetailResponseDto getById(@PathVariable("id") Long id) {
     return productService.getById(id);
+  }
+
+  @GetMapping("/{id}/related")
+  public Pagination<ProductResponseDto> getRelatedProducts(
+      @PathVariable Long id,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size) {
+    return productService.getRelatedProducts(id, page, size);
   }
 
   @GetMapping("/search")
