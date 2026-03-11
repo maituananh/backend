@@ -1,10 +1,13 @@
 package com.spring.backend.service.mapper;
 
+import com.spring.backend.dto.chat.ChatCreateAccountRequestDto;
 import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
 import com.spring.backend.service.chat.CategoryAI;
+import com.spring.backend.service.chat.OCRService;
+import com.spring.backend.utils.DateUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -61,6 +64,25 @@ public class UserMapper {
         .address(entity.getAddress())
         .gender(entity.getGender())
         .result(String.valueOf(CategoryAI.PROFILE))
+        .build();
+  }
+
+  public static UserEntity toEntity(
+      OCRService.CitizenIdResponse dto,
+      ChatCreateAccountRequestDto chatRequestDto,
+      String passwordHash) {
+    return UserEntity.builder()
+        .name(dto.getFullName())
+        .cardId(dto.getIdNumber())
+        .address(dto.getPlaceOfOrigin())
+        .gender(dto.getGender())
+        .isActive(true)
+        .age(DateUtils.calculateAge(dto.getDateOfBirth()))
+        .role(UserRole.CUSTOMER)
+        .username(chatRequestDto.getUsername())
+        .email(chatRequestDto.getEmail())
+        .phone(chatRequestDto.getPhone())
+        .password(passwordHash)
         .build();
   }
 }
