@@ -1,5 +1,6 @@
 package com.spring.backend.dto.chat;
 
+import com.spring.backend.service.chat.CategoryAI;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -12,12 +13,9 @@ public class ChatResponseDto {
   private String result;
   private String type;
 
-  public ChatResponseDto(String result) {
-    this.result = result;
-  }
-
   public static ChatResponseDto errorAnswer() {
-    return new ChatResponseDto("Sorry your question isn't supported !!");
+    return new ChatResponseDto(
+        "Sorry your question isn't supported !!", String.valueOf(CategoryAI.ERROR));
   }
 
   public static ChatResponseDto errorAnswer(String message) {
@@ -26,6 +24,7 @@ public class ChatResponseDto {
             Sorry your question isn't supported !!
             Detail: %s
             """
-            .formatted(message));
+            .formatted(message),
+        String.valueOf(CategoryAI.ERROR));
   }
 }

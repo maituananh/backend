@@ -91,7 +91,8 @@ public class OCRService {
     return OCRChatResponseDto.builder()
         .username(chatRequestDto.getUsername())
         .password(password)
-        .result("username: %s | password: %s".formatted(chatRequestDto.getUsername(), passwordHash))
+        .type(String.valueOf(CategoryAI.OCR_IDENTITY))
+        .result("Create account successful")
         .build();
   }
 
