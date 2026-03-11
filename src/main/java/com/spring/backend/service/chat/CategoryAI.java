@@ -2,5 +2,6 @@ package com.spring.backend.service.chat;
 
 public enum CategoryAI {
   PROFILE,
-  OCI_IDENTITY
+  OCR_IDENTITY,
+  NEW_ACCOUNT
 }

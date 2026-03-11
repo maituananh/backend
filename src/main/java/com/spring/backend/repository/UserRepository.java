@@ -16,6 +16,14 @@ public interface UserRepository
 
   Optional<UserEntity> findByUsername(String username);
 
+  boolean existsByUsername(String username);
+
+  boolean existsByEmail(String email);
+
+  boolean existsByPhone(String phone);
+
+  boolean existsByCardId(String cardId);
+
   long countByIsActiveIsTrue();
 
   static Specification<UserEntity> search(

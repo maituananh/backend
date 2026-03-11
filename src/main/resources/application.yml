@@ -25,6 +25,12 @@ spring:
       chat:
         options:
           model: gpt-4o-mini
+  servlet:
+    multipart:
+      enabled: true
+      fileSizeThreshold: 100MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 jobrunr:
   background-job-server:
@@ -50,3 +56,6 @@ stripe:
 
 server:
   port: ${BE_PORT:8080}
+  tomcat:
+    max-swallow-size: 100MB
+    max-http-form-post-size: 100MB
