@@ -64,6 +64,7 @@ public class UserMapper {
         .address(entity.getAddress())
         .gender(entity.getGender())
         .result(String.valueOf(CategoryAI.PROFILE))
+        .type(String.valueOf(CategoryAI.PROFILE))
         .build();
   }
 
