@@ -4,6 +4,7 @@ import com.spring.backend.enums.ProductStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -17,7 +18,7 @@ public class ProductEntity extends BaseEntity {
   public ProductEntity() {}
 
   @Column(name = "is_actived")
-  @lombok.Builder.Default
+  @Builder.Default
   private Boolean isActived = true;
 
   @Column(name = "name")
