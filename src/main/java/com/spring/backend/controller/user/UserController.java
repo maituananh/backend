@@ -1,5 +1,6 @@
 package com.spring.backend.controller.user;
 
+import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.service.ProductService;
@@ -7,6 +8,7 @@ import com.spring.backend.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,14 +27,22 @@ public class UserController {
     return userService.getAll();
   }
 
-  @GetMapping("/{id}")
-  public UserDto getUserById(@PathVariable("id") Long id) {
-    return userService.getByIdCard(id);
-  }
-
   @GetMapping("/me")
   public UserDto getMyInfo() {
     return userService.getMyInfo();
+  }
+
+  @PutMapping("/me")
+  public UserDto updateMyInfo(@RequestBody UserDto userDto) {
+    UserDetailsCustom currentUser =
+        (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    return userService.updateUser(currentUser.getId(), userDto);
+  }
+
+  @GetMapping("/id/{id}")
+  public UserDto getUserById(@PathVariable("id") Long id) {
+    return userService.getByIdCard(id);
   }
 
   @GetMapping("/search")
@@ -47,12 +57,12 @@ public class UserController {
     return userService.searchUser(name, email, phone, cardId, username, page, size);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/id/{id}")
   public void deleteUserById(@PathVariable Long id) {
     userService.delete(id);
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/id/{id}")
   public UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
     return userService.updateUser(id, userDto);
   }

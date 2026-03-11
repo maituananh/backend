@@ -31,6 +31,8 @@ public class UserMapper {
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
     userEntity.setRole(userDto.getRole());
+    userEntity.setAvatarUrl(userDto.getAvatarUrl());
+    userEntity.setCccdImageUrl(userDto.getCccdImageUrl());
   }
 
   public static UserDto toUserDto(UserEntity entity) {
@@ -45,6 +47,8 @@ public class UserMapper {
         .address(entity.getAddress())
         .gender(entity.getGender())
         .role(entity.getRole())
+        .avatarUrl(entity.getAvatarUrl()) // thêm dòng này
+        .cccdImageUrl(entity.getCccdImageUrl())
         .build();
   }
 }

@@ -45,6 +45,12 @@ public class UserEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
+  @Column(name = "avatar_url", length = 1000)
+  private String avatarUrl;
+
+  @Column(name = "cccd_image_url", length = 1000)
+  private String cccdImageUrl;
+
   @Column(name = "is_active", nullable = false)
   private Boolean isActive = true;
 

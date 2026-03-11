@@ -23,7 +23,7 @@ public class FileUploadService {
     UploadFileDto fileMetadata = s3Adapter.uploadFile(file);
 
     ImageEntity imageEntity =
-        imageRepository.save(ImageEntity.builder().fileName(fileMetadata.getKey()).build());
+        imageRepository.save(ImageEntity.builder().fileName(fileMetadata.getUrl()).build());
 
     return new ImageResponseDto(imageEntity);
   }

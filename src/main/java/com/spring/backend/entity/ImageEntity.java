@@ -16,6 +16,6 @@ public class ImageEntity extends BaseEntity {
   @JoinColumn(name = "product_id")
   private ProductEntity product;
 
-  @Column(name = "file_name")
+  @Column(name = "file_name", length = 1000)
   private String fileName;
 }
