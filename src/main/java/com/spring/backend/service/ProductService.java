@@ -61,7 +61,13 @@ public class ProductService {
 
   public List<ProductResponseDto> getAll() {
     List<ProductEntity> entities =
-        productRepository.findAll().stream().filter(ProductEntity::getIsActived).toList();
+        productRepository.findAll().stream()
+            .filter(p -> Boolean.TRUE.equals(p.getIsActived()))
+            .toList();
+
+    if (CollectionUtils.isEmpty(entities)) {
+      return new ArrayList<>();
+    }
 
     return entities.stream()
         .map(

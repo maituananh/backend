@@ -1,5 +1,6 @@
 package com.spring.backend.service;
 
+import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.cart.AddToCartRequestDto;
 import com.spring.backend.dto.cart.CartResponseDto;
 import com.spring.backend.entity.*;
@@ -26,6 +27,16 @@ public class CartService {
   private final ProductRepository productRepository;
   private final UserRepository userRepository;
   private final UserHelper userHelper;
+  private final S3Adapter s3Adapter;
+
+  private String getImage(CartItemEntity item) {
+    if (item.getProduct() != null
+        && item.getProduct().getImages() != null
+        && !item.getProduct().getImages().isEmpty()) {
+      return s3Adapter.getUrl(item.getProduct().getImages().getFirst().getFileName());
+    }
+    return null;
+  }
 
   @Transactional
   public CartResponseDto addToCart(AddToCartRequestDto dto) {
@@ -67,7 +78,7 @@ public class CartService {
 
       cart.getItems().add(newItem);
     }
-    return CartMapper.toCartDto(cart);
+    return CartMapper.toCartDto(cart, this::getImage);
   }
 
   public CartResponseDto getMyCart() {
@@ -75,7 +86,7 @@ public class CartService {
 
     CartEntity cart = cartRepository.findByCustomerId(customerId).orElse(null);
 
-    return cart == null ? null : CartMapper.toCartDto(cart);
+    return cart == null ? null : CartMapper.toCartDto(cart, this::getImage);
   }
 
   @Transactional

@@ -4,6 +4,7 @@ import com.spring.backend.configuration.interceptor.InterceptorConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -27,7 +28,8 @@ public class SecurityConfiguration {
     "/v3/api-docs/**",
     "/swagger-ui/**",
     "/api-docs.yaml",
-    "/api-docs"
+    "/api-docs",
+    "/api/chat/**",
   };
 
   private final InterceptorConfiguration interceptorConfiguration;
@@ -42,6 +44,10 @@ public class SecurityConfiguration {
             authorizeRequests ->
                 authorizeRequests
                     .requestMatchers(WHITE_LIST)
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/products/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/categories/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
