@@ -4,5 +4,6 @@ public enum CategoryAI {
   PROFILE,
   OCR_IDENTITY,
   NEW_ACCOUNT,
+  ORDER,
   ERROR
 }
