@@ -43,4 +43,9 @@ public class OrderItemEntity extends BaseEntity {
 
   @Column(name = "subtotal", nullable = false, precision = 18, scale = 2)
   private BigDecimal subtotal;
+
+  /** Convenience method - delegates to FK */
+  public Long getProductId() {
+    return product != null ? product.getId() : null;
+  }
 }

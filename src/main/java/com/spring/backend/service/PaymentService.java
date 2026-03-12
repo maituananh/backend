@@ -33,7 +33,10 @@ public class PaymentService {
             PaymentRequest.builder()
                 .currency(request.getCurrency())
                 .productName(cart.getCartName(cartItemEntities))
-                .amount(cart.getTotalAmount(cartItemEntities))
+                .amount(
+                    cart.getTotalAmount(cartItemEntities)
+                        .multiply(java.math.BigDecimal.valueOf(100))
+                        .longValue())
                 .build());
 
     return PaymentResponseDto.builder()

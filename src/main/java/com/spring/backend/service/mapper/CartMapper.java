@@ -9,6 +9,7 @@ public class CartMapper {
 
   public static CartItemResponseDto toItemDto(CartItemEntity entity, String image) {
     return new CartItemResponseDto(
+        entity.getId(),
         entity.getProduct().getId(),
         entity.getProduct().getName(),
         image,

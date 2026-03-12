@@ -1,6 +1,7 @@
 package com.spring.backend.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,8 +34,10 @@ public class CartEntity extends BaseEntity {
   @Builder.Default
   private List<CartItemEntity> items = new ArrayList<>();
 
-  public Long getTotalAmount(List<CartItemEntity> cartItemEntities) {
-    return cartItemEntities.stream().mapToLong(CartItemEntity::getTotalItem).sum();
+  public BigDecimal getTotalAmount(List<CartItemEntity> cartItemEntities) {
+    return cartItemEntities.stream()
+        .map(CartItemEntity::getTotalItem)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   public String getCartName(List<CartItemEntity> cartItemEntities) {

@@ -11,6 +11,7 @@ import com.spring.backend.repository.CartRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.CartMapper;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +72,7 @@ public class CartService {
           CartItemEntity.builder()
               .cart(cart)
               .product(product)
-              .price(product.getPrice())
+              .price(BigDecimal.valueOf(product.getPrice()))
               .quantity(dto.getQuantity())
               .status(CartItemStatus.PENDING)
               .build();

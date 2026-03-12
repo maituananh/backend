@@ -2,6 +2,7 @@ package com.spring.backend.entity;
 
 import com.spring.backend.enums.CartItemStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -30,8 +31,8 @@ public class CartItemEntity extends BaseEntity {
   @JoinColumn(name = "product_id", nullable = false)
   private ProductEntity product;
 
-  @Column(nullable = false)
-  private Double price;
+  @Column(nullable = false, precision = 18, scale = 2)
+  private BigDecimal price;
 
   @Column(nullable = false)
   private Integer quantity;
@@ -40,7 +41,7 @@ public class CartItemEntity extends BaseEntity {
   @Column(nullable = false)
   private CartItemStatus status;
 
-  public Long getTotalItem() {
-    return Math.round(getPrice() * getQuantity());
+  public BigDecimal getTotalItem() {
+    return getPrice().multiply(BigDecimal.valueOf(getQuantity()));
   }
 }
