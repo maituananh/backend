@@ -51,11 +51,14 @@ aws:
 
 stripe:
   secret-key: ${STRIPE_API_KEY:sk_test_xxxxpI0XB5C}
-  success-url: ${STRIPE_SUCCESS_URL:https://mail.google.com}
-  cancel-url: ${STRIPE_CANCEL_URL:https://dashboard.stripe.com}
+  success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/payment-success}
+  cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/mycart}
 
 server:
   port: ${BE_PORT:8080}
   tomcat:
     max-swallow-size: 100MB
     max-http-form-post-size: 100MB
+
+frontend:
+  base-url: http://localhost:5173/

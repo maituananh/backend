@@ -1,0 +1,277 @@
+package com.spring.backend.service;
+
+import com.spring.backend.dto.checkout.CheckoutRequest;
+import com.spring.backend.dto.checkout.CheckoutResponse;
+import com.spring.backend.dto.order.OrderDetailResponse;
+import com.spring.backend.dto.order.OrderStatusResponse;
+import com.spring.backend.dto.order.WebhookPayload;
+import com.spring.backend.entity.*;
+import com.spring.backend.enums.OrderStatus;
+import com.spring.backend.enums.PaymentStatus;
+import com.spring.backend.helper.UserHelper;
+import com.spring.backend.repository.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class OrderService {
+
+  private final OrderRepository orderRepository;
+  private final OrderItemRepository orderItemRepository;
+  private final PaymentRepository paymentRepository;
+  private final CartItemRepository cartItemRepository;
+  private final PaymentGatewayService paymentGatewayService;
+  private final InventoryService inventoryService;
+  private final UserHelper userHelper;
+  private final UserRepository userRepository;
+
+  // ============================================================
+  // 1. CHECKOUT - Tạo order từ các cart item được chọn
+  // ============================================================
+  public CheckoutResponse checkout(CheckoutRequest request) {
+    Long userId = userHelper.getCurrentUserId();
+    UserEntity userEntity =
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+    // Validate cart items - truy vấn qua cart.customer_id
+    List<CartItemEntity> cartItems =
+        cartItemRepository.findByIdInAndCartCustomerId(request.getCartItemIds(), userId);
+
+    if (cartItems.isEmpty()) {
+      throw new RuntimeException("No items selected");
+    }
+    if (cartItems.size() != request.getCartItemIds().size()) {
+      throw new RuntimeException("Some items are invalid or not yours");
+    }
+
+    // Kiểm tra tồn kho trước khi tạo order
+    inventoryService.validateStock(cartItems);
+
+    // Tính tổng tiền
+    BigDecimal total =
+        cartItems.stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // Tạo Order
+    OrderEntity order =
+        OrderEntity.builder()
+            .user(userEntity)
+            .status(OrderStatus.PENDING)
+            .totalAmount(total)
+            .note(request.getNote())
+            .shippingName(request.getShippingName())
+            .shippingPhone(request.getShippingPhone())
+            .shippingAddress(request.getShippingAddress())
+            .build();
+    orderRepository.save(order);
+
+    // Tạo Order Items (snapshot - lưu lại thông tin tại thời điểm đặt hàng)
+    List<OrderItemEntity> orderItems =
+        cartItems.stream()
+            .map(
+                cart -> {
+                  ProductEntity product = cart.getProduct();
+                  // Lấy ảnh đầu tiên của sản phẩm
+                  String productImage = null;
+                  if (product.getImages() != null && !product.getImages().isEmpty()) {
+                    productImage = product.getImages().getFirst().getFileName();
+                  }
+                  return (OrderItemEntity)
+                      OrderItemEntity.builder()
+                          .order(order)
+                          .product(product)
+                          .productName(product.getName())
+                          .productImage(productImage)
+                          .unitPrice(cart.getPrice())
+                          .quantity(cart.getQuantity())
+                          .subtotal(
+                              cart.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
+                          .build();
+                })
+            .toList();
+    orderItemRepository.saveAll(orderItems);
+
+    // Tạo Payment record
+    PaymentEntity payment =
+        PaymentEntity.builder()
+            .order(order)
+            .amount(total)
+            .paymentMethod(request.getPaymentMethod())
+            .status(PaymentStatus.PENDING)
+            .build();
+    paymentRepository.save(payment);
+
+    // Lấy payment URL từ Gateway (Stripe session URL hoặc null nếu CASH)
+    // Lưu ý: order.getItems() chưa có data trong session này nên truyền orderItems trực tiếp
+    // PaymentGatewayService sẽ dùng tên từ items để tạo session description
+    payment.getOrder().getItems().addAll(orderItems); // để service build tên
+
+    String paymentUrl = paymentGatewayService.createPaymentUrl(order, payment);
+
+    return CheckoutResponse.builder()
+        .orderId(order.getId())
+        .paymentUrl(paymentUrl)
+        .totalAmount(total)
+        .status(OrderStatus.PENDING)
+        .build();
+  }
+
+  // ============================================================
+  // 2. WEBHOOK - Gateway callback sau khi thanh toán
+  // ============================================================
+  public void handleWebhook(WebhookPayload payload) {
+
+    // Verify chữ ký tránh giả mạo
+    if (!paymentGatewayService.verifySignature(payload)) {
+      throw new RuntimeException("Invalid signature");
+    }
+
+    PaymentEntity payment =
+        paymentRepository
+            .findByTransactionId(payload.getTransactionId())
+            .orElseThrow(
+                () -> new RuntimeException("Payment not found: " + payload.getTransactionId()));
+
+    OrderEntity order = payment.getOrder();
+
+    // Idempotency: tránh xử lý 2 lần
+    if (order.getStatus() != OrderStatus.PENDING) {
+      log.warn(
+          "Order {} already processed (status={}), skipping", order.getId(), order.getStatus());
+      return;
+    }
+
+    // Lưu raw response để debug
+    payment.setGatewayResponse(payload.getRawResponse());
+
+    if (payload.isSuccess()) {
+      handlePaymentSuccess(order, payment);
+    } else {
+      handlePaymentFailed(order, payment);
+    }
+
+    orderRepository.save(order);
+    paymentRepository.save(payment);
+  }
+
+  private void handlePaymentSuccess(OrderEntity order, PaymentEntity payment) {
+    log.info("Payment success for order {}", order.getId());
+
+    order.setStatus(OrderStatus.CONFIRMED);
+    payment.setStatus(PaymentStatus.SUCCESS);
+    payment.setPaidAt(Instant.now());
+
+    // Trừ tồn kho
+    List<OrderItemEntity> items = orderItemRepository.findByOrderId(order.getId());
+    inventoryService.deductStock(items);
+
+    // Xóa các cart items đã thanh toán (xóa theo product id của user)
+    List<Long> cartItemProductIds = items.stream().map(OrderItemEntity::getProductId).toList();
+    cartItemRepository.deleteByCartCustomerIdAndProductIdIn(
+        order.getUser().getId(), cartItemProductIds);
+
+    // emailService.sendOrderConfirmation(order); // TODO: implement email later
+  }
+
+  private void handlePaymentFailed(OrderEntity order, PaymentEntity payment) {
+    log.warn("Payment failed for order {}", order.getId());
+
+    order.setStatus(OrderStatus.FAILED);
+    payment.setStatus(PaymentStatus.FAILED);
+
+    // KHÔNG xóa cart, KHÔNG trừ kho - user có thể thử lại
+  }
+
+  // ============================================================
+  // 3. GET STATUS - FE polling sau khi redirect về từ Stripe
+  // ============================================================
+  @Transactional(readOnly = true)
+  public OrderStatusResponse getOrderStatus(Long orderId) {
+    Long userId = userHelper.getCurrentUserId();
+
+    OrderEntity order =
+        orderRepository
+            .findByIdAndUserId(orderId, userId)
+            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+    PaymentEntity payment =
+        paymentRepository
+            .findByOrderId(orderId)
+            .orElseThrow(() -> new RuntimeException("Payment not found for order: " + orderId));
+
+    return OrderStatusResponse.builder()
+        .orderId(order.getId())
+        .orderStatus(order.getStatus())
+        .paymentStatus(payment.getStatus())
+        .build();
+  }
+
+  // ============================================================
+  // 4. GET ORDERS - Danh sách orders của user
+  // ============================================================
+  @Transactional(readOnly = true)
+  public List<OrderDetailResponse> getOrders() {
+    Long userId = userHelper.getCurrentUserId();
+    List<OrderEntity> orders = orderRepository.findByUserId(userId);
+    return orders.stream().map(this::toDetailResponse).toList();
+  }
+
+  // ============================================================
+  // 5. GET ORDER DETAIL - Chi tiết một order
+  // ============================================================
+  @Transactional(readOnly = true)
+  public OrderDetailResponse getOrderDetail(Long orderId) {
+    Long userId = userHelper.getCurrentUserId();
+    OrderEntity order =
+        orderRepository
+            .findByIdAndUserId(orderId, userId)
+            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    return toDetailResponse(order);
+  }
+
+  // ============================================================
+  // Helpers
+  // ============================================================
+  private OrderDetailResponse toDetailResponse(OrderEntity order) {
+    List<OrderItemEntity> items = orderItemRepository.findByOrderId(order.getId());
+
+    List<OrderDetailResponse.OrderItemDto> itemDtos =
+        items.stream()
+            .map(
+                item ->
+                    OrderDetailResponse.OrderItemDto.builder()
+                        .productId(item.getProductId())
+                        .productName(item.getProductName())
+                        .productImage(item.getProductImage())
+                        .unitPrice(item.getUnitPrice())
+                        .quantity(item.getQuantity())
+                        .subtotal(item.getSubtotal())
+                        .build())
+            .toList();
+
+    PaymentEntity payment = paymentRepository.findByOrderId(order.getId()).orElse(null);
+
+    return OrderDetailResponse.builder()
+        .orderId(order.getId())
+        .orderStatus(order.getStatus())
+        .totalAmount(order.getTotalAmount())
+        .note(order.getNote())
+        .shippingName(order.getShippingName())
+        .shippingPhone(order.getShippingPhone())
+        .shippingAddress(order.getShippingAddress())
+        .paymentMethod(payment != null ? payment.getPaymentMethod() : null)
+        .paymentStatus(payment != null ? payment.getStatus() : null)
+        .paidAt(payment != null ? payment.getPaidAt() : null)
+        .items(itemDtos)
+        .build();
+  }
+}
