@@ -17,6 +17,7 @@ public class OrderDetailResponse {
   private OrderStatus orderStatus;
   private BigDecimal totalAmount;
   private String note;
+  private Instant createdAt;
 
   // Shipping info
   private String shippingName;
