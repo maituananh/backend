@@ -12,12 +12,14 @@ import com.spring.backend.entity.ImageEntity;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.ProductStatus;
+import com.spring.backend.repository.CartItemRepository;
 import com.spring.backend.repository.CategoryRepository;
 import com.spring.backend.repository.ImageRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
 import com.spring.backend.service.mapper.PageMapper;
 import com.spring.backend.service.mapper.ProductMapper;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,6 +43,7 @@ public class ProductService {
   private final UserRepository userRepository;
   private final ProductRepository productRepository;
   private final ImageRepository imageRepository;
+  private final CartItemRepository cartItemRepository;
   private final S3Adapter s3Adapter;
 
   private void validateProductDate(LocalDate startDate, LocalDate endDate) {
@@ -247,6 +250,7 @@ public class ProductService {
     }
 
     ProductEntity saved = productRepository.save(productEntity);
+    cartItemRepository.updatePriceByProductId(id, BigDecimal.valueOf(saved.getPrice()));
     return ProductMapper.toProductResponse(saved, null);
   }
 

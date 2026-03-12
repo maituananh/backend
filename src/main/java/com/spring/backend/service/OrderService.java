@@ -168,20 +168,19 @@ public class OrderService {
     }
 
     // Lưu raw response để debug
-    payment.setGatewayResponse(webhookPayload.getRawResponse());
+    payment.setGatewayResponse(payload);
 
     String eventType = webhookPayload.getEventType();
     log.info("Processing webhook event: {} for order: {}", eventType, order.getId());
 
-    if ("checkout.session.completed".equals(eventType)) {
-      handlePaymentSuccess(order, payment);
-    } else if ("checkout.session.expired".equals(eventType)) {
-      handlePaymentExpired(order, payment);
-    } else if ("payment_intent.payment_failed".equals(eventType)) {
-      handlePaymentFailed(order, payment);
-    } else {
-      log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
-      return; // Do not save if we don't know the event
+    switch (eventType) {
+      case "checkout.session.completed" -> handlePaymentSuccess(order, payment);
+      case "checkout.session.expired" -> handlePaymentExpired(order, payment);
+      case "payment_intent.payment_failed" -> handlePaymentFailed(order, payment);
+      case null, default -> {
+        log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
+        return; // Do not save if we don't know the event
+      }
     }
 
     orderRepository.save(order);
