@@ -1,5 +1,7 @@
 package com.spring.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
@@ -37,6 +39,7 @@ public class OrderService {
   private final UserHelper userHelper;
   private final UserRepository userRepository;
   private final S3Adapter s3Adapter;
+  private final ObjectMapper objectMapper;
 
   // ============================================================
   // 1. CHECKOUT - Tạo order từ các cart item được chọn
@@ -133,18 +136,27 @@ public class OrderService {
   // ============================================================
   // 2. WEBHOOK - Gateway callback sau khi thanh toán
   // ============================================================
-  public void handleWebhook(WebhookPayload payload) {
+  public void handleWebhook(String sigHeader, String payload) {
+    WebhookPayload webhookPayload;
+    try {
+      webhookPayload = objectMapper.readValue(payload, WebhookPayload.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     // Verify chữ ký tránh giả mạo
-    if (!paymentGatewayService.verifySignature(payload)) {
+    if (!paymentGatewayService.verifySignature(sigHeader, payload)
+        || !paymentGatewayService.verifyTransaction(webhookPayload)) {
       throw new RuntimeException("Invalid signature");
     }
 
     PaymentEntity payment =
         paymentRepository
-            .findByTransactionId(payload.getTransactionId())
+            .findByTransactionId(webhookPayload.getTransactionId())
             .orElseThrow(
-                () -> new RuntimeException("Payment not found: " + payload.getTransactionId()));
+                () ->
+                    new RuntimeException(
+                        "Payment not found: " + webhookPayload.getTransactionId()));
 
     OrderEntity order = payment.getOrder();
 
@@ -156,16 +168,30 @@ public class OrderService {
     }
 
     // Lưu raw response để debug
-    payment.setGatewayResponse(payload.getRawResponse());
+    payment.setGatewayResponse(payload);
 
-    if (payload.isSuccess()) {
-      handlePaymentSuccess(order, payment);
-    } else {
-      handlePaymentFailed(order, payment);
+    String eventType = webhookPayload.getEventType();
+    log.info("Processing webhook event: {} for order: {}", eventType, order.getId());
+
+    switch (eventType) {
+      case "checkout.session.completed" -> handlePaymentSuccess(order, payment);
+      case "checkout.session.expired" -> handlePaymentExpired(order, payment);
+      case "payment_intent.payment_failed" -> handlePaymentFailed(order, payment);
+      case null, default -> {
+        log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
+        return; // Do not save if we don't know the event
+      }
     }
 
     orderRepository.save(order);
     paymentRepository.save(payment);
+  }
+
+  private void handlePaymentExpired(OrderEntity order, PaymentEntity payment) {
+    log.warn("Payment expired for order {}", order.getId());
+
+    order.setStatus(OrderStatus.CANCELLED);
+    payment.setStatus(PaymentStatus.FAILED);
   }
 
   private void handlePaymentSuccess(OrderEntity order, PaymentEntity payment) {

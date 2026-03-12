@@ -49,6 +49,8 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/categories/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/payment/webhook")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .httpBasic(AbstractHttpConfigurer::disable)

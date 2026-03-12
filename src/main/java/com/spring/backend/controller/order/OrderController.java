@@ -4,16 +4,17 @@ import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
-import com.spring.backend.dto.order.WebhookPayload;
 import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.service.OrderService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -35,8 +36,10 @@ public class OrderController {
 
   /** Bước 3: Stripe/gateway gọi callback webhook sau khi thanh toán */
   @PostMapping("/payment/webhook")
-  public ResponseEntity<Void> webhook(@RequestBody WebhookPayload payload) {
-    orderService.handleWebhook(payload);
+  public ResponseEntity<Void> webhook(
+      @RequestHeader("Stripe-Signature") String sigHeader, @RequestBody String payload) {
+    log.info("Webhook Payload: {}", payload);
+    orderService.handleWebhook(sigHeader, payload);
     return ResponseEntity.ok().build();
   }
 
