@@ -1,10 +1,12 @@
 package com.spring.backend.service;
 
+import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.order.WebhookPayload;
+import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.entity.*;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.enums.PaymentStatus;
@@ -15,6 +17,8 @@ import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,7 @@ public class OrderService {
   private final InventoryService inventoryService;
   private final UserHelper userHelper;
   private final UserRepository userRepository;
+  private final S3Adapter s3Adapter;
 
   // ============================================================
   // 1. CHECKOUT - Tạo order từ các cart item được chọn
@@ -216,13 +221,39 @@ public class OrderService {
   }
 
   // ============================================================
-  // 4. GET ORDERS - Danh sách orders của user
+  // 4. GET ORDERS - Danh sách orders của user (không paging)
   // ============================================================
   @Transactional(readOnly = true)
   public List<OrderDetailResponse> getOrders() {
     Long userId = userHelper.getCurrentUserId();
     List<OrderEntity> orders = orderRepository.findByUserId(userId);
     return orders.stream().map(this::toDetailResponse).toList();
+  }
+
+  // ============================================================
+  // 4.1 GET ORDERS PAGINATED - Danh sách orders của user có paging
+  // ============================================================
+  @Transactional(readOnly = true)
+  public Pagination<OrderDetailResponse> getOrdersPaginated(
+      int page, int size, OrderStatus status) {
+    Long userId = userHelper.getCurrentUserId();
+    Page<OrderEntity> orderPage;
+
+    if (status != null) {
+      orderPage =
+          orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(
+              userId, status, PageRequest.of(page, size));
+    } else {
+      orderPage =
+          orderRepository.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(page, size));
+    }
+
+    return Pagination.<OrderDetailResponse>builder()
+        .data(orderPage.getContent().stream().map(this::toDetailResponse).toList())
+        .totalElements(orderPage.getTotalElements())
+        .totalPages(orderPage.getTotalPages())
+        .currentPage(page)
+        .build();
   }
 
   // ============================================================
@@ -251,7 +282,10 @@ public class OrderService {
                     OrderDetailResponse.OrderItemDto.builder()
                         .productId(item.getProductId())
                         .productName(item.getProductName())
-                        .productImage(item.getProductImage())
+                        .productImage(
+                            item.getProductImage() != null
+                                ? s3Adapter.getUrl(item.getProductImage())
+                                : null)
                         .unitPrice(item.getUnitPrice())
                         .quantity(item.getQuantity())
                         .subtotal(item.getSubtotal())
@@ -265,6 +299,7 @@ public class OrderService {
         .orderStatus(order.getStatus())
         .totalAmount(order.getTotalAmount())
         .note(order.getNote())
+        .createdAt(order.getCreatedAt())
         .shippingName(order.getShippingName())
         .shippingPhone(order.getShippingPhone())
         .shippingAddress(order.getShippingAddress())

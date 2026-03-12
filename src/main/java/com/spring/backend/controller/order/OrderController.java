@@ -5,6 +5,8 @@ import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.order.WebhookPayload;
+import com.spring.backend.dto.page.Pagination;
+import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.service.OrderService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,10 +40,19 @@ public class OrderController {
     return ResponseEntity.ok().build();
   }
 
-  /** Lấy danh sách tất cả orders của user đang đăng nhập */
-  @GetMapping("/orders")
+  /** Lấy danh sách tất cả orders của user đang đăng nhập (không paging) */
+  @GetMapping("/orders/all")
   public ResponseEntity<List<OrderDetailResponse>> getOrders() {
     return ResponseEntity.ok(orderService.getOrders());
+  }
+
+  /** Lấy danh sách đơn hàng có phân trang (mới nhất trước) */
+  @GetMapping("/orders")
+  public ResponseEntity<Pagination<OrderDetailResponse>> getOrdersPaginated(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) OrderStatus status) {
+    return ResponseEntity.ok(orderService.getOrdersPaginated(page, size, status));
   }
 
   /** Lấy chi tiết một order theo ID */
