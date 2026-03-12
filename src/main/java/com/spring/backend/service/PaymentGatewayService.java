@@ -8,16 +8,21 @@ import com.spring.backend.entity.OrderItemEntity;
 import com.spring.backend.entity.PaymentEntity;
 import com.spring.backend.enums.PaymentMethod;
 import com.spring.backend.repository.PaymentRepository;
+import com.stripe.net.Webhook;
 import java.math.RoundingMode;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentGatewayService {
+
+  @Value("${stripe.webhook-secret}")
+  private String webhookSecret;
 
   private final StripeAdapter stripeAdapter;
   private final PaymentRepository paymentRepository;
@@ -68,7 +73,17 @@ public class PaymentGatewayService {
    *
    * <p>TODO: Thêm Stripe-Signature verification khi có webhook secret.
    */
-  public boolean verifySignature(WebhookPayload payload) {
+  public boolean verifySignature(String sigHeader, String payload) {
+    try {
+      Webhook.constructEvent(payload, sigHeader, webhookSecret);
+    } catch (Exception e) {
+      log.error("Invalid signature");
+      return false;
+    }
+    return true;
+  }
+
+  public boolean verifyTransaction(WebhookPayload payload) {
     // Kiểm tra transactionId không rỗng là điều kiện tối thiểu
     if (payload.getTransactionId() == null || payload.getTransactionId().isBlank()) {
       log.warn("Webhook received with empty transactionId");

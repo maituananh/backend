@@ -51,6 +51,7 @@ aws:
 
 stripe:
   secret-key: ${STRIPE_API_KEY:sk_test_xxxxpI0XB5C}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_xxxxxxxxx}
   success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/payment-success}
   cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/mycart}
 
