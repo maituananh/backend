@@ -4,11 +4,10 @@ import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.service.ProductService;
 import com.spring.backend.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
