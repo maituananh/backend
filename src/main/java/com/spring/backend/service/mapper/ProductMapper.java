@@ -27,7 +27,7 @@ public class ProductMapper {
             .startDate(dto.getStartDate())
             .endDate(dto.getEndDate())
             .description(dto.getDescription())
-            .quantity(dto.getQuantity())
+            .stockQty(dto.getStockQty())
             .category(categoryEntity)
             .customer(userEntity)
             .status(ProductStatus.NEW)
@@ -51,7 +51,8 @@ public class ProductMapper {
         .image(image)
         .isActived(entity.getIsActived())
         .status(entity.getStatus())
-        .availableQty(entity.getQuantity())
+        .availableQty(entity.getAvailableQty())
+        .stockQty(entity.getStockQty())
         .build();
   }
 
@@ -67,7 +68,8 @@ public class ProductMapper {
         .endDate(entity.getEndDate())
         .type(entity.getType())
         .images(images)
-        .quantity(entity.getQuantity())
+        .stockQty(entity.getStockQty())
+        .availableQty(entity.getAvailableQty())
         .description(entity.getDescription())
         .category(CategoryMapper.toCategoryDto(entity.getCategory()))
         .user(UserMapper.toUserDto(entity.getCustomer()))

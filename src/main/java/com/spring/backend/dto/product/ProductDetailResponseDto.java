@@ -22,7 +22,8 @@ public class ProductDetailResponseDto {
   private String type;
   private String code;
   private List<ImageResponseDto> images;
-  private Integer quantity;
+  private Integer stockQty;
+  private Integer availableQty;
   private String description;
   private CategoryResponseDto category;
   private UserDto user;

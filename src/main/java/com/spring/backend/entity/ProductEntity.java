@@ -42,8 +42,27 @@ public class ProductEntity extends BaseEntity {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "quantity")
-  private int quantity;
+  @Column(name = "stock_qty", columnDefinition = "integer default 0", nullable = false)
+  @Builder.Default
+  private int stockQty = 0;
+
+  @Column(name = "reserved_qty", columnDefinition = "integer default 0", nullable = false)
+  @Builder.Default
+  private int reservedQty = 0;
+
+  @Column(name = "available_qty", columnDefinition = "integer default 0", nullable = false)
+  @Builder.Default
+  private int availableQty = 0;
+
+  public void setStockQty(int stockQty) {
+    this.stockQty = stockQty;
+    this.availableQty = this.stockQty - this.reservedQty;
+  }
+
+  public void setReservedQty(int reservedQty) {
+    this.reservedQty = reservedQty;
+    this.availableQty = this.stockQty - this.reservedQty;
+  }
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)

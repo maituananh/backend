@@ -29,7 +29,7 @@ public class ProductRequestDto {
   @NotNull
   private Double dailyProfit;
 
-  @NotNull private Integer quantity;
+  @NotNull private Integer stockQty;
 
   @NotNull private LocalDate startDate;
 
