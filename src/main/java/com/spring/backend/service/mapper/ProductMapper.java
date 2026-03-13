@@ -51,6 +51,7 @@ public class ProductMapper {
         .image(image)
         .isActived(entity.getIsActived())
         .status(entity.getStatus())
+        .availableQty(entity.getQuantity())
         .build();
   }
 
