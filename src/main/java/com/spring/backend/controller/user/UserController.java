@@ -4,16 +4,18 @@ import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.service.ProductService;
 import com.spring.backend.service.UserService;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
-  @Autowired private UserService userService;
-  @Autowired private ProductService productService;
+  private final UserService userService;
+  private final ProductService productService;
 
   @PostMapping
   public UserDto createUser(@RequestBody UserDto userDto) {
@@ -26,7 +28,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public UserDto getUserById(@PathVariable("id") Long id) {
+  public UserDto getUserById(@PathVariable Long id) {
     return userService.getByIdCard(id);
   }
 
@@ -53,7 +55,7 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public UserDto updateUserById(@PathVariable("id") Long id, @RequestBody UserDto userDto) {
+  public UserDto updateUserById(@PathVariable Long id, @RequestBody UserDto userDto) {
     return userService.updateUser(id, userDto);
   }
 

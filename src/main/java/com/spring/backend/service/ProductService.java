@@ -157,7 +157,9 @@ public class ProductService {
             searchDto.getCode(),
             searchDto.getCategoryIds());
 
-    Pageable pageable = PageMapper.getPageable(searchDto.getPage(), searchDto.getSize());
+    Sort sort =
+        Sort.by(Sort.Direction.DESC, "isActived").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+    Pageable pageable = PageMapper.getPageable(searchDto.getPage(), searchDto.getSize(), sort);
 
     Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
 
