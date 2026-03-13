@@ -91,4 +91,13 @@ public class PaymentGatewayService {
     }
     return true;
   }
+
+  /** Hoàn tiền cho đơn hàng qua Stripe. */
+  public void refund(String sessionId) {
+    if (sessionId == null || sessionId.isBlank()) {
+      log.warn("No session ID provided for refund");
+      return;
+    }
+    stripeAdapter.refund(sessionId);
+  }
 }
