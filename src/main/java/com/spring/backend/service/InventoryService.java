@@ -63,4 +63,22 @@ public class InventoryService {
           newQty);
     }
   }
+
+  /** Hoàn tồn kho khi hủy đơn hàng. */
+  public void releaseStock(List<OrderItemEntity> orderItems) {
+    for (OrderItemEntity item : orderItems) {
+      ProductEntity product = item.getProduct();
+      if (product == null) {
+        log.warn("Product not found for order item id={}, skipping release", item.getId());
+        continue;
+      }
+      product.setQuantity(product.getQuantity() + item.getQuantity());
+      productRepository.save(product);
+      log.info(
+          "Released {} units for product '{}', new quantity={}",
+          item.getQuantity(),
+          product.getName(),
+          product.getQuantity());
+    }
+  }
 }

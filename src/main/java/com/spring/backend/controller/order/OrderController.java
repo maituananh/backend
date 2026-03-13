@@ -63,4 +63,11 @@ public class OrderController {
   public ResponseEntity<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId) {
     return ResponseEntity.ok(orderService.getOrderDetail(orderId));
   }
+
+  /** Hủy đơn hàng và hoàn tiền (nếu đã thanh toán qua Stripe) */
+  @PostMapping("/orders/{orderId}/cancel")
+  public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
+    orderService.cancelOrder(orderId);
+    return ResponseEntity.ok().build();
+  }
 }

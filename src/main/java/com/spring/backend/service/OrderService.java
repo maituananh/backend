@@ -335,4 +335,44 @@ public class OrderService {
         .items(itemDtos)
         .build();
   }
+
+  @Transactional
+  public void cancelOrder(Long orderId) {
+    Long userId = userHelper.getCurrentUserId();
+    OrderEntity order =
+        orderRepository
+            .findByIdAndUserId(orderId, userId)
+            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+    // Chỉ cho phép hủy khi đơn hàng đang PENDING hoặc CONFIRMED
+    if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+      throw new RuntimeException("Order cannot be cancelled in status: " + order.getStatus());
+    }
+
+    PaymentEntity payment =
+        paymentRepository
+            .findByOrderId(orderId)
+            .orElseThrow(() -> new RuntimeException("Payment not found for order: " + orderId));
+
+    // Nếu đã thanh toán thành công, thực hiện hoàn tiền trên Stripe
+    if (payment.getStatus() == PaymentStatus.SUCCESS
+        && payment.getPaymentMethod() != com.spring.backend.enums.PaymentMethod.CASH) {
+      log.info("Initiating refund for order: {}", orderId);
+      paymentGatewayService.refund(payment.getTransactionId());
+      payment.setStatus(PaymentStatus.REFUNDED);
+    } else {
+      payment.setStatus(PaymentStatus.FAILED);
+    }
+
+    // Nếu đã CONFIRMED, hoàn lại tồn kho
+    if (order.getStatus() == OrderStatus.CONFIRMED) {
+      List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+      inventoryService.releaseStock(items);
+    }
+
+    order.setStatus(OrderStatus.CANCELLED);
+
+    orderRepository.save(order);
+    paymentRepository.save(payment);
+  }
 }

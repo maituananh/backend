@@ -128,8 +128,8 @@ public class ProductService {
         PageMapper.getPageable(page, size, Sort.by(Sort.Direction.DESC, "startDate"));
 
     Page<ProductEntity> pageRelatedProducts =
-        productRepository.findByCategoryIdAndStatusAndIdNotAndIsActivedTrue(
-            product.getCategory().getId(), ProductStatus.LIQUIDATION, id, pageable);
+        productRepository.findByCategoryIdAndStatusAndIdNotAndIsActivedTrueAndQuantityGreaterThan(
+            product.getCategory().getId(), ProductStatus.LIQUIDATION, id, 0, pageable);
 
     List<ProductResponseDto> productResponseDtos =
         pageRelatedProducts.getContent().stream()
