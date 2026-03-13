@@ -20,4 +20,5 @@ public class ProductResponseDto {
   private String code;
   private Boolean isActived;
   private ProductStatus status;
+  private Integer availableQty;
 }
