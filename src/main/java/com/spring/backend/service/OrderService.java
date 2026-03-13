@@ -177,7 +177,7 @@ public class OrderService {
       case "checkout.session.completed" -> handlePaymentSuccess(order, payment);
       case "checkout.session.expired" -> handlePaymentExpired(order, payment);
       case "payment_intent.payment_failed" -> handlePaymentFailed(order, payment);
-      case null, default -> {
+      default -> {
         log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
         return; // Do not save if we don't know the event
       }
