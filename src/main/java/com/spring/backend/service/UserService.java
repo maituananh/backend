@@ -74,6 +74,29 @@ public class UserService {
   }
 
   @Transactional
+  public UserDto updateMyInfo(UserDto userDto) {
+
+    UserDetailsCustom currentUser =
+        (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    UserEntity userEntity =
+        userRepository
+            .findById(currentUser.getId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    userEntity.setName(userDto.getName());
+    userEntity.setEmail(userDto.getEmail());
+    userEntity.setPhone(userDto.getPhone());
+    userEntity.setAddress(userDto.getAddress());
+    userEntity.setGender(userDto.getGender());
+    userEntity.setCardId(userDto.getCardId());
+
+    UserEntity updatedUser = userRepository.save(userEntity);
+
+    return UserMapper.toUserDto(updatedUser);
+  }
+
+  @Transactional
   public UserDto updateUser(Long id, UserDto userDto) {
     UserEntity userEntity =
         userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
