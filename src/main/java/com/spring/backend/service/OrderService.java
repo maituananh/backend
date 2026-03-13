@@ -60,8 +60,9 @@ public class OrderService {
       throw new RuntimeException("Some items are invalid or not yours");
     }
 
-    // Kiểm tra tồn kho trước khi tạo order
+    // Kiểm tra và Giữ chỗ tồn kho (Reserve)
     inventoryService.validateStock(cartItems);
+    inventoryService.reserveStock(cartItems);
 
     // Tính tổng tiền
     BigDecimal total =
@@ -192,6 +193,10 @@ public class OrderService {
 
     order.setStatus(OrderStatus.CANCELLED);
     payment.setStatus(PaymentStatus.FAILED);
+
+    // Hoàn reserve stock
+    List<OrderItemEntity> items = orderItemRepository.findByOrderId(order.getId());
+    inventoryService.releaseStock(items);
   }
 
   private void handlePaymentSuccess(OrderEntity order, PaymentEntity payment) {
@@ -218,6 +223,10 @@ public class OrderService {
 
     order.setStatus(OrderStatus.FAILED);
     payment.setStatus(PaymentStatus.FAILED);
+
+    // Hoàn reserve stock khi thanh toán thất bại (người dùng sẽ phải đặt lại nếu muốn)
+    List<OrderItemEntity> items = orderItemRepository.findByOrderId(order.getId());
+    inventoryService.releaseStock(items);
 
     // KHÔNG xóa cart, KHÔNG trừ kho - user có thể thử lại
   }
@@ -364,11 +373,9 @@ public class OrderService {
       payment.setStatus(PaymentStatus.FAILED);
     }
 
-    // Nếu đã CONFIRMED, hoàn lại tồn kho
-    if (order.getStatus() == OrderStatus.CONFIRMED) {
-      List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
-      inventoryService.releaseStock(items);
-    }
+    // Hoàn lại tồn kho (dành cho cả đơn PENDING và CONFIRMED)
+    List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+    inventoryService.releaseStock(items);
 
     order.setStatus(OrderStatus.CANCELLED);
 

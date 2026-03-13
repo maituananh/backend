@@ -99,6 +99,7 @@ public class ProductService {
 
     ProductEntity productEntity =
         ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
+    productEntity.setAvailableQty(productEntity.getStockQty());
 
     ProductEntity productUpdated = productRepository.save(productEntity);
 
@@ -128,8 +129,9 @@ public class ProductService {
         PageMapper.getPageable(page, size, Sort.by(Sort.Direction.DESC, "startDate"));
 
     Page<ProductEntity> pageRelatedProducts =
-        productRepository.findByCategoryIdAndStatusAndIdNotAndIsActivedTrueAndQuantityGreaterThan(
-            product.getCategory().getId(), ProductStatus.LIQUIDATION, id, 0, pageable);
+        productRepository
+            .findByCategoryIdAndStatusAndIdNotAndIsActivedTrueAndAvailableQtyGreaterThan(
+                product.getCategory().getId(), ProductStatus.LIQUIDATION, id, 0, pageable);
 
     List<ProductResponseDto> productResponseDtos =
         pageRelatedProducts.getContent().stream()
@@ -207,6 +209,9 @@ public class ProductService {
   @Transactional
   public void deleteById(Long id) {
     ProductEntity product = productRepository.findById(id).orElseThrow();
+    if (product.getStatus() == ProductStatus.SOLD_OUT) {
+      throw new RuntimeException("Cannot delete a sold out product");
+    }
     product.setIsActived(false);
     productRepository.save(product);
   }
@@ -217,6 +222,9 @@ public class ProductService {
     validateProductDate(dto.getStartDate(), dto.getEndDate());
 
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+    if (productEntity.getStatus() == ProductStatus.SOLD_OUT) {
+      throw new RuntimeException("Cannot update a sold out product");
+    }
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -243,7 +251,7 @@ public class ProductService {
     productEntity.setEndDate(dto.getEndDate());
     productEntity.setType(dto.getType());
     productEntity.setDescription(dto.getDescription());
-    productEntity.setQuantity(dto.getQuantity());
+    productEntity.setStockQty(dto.getStockQty());
     productEntity.setCategory(categoryEntity);
     productEntity.setCustomer(userEntity);
 
@@ -262,6 +270,10 @@ public class ProductService {
         productRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+    if (productEntity.getStatus() == ProductStatus.SOLD_OUT) {
+      throw new RuntimeException("Cannot liquidate a sold out product");
+    }
 
     productEntity.setStatus(ProductStatus.LIQUIDATION);
 
