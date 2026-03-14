@@ -266,10 +266,10 @@ public class OrderService {
   }
 
   // ============================================================
-  // 4.1 GET ORDERS PAGINATED - Danh sách orders của user có paging
+  // 4.1 GET MY ORDERS PAGINATED - Danh sách orders của user hiện tại
   // ============================================================
   @Transactional(readOnly = true)
-  public Pagination<OrderDetailResponse> getOrdersPaginated(
+  public Pagination<OrderDetailResponse> getMyOrdersPaginated(
       int page, int size, OrderStatus status) {
     Long userId = userHelper.getCurrentUserId();
     Page<OrderEntity> orderPage;
@@ -292,15 +292,49 @@ public class OrderService {
   }
 
   // ============================================================
+  // 4.2 GET ALL ORDERS PAGINATED (ADMIN) - Admin xem toàn bộ đơn hàng
+  // ============================================================
+  @Transactional(readOnly = true)
+  public Pagination<OrderDetailResponse> getAllOrdersPaginatedForAdmin(
+      int page, int size, OrderStatus status) {
+    Page<OrderEntity> orderPage;
+
+    if (status != null) {
+      orderPage =
+          orderRepository.findByStatusOrderByCreatedAtDesc(status, PageRequest.of(page, size));
+    } else {
+      orderPage = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
+    }
+
+    return Pagination.<OrderDetailResponse>builder()
+        .data(orderPage.getContent().stream().map(this::toDetailResponse).toList())
+        .totalElements(orderPage.getTotalElements())
+        .totalPages(orderPage.getTotalPages())
+        .currentPage(page)
+        .build();
+  }
+
+  // ============================================================
   // 5. GET ORDER DETAIL - Chi tiết một order
   // ============================================================
   @Transactional(readOnly = true)
   public OrderDetailResponse getOrderDetail(Long orderId) {
     Long userId = userHelper.getCurrentUserId();
-    OrderEntity order =
-        orderRepository
-            .findByIdAndUserId(orderId, userId)
-            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    UserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+    OrderEntity order;
+    if (user.getRole() == com.spring.backend.enums.UserRole.ADMIN) {
+      order =
+          orderRepository
+              .findById(orderId)
+              .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    } else {
+      order =
+          orderRepository
+              .findByIdAndUserId(orderId, userId)
+              .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    }
     return toDetailResponse(order);
   }
 
@@ -348,10 +382,21 @@ public class OrderService {
   @Transactional
   public void cancelOrder(Long orderId) {
     Long userId = userHelper.getCurrentUserId();
-    OrderEntity order =
-        orderRepository
-            .findByIdAndUserId(orderId, userId)
-            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    UserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+    OrderEntity order;
+    if (user.getRole() == com.spring.backend.enums.UserRole.ADMIN) {
+      order =
+          orderRepository
+              .findById(orderId)
+              .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    } else {
+      order =
+          orderRepository
+              .findByIdAndUserId(orderId, userId)
+              .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    }
 
     // Chỉ cho phép hủy khi đơn hàng đang PENDING hoặc CONFIRMED
     if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {

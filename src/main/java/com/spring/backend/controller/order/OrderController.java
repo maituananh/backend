@@ -49,13 +49,22 @@ public class OrderController {
     return ResponseEntity.ok(orderService.getOrders());
   }
 
-  /** Lấy danh sách đơn hàng có phân trang (mới nhất trước) */
+  /** Lấy danh sách đơn hàng của user đang login có phân trang (mới nhất trước) */
   @GetMapping("/orders")
-  public ResponseEntity<Pagination<OrderDetailResponse>> getOrdersPaginated(
+  public ResponseEntity<Pagination<OrderDetailResponse>> getMyOrdersPaginated(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(required = false) OrderStatus status) {
-    return ResponseEntity.ok(orderService.getOrdersPaginated(page, size, status));
+    return ResponseEntity.ok(orderService.getMyOrdersPaginated(page, size, status));
+  }
+
+  /** (ADMIN) Lấy danh sách toàn bộ đơn hàng của tất cả user có phân trang */
+  @GetMapping("/admin/orders")
+  public ResponseEntity<Pagination<OrderDetailResponse>> getAllOrdersPaginatedForAdmin(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) OrderStatus status) {
+    return ResponseEntity.ok(orderService.getAllOrdersPaginatedForAdmin(page, size, status));
   }
 
   /** Lấy chi tiết một order theo ID */
