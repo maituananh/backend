@@ -26,14 +26,19 @@ public class UserController {
     return userService.getAll();
   }
 
-  @GetMapping("/{id}")
-  public UserDto getUserById(@PathVariable Long id) {
-    return userService.getByIdCard(id);
-  }
-
   @GetMapping("/me")
   public UserDto getMyInfo() {
     return userService.getMyInfo();
+  }
+
+  @PutMapping("/me")
+  public UserDto updateMyInfo(@RequestBody UserDto userDto) {
+    return userService.updateMyInfo(userDto);
+  }
+
+  @GetMapping("/{id:\\d+}")
+  public UserDto getUserById(@PathVariable Long id) {
+    return userService.getByIdCard(id);
   }
 
   @GetMapping("/search")
@@ -48,12 +53,12 @@ public class UserController {
     return userService.searchUser(name, email, phone, cardId, username, page, size);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{id:\\d+}")
   public void deleteUserById(@PathVariable Long id) {
     userService.delete(id);
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/{id:\\d+}")
   public UserDto updateUserById(@PathVariable Long id, @RequestBody UserDto userDto) {
     return userService.updateUser(id, userDto);
   }
