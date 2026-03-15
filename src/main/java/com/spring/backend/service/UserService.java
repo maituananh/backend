@@ -1,5 +1,7 @@
 package com.spring.backend.service;
 
+import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.adapter.s3.dto.UploadFileDto;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
@@ -16,20 +18,21 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
-
   private final UserRepository userRepository;
+  private final S3Adapter s3Adapter;
 
   public List<UserDto> getAll() {
     List<UserEntity> userEntity = userRepository.findAll();
 
     List<UserDto> userDto = new ArrayList<>();
-    for (UserEntity productEntity : userEntity) {
-      userDto.add(UserMapper.toUserDto(productEntity));
+    for (UserEntity user : userEntity) {
+      userDto.add(UserMapper.toUserDto(user, s3Adapter));
     }
     return userDto;
   }
@@ -39,12 +42,12 @@ public class UserService {
     UserEntity userEntity = UserMapper.toEntity(userDto);
     UserEntity saveUser = userRepository.save(userEntity);
 
-    return UserMapper.toUserDto(saveUser);
+    return UserMapper.toUserDto(saveUser, s3Adapter);
   }
 
   public UserDto getByIdCard(Long id) {
     UserEntity productUser = userRepository.findById(id).orElseThrow();
-    return UserMapper.toUserDto(productUser);
+    return UserMapper.toUserDto(productUser, s3Adapter);
   }
 
   public UserDto getMyInfo() {
@@ -52,7 +55,7 @@ public class UserService {
         (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     UserEntity productUser = userRepository.findById(currentUser.getId()).get();
-    return UserMapper.toUserDto(productUser);
+    return UserMapper.toUserDto(productUser, s3Adapter);
   }
 
   public Page<UserDto> searchUser(
@@ -63,7 +66,7 @@ public class UserService {
     Page<UserEntity> usersEntities = userRepository.findAll(spec, pageable);
 
     List<UserDto> userDtos =
-        usersEntities.getContent().stream().map(UserMapper::toUserDto).toList();
+        usersEntities.getContent().stream().map(u -> UserMapper.toUserDto(u, s3Adapter)).toList();
 
     return new PageImpl<>(userDtos, pageable, usersEntities.getTotalElements());
   }
@@ -90,10 +93,11 @@ public class UserService {
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
     userEntity.setCardId(userDto.getCardId());
+    userEntity.setAvatar(userDto.getAvatar());
 
     UserEntity updatedUser = userRepository.save(userEntity);
 
-    return UserMapper.toUserDto(updatedUser);
+    return UserMapper.toUserDto(updatedUser, s3Adapter);
   }
 
   @Transactional
@@ -104,6 +108,24 @@ public class UserService {
     UserMapper.toEntity(userDto, userEntity);
     UserEntity updatedUser = userRepository.save(userEntity);
 
-    return UserMapper.toUserDto(updatedUser);
+    return UserMapper.toUserDto(updatedUser, s3Adapter);
+  }
+
+  @Transactional
+  public UserDto uploadAvatar(MultipartFile file) {
+    UserDetailsCustom currentUser =
+        (UserDetailsCustom) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    UserEntity userEntity =
+        userRepository
+            .findById(currentUser.getId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    UploadFileDto uploadFileDto = s3Adapter.uploadFile(file);
+    userEntity.setAvatar(uploadFileDto.getKey());
+
+    UserEntity updatedUser = userRepository.save(userEntity);
+
+    return UserMapper.toUserDto(updatedUser, s3Adapter);
   }
 }

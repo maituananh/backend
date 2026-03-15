@@ -48,6 +48,9 @@ public class UserEntity extends BaseEntity {
   @Column(name = "is_active", nullable = false)
   private Boolean isActive = true;
 
+  @Column(name = "avatar")
+  private String avatar;
+
   @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<ProductEntity> products;
 

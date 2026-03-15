@@ -120,7 +120,7 @@ public class ProductService {
                         .build())
             .toList();
 
-    return ProductMapper.toProductDetailResponse(productEntity, images);
+    return ProductMapper.toProductDetailResponse(productEntity, images, s3Adapter);
   }
 
   public Pagination<ProductResponseDto> getRelatedProducts(Long id, Integer page, Integer size) {
