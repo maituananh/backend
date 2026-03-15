@@ -1,5 +1,6 @@
 package com.spring.backend.service.mapper;
 
+import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
@@ -57,7 +58,7 @@ public class ProductMapper {
   }
 
   public static ProductDetailResponseDto toProductDetailResponse(
-      ProductEntity entity, List<ImageResponseDto> images) {
+      ProductEntity entity, List<ImageResponseDto> images, S3Adapter s3Adapter) {
     return ProductDetailResponseDto.builder()
         .name(entity.getName())
         .price(entity.getPrice())
@@ -72,7 +73,7 @@ public class ProductMapper {
         .availableQty(entity.getAvailableQty())
         .description(entity.getDescription())
         .category(CategoryMapper.toCategoryDto(entity.getCategory()))
-        .user(UserMapper.toUserDto(entity.getCustomer()))
+        .user(UserMapper.toUserDto(entity.getCustomer(), s3Adapter))
         .dailyProfit(entity.getDailyProfit())
         .isActived(entity.getIsActived())
         .status(entity.getStatus())

@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/users")
@@ -66,5 +67,10 @@ public class UserController {
   @GetMapping("/{userId}/products")
   public List<ProductResponseDto> getProductsByUserId(@PathVariable Long userId) {
     return productService.getProductsByUserId(userId);
+  }
+
+  @PostMapping("/avatar")
+  public UserDto uploadAvatar(@RequestParam("file") MultipartFile file) {
+    return userService.uploadAvatar(file);
   }
 }

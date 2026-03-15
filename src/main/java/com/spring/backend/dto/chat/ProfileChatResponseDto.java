@@ -20,4 +20,5 @@ public class ProfileChatResponseDto extends ChatResponseDto {
   private String phone;
   private String address;
   private String gender;
+  private String avatar;
 }

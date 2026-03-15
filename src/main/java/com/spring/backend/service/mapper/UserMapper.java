@@ -1,5 +1,6 @@
 package com.spring.backend.service.mapper;
 
+import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.chat.ChatCreateAccountRequestDto;
 import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.dto.user.UserDto;
@@ -23,6 +24,7 @@ public class UserMapper {
         .cardId(userDto.getCardId())
         .address(userDto.getAddress())
         .gender(userDto.getGender())
+        .avatar(userDto.getAvatar())
         .role(UserRole.CUSTOMER)
         .build();
   }
@@ -35,6 +37,7 @@ public class UserMapper {
     userEntity.setCardId(userDto.getCardId());
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
+    userEntity.setAvatar(userDto.getAvatar());
     if (userDto.getRole() != null) {
       userEntity.setRole(userDto.getRole());
     }
@@ -52,7 +55,16 @@ public class UserMapper {
         .address(entity.getAddress())
         .gender(entity.getGender())
         .role(entity.getRole())
+        .avatar(entity.getAvatar())
         .build();
+  }
+
+  public static UserDto toUserDto(UserEntity entity, S3Adapter s3Adapter) {
+    UserDto dto = toUserDto(entity);
+    if (entity.getAvatar() != null && s3Adapter != null) {
+      dto.setAvatar(s3Adapter.getUrl(entity.getAvatar()));
+    }
+    return dto;
   }
 
   public static ProfileChatResponseDto toProfileDto(UserEntity entity) {
@@ -65,9 +77,18 @@ public class UserMapper {
         .cardId(entity.getCardId())
         .address(entity.getAddress())
         .gender(entity.getGender())
+        .avatar(entity.getAvatar())
         .result(String.valueOf(CategoryAI.PROFILE))
         .type(String.valueOf(CategoryAI.PROFILE))
         .build();
+  }
+
+  public static ProfileChatResponseDto toProfileDto(UserEntity entity, S3Adapter s3Adapter) {
+    ProfileChatResponseDto dto = toProfileDto(entity);
+    if (entity.getAvatar() != null && s3Adapter != null) {
+      dto.setAvatar(s3Adapter.getUrl(entity.getAvatar()));
+    }
+    return dto;
   }
 
   public static UserEntity toEntity(

@@ -1,5 +1,6 @@
 package com.spring.backend.service.chat;
 
+import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.chat.ChatRequestDto;
 import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.entity.UserEntity;
@@ -15,6 +16,7 @@ public class ProfileService extends AbstractChatService {
 
   private final UserRepository userRepository;
   private final UserHelper userHelper;
+  private final S3Adapter s3Adapter;
 
   @Override
   public ChatResponseDto handle(ChatRequestDto chatRequestDto) {
@@ -27,7 +29,7 @@ public class ProfileService extends AbstractChatService {
           .build();
     }
 
-    return UserMapper.toProfileDto(userEntity);
+    return UserMapper.toProfileDto(userEntity, s3Adapter);
   }
 
   @Override
