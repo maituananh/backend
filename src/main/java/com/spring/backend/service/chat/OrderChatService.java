@@ -6,9 +6,7 @@ import com.spring.backend.dto.chat.OrderChatResponseDto;
 import com.spring.backend.entity.OrderEntity;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.OrderItemRepository;
 import com.spring.backend.repository.OrderRepository;
-import com.spring.backend.repository.PaymentRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +22,6 @@ public class OrderChatService extends AbstractChatService {
 
   private final ChatClient chatClient;
   private final OrderRepository orderRepository;
-  private final OrderItemRepository orderItemRepository;
-  private final PaymentRepository paymentRepository;
   private final UserHelper userHelper;
 
   @Override
@@ -38,7 +34,7 @@ public class OrderChatService extends AbstractChatService {
     log.info("Determined status: {}", statusStr);
 
     List<OrderEntity> orders;
-    if (statusStr == null || statusStr.equalsIgnoreCase("ALL")) {
+    if (statusStr.equalsIgnoreCase("ALL")) {
       orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
     } else {
       try {
@@ -53,9 +49,7 @@ public class OrderChatService extends AbstractChatService {
       return ChatResponseDto.builder()
           .result(
               "You don't have any orders"
-                  + (statusStr != null && !statusStr.equals("ALL")
-                      ? " with status " + statusStr
-                      : ""))
+                  + (!statusStr.equals("ALL") ? " with status " + statusStr : ""))
           .build();
     }
 
@@ -76,7 +70,7 @@ public class OrderChatService extends AbstractChatService {
                 + "Identify which order status they want to view. "
                 + "Valid statuses are: [%s]. "
                 + "If the user wants to see all orders or doesn't mention a specific status, return 'ALL'. "
-                + "Return ONLY the status name (e.g., PENDING, CONFIRMED, CANCELLED, ALL). "
+                + "Return ONLY the status name (e.g., PENDING, CONFIRMED | COMPLETED, CANCELLED, ALL). "
                 + "Do not add any additional explanation.",
             question, allStatus);
 
