@@ -25,6 +25,12 @@ spring:
       chat:
         options:
           model: gpt-4o-mini
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:myredispassword}
+      timeout: 10000
   servlet:
     multipart:
       enabled: true

@@ -1,31 +1,39 @@
 package com.spring.backend.controller.chat;
 
-import com.spring.backend.dto.chat.ChatCreateAccountRequestDto;
+import com.spring.backend.dto.chat.ChatHistoryItemDto;
 import com.spring.backend.dto.chat.ChatRequestDto;
 import com.spring.backend.dto.chat.ChatResponseDto;
-import com.spring.backend.service.OpenAiService;
-import com.spring.backend.service.chat.OCRService;
+import com.spring.backend.helper.UserHelper;
+import com.spring.backend.service.AgentService;
+import com.spring.backend.service.ChatHistoryService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class OpenAIChatController {
 
-  private final OpenAiService openAiService;
-  private final OCRService ocrService;
+  private final AgentService agentService;
+  private final ChatHistoryService chatHistoryService;
+  private final UserHelper userHelper;
 
   @PostMapping
   public ChatResponseDto sendMessage(@RequestBody ChatRequestDto chatRequestDto) {
-    return openAiService.handleRequest(chatRequestDto);
+    return agentService.process(
+        String.valueOf(userHelper.getCurrentUserId()),
+        chatRequestDto.getContent(),
+        chatRequestDto.getFileUrl());
   }
 
-  @PostMapping("/ocr/user")
-  public ChatResponseDto ocrUser(@RequestBody ChatCreateAccountRequestDto chatRequestDto) {
-    return ocrService.handle(chatRequestDto);
+  @GetMapping("/history")
+  public List<ChatHistoryItemDto> getHistory() {
+    return chatHistoryService.getHistory(String.valueOf(userHelper.getCurrentUserId()));
+  }
+
+  @DeleteMapping("/history")
+  public void clearHistory() {
+    chatHistoryService.clear(String.valueOf(userHelper.getCurrentUserId()));
   }
 }

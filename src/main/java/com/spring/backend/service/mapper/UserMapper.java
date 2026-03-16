@@ -1,14 +1,12 @@
 package com.spring.backend.service.mapper;
 
 import com.spring.backend.adapter.s3.S3Adapter;
-import com.spring.backend.dto.chat.ChatCreateAccountRequestDto;
-import com.spring.backend.dto.chat.ProfileChatResponseDto;
+import com.spring.backend.dto.chat.ProfileResultDto;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
-import com.spring.backend.service.chat.CategoryAI;
-import com.spring.backend.service.chat.OCRService;
-import com.spring.backend.utils.DateUtils;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +18,10 @@ public class UserMapper {
         .email(userDto.getEmail())
         .name(userDto.getName())
         .age(userDto.getAge())
+        .birthDate(
+            userDto.getBirthDate() != null
+                ? LocalDate.parse(userDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : null)
         .phone(userDto.getPhone())
         .cardId(userDto.getCardId())
         .address(userDto.getAddress())
@@ -33,6 +35,10 @@ public class UserMapper {
     userEntity.setEmail(userDto.getEmail());
     userEntity.setName(userDto.getName());
     userEntity.setAge(userDto.getAge());
+    if (userDto.getBirthDate() != null) {
+      userEntity.setBirthDate(
+          LocalDate.parse(userDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+    }
     userEntity.setPhone(userDto.getPhone());
     userEntity.setCardId(userDto.getCardId());
     userEntity.setAddress(userDto.getAddress());
@@ -50,6 +56,10 @@ public class UserMapper {
         .name(entity.getName())
         .username(entity.getUsername())
         .age(entity.getAge())
+        .birthDate(
+            entity.getBirthDate() != null
+                ? entity.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : null)
         .phone(entity.getPhone())
         .cardId(entity.getCardId())
         .address(entity.getAddress())
@@ -67,46 +77,29 @@ public class UserMapper {
     return dto;
   }
 
-  public static ProfileChatResponseDto toProfileDto(UserEntity entity) {
-    return ProfileChatResponseDto.builder()
+  public static ProfileResultDto toProfileDto(UserEntity entity) {
+    return ProfileResultDto.builder()
         .email(entity.getEmail())
         .name(entity.getName())
         .username(entity.getUsername())
         .age(entity.getAge())
+        .birthDate(
+            entity.getBirthDate() != null
+                ? entity.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : null)
         .phone(entity.getPhone())
         .cardId(entity.getCardId())
         .address(entity.getAddress())
         .gender(entity.getGender())
         .avatar(entity.getAvatar())
-        .result(String.valueOf(CategoryAI.PROFILE))
-        .type(String.valueOf(CategoryAI.PROFILE))
         .build();
   }
 
-  public static ProfileChatResponseDto toProfileDto(UserEntity entity, S3Adapter s3Adapter) {
-    ProfileChatResponseDto dto = toProfileDto(entity);
+  public static ProfileResultDto toProfileDto(UserEntity entity, S3Adapter s3Adapter) {
+    ProfileResultDto dto = toProfileDto(entity);
     if (entity.getAvatar() != null && s3Adapter != null) {
       dto.setAvatar(s3Adapter.getUrl(entity.getAvatar()));
     }
     return dto;
-  }
-
-  public static UserEntity toEntity(
-      OCRService.CitizenIdResponse dto,
-      ChatCreateAccountRequestDto chatRequestDto,
-      String passwordHash) {
-    return UserEntity.builder()
-        .name(dto.getFullName())
-        .cardId(dto.getIdNumber())
-        .address(dto.getPlaceOfOrigin())
-        .gender(dto.getGender())
-        .isActive(true)
-        .age(DateUtils.calculateAge(dto.getDateOfBirth()))
-        .role(UserRole.CUSTOMER)
-        .username(chatRequestDto.getUsername())
-        .email(chatRequestDto.getEmail())
-        .phone(chatRequestDto.getPhone())
-        .password(passwordHash)
-        .build();
   }
 }

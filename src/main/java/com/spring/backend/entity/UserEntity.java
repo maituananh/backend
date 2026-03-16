@@ -2,6 +2,7 @@ package com.spring.backend.entity;
 
 import com.spring.backend.enums.UserRole;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +25,10 @@ public class UserEntity extends BaseEntity {
   private String name;
 
   @Column(name = "age")
-  private int age;
+  private Integer age;
+
+  @Column(name = "birth_date")
+  private LocalDate birthDate;
 
   @Column(name = "email", nullable = false)
   private String email;
