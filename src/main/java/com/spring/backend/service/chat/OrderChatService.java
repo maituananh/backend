@@ -1,18 +1,20 @@
 package com.spring.backend.service.chat;
 
-import com.spring.backend.dto.chat.ChatRequestDto;
 import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.OrderChatResponseDto;
+import com.spring.backend.dto.chat.OrderResultDto;
+import com.spring.backend.dto.classifier.AgentContext;
 import com.spring.backend.entity.OrderEntity;
+import com.spring.backend.enums.AgentAIStep;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.OrderRepository;
+import com.spring.backend.service.AIClient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,19 +22,34 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OrderChatService extends AbstractChatService {
 
-  private final ChatClient chatClient;
+  private final AIClient aiClient;
   private final OrderRepository orderRepository;
   private final UserHelper userHelper;
 
   @Override
-  public ChatResponseDto handle(ChatRequestDto chatRequestDto) {
-    String question = chatRequestDto.getContent();
+  public ChatResponseDto<?> process(AgentContext ctx, String message, String fileUrl) {
     Long userId = userHelper.getCurrentUserId();
 
-    // Sử dụng AI để xác định xem User đang muốn lấy đơn hàng ở trạng thái nào
-    String statusStr = determineStatus(question);
-    log.info("Determined status: {}", statusStr);
+    // 1. Identify which order status they want to view using AI
+    String statusStr = determineStatus(message);
+    log.info("Determined status for user {}: {}", userId, statusStr);
 
+    if (statusStr.equalsIgnoreCase("UNKNOWN")) {
+      ctx.setStep(AgentAIStep.IN_PROGRESS);
+      return ChatResponseDto.<OrderResultDto>builder()
+          .status("success")
+          .data(
+              ChatResponseDto.ChatData.<OrderResultDto>builder()
+                  .reply(
+                      "What status would you like to see for your order? (For example: Awaiting Confirmation, In Transit, Completed, or All)")
+                  .intent(intent().name())
+                  .isComplete(false)
+                  .messages(ctx.getMessages())
+                  .build())
+          .build();
+    }
+
+    // 2. Fetch orders
     List<OrderEntity> orders;
     if (statusStr.equalsIgnoreCase("ALL")) {
       orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
@@ -41,51 +58,64 @@ public class OrderChatService extends AbstractChatService {
         OrderStatus status = OrderStatus.valueOf(statusStr.toUpperCase());
         orders = orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status);
       } catch (IllegalArgumentException e) {
+        log.warn("Invalid status determined: {}. Falling back to ALL.", statusStr);
         orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        statusStr = "ALL";
       }
     }
 
-    if (orders.isEmpty()) {
-      return ChatResponseDto.builder()
-          .result(
-              "You don't have any orders"
-                  + (!statusStr.equals("ALL") ? " with status " + statusStr : ""))
-          .build();
-    }
+    ctx.setStep(AgentAIStep.COMPLETED);
+
+    OrderResultDto result =
+        OrderResultDto.builder()
+            .message(
+                "Found "
+                    + orders.size()
+                    + " orders "
+                    + (statusStr.equalsIgnoreCase("ALL") ? "" : statusStr.toLowerCase()))
+            .orders(orders.stream().map(this::toBriefDto).toList())
+            .build();
 
     return OrderChatResponseDto.builder()
-        .result("I found " + orders.size() + " orders for you:")
-        .type(String.valueOf(CategoryAI.ORDER))
-        .orders(orders.stream().map(this::toBriefDto).toList())
+        .status("success")
+        .data(
+            ChatResponseDto.ChatData.<OrderResultDto>builder()
+                .reply(result.getMessage())
+                .intent(intent().name())
+                .isComplete(true)
+                .result(result)
+                .messages(ctx.getMessages())
+                .build())
         .build();
   }
 
-  private String determineStatus(String question) {
-    String allStatus =
+  private String determineStatus(String message) {
+    String availableStatuses =
         Arrays.stream(OrderStatus.values()).map(Enum::name).collect(Collectors.joining(", "));
 
     String prompt =
-        String.format(
-            "Based on the user's question: '%s'. "
-                + "Identify which order status they want to view. "
-                + "Valid statuses are: [%s]. "
-                + "If the user wants to see all orders or doesn't mention a specific status, return 'ALL'. "
-                + "Return ONLY the status name (e.g., PENDING, CONFIRMED | COMPLETED, CANCELLED, ALL). "
-                + "Do not add any additional explanation.",
-            question, allStatus);
+        """
+        You are an assistant identifying order status from user requests.
+        Available statuses are: [%s]
 
-    String content = chatClient.prompt().user(prompt).call().content();
+        Rules:
+        - If the user wants to see ALL orders or doesn't specify, return 'ALL'.
+        - If the user specifies a status, return the exact status name from the available list.
+        - If it's completely unclear what status they want (and it's not 'ALL'), return 'UNKNOWN'.
 
+        Return ONLY the status name or 'ALL' or 'UNKNOWN'. No explanation.
+        """
+            .formatted(availableStatuses);
+
+    String content = aiClient.chat(prompt, message);
     if (content == null || content.isBlank()) {
       return "ALL";
     }
-
     return content.trim().toUpperCase();
   }
 
-  // Helper để map gọn thông tin đơn hàng trả về trong Chat
-  private OrderChatResponseDto.OrderBriefDto toBriefDto(OrderEntity order) {
-    return OrderChatResponseDto.OrderBriefDto.builder()
+  private OrderResultDto.OrderBriefDto toBriefDto(OrderEntity order) {
+    return OrderResultDto.OrderBriefDto.builder()
         .orderId(order.getId())
         .status(order.getStatus().name())
         .totalAmount(order.getTotalAmount().toString())
@@ -94,12 +124,7 @@ public class OrderChatService extends AbstractChatService {
   }
 
   @Override
-  public String description() {
-    return "Look up my order list (e.g., placed orders, cancelled orders)";
-  }
-
-  @Override
-  public CategoryAI category() {
-    return CategoryAI.ORDER;
+  public AIIntent intent() {
+    return AIIntent.ORDER;
   }
 }

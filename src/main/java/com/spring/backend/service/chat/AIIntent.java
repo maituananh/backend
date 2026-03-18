@@ -1,9 +1,9 @@
 package com.spring.backend.service.chat;
 
-public enum CategoryAI {
+public enum AIIntent {
   PROFILE,
   OCR_IDENTITY,
-  NEW_ACCOUNT,
+  CREATE_ACCOUNT,
   ORDER,
   ERROR
 }

@@ -13,7 +13,8 @@ public class UserDto {
   private String email;
   private String name;
   private String username;
-  private int age;
+  private Integer age;
+  private String birthDate;
   private String phone;
   private String cardId;
   private String address;
