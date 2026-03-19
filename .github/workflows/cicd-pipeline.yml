@@ -22,52 +22,64 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login Dockerhub
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Gradle clean
         run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          ./gradlew clean
 
-      - name: Build Docker Image
-        env:
-          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+      - name: Gradle build
         run: |
-          docker build -t $IMAGE:latest .
+          ./gradlew build
 
-      - name: Push Docker Image
-        env:
-          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+      - name: Gradle test
         run: |
-          docker push $IMAGE:latest
+          ./gradlew test
 
-      - name: Delete old Docker Hub tags (keep last 5)
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          REPO: ${{ secrets.DOCKER_IMAGE_NAME }}
-        run: |
-          TOKEN=$(curl -s -H "Content-Type: application/json" \
-          -X POST \
-          -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" \
-          https://hub.docker.com/v2/users/login/ | jq -r .token)
-  
-          TAGS=$(curl -s \
-          -H "Authorization: JWT $TOKEN" \
-          "https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags?page_size=100" \
-          | jq -r '.results | sort_by(.last_updated) | reverse | .[].name')
-  
-          COUNT=0
-          for TAG in $TAGS; do
-            COUNT=$((COUNT+1))
-  
-            if [ $COUNT -gt 5 ]; then
-              echo "Deleting tag: $TAG"
-              curl -s -X DELETE \
-              -H "Authorization: JWT $TOKEN" \
-              https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags/$TAG/
-            fi
-          done
+#      - name: Login Dockerhub
+#        env:
+#          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#        run: |
+#          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+#
+#      - name: Build Docker Image
+#        env:
+#          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+#        run: |
+#          docker build -t $IMAGE:latest .
+
+#      - name: Push Docker Image
+#        env:
+#          IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+#        run: |
+#          docker push $IMAGE:latest
+#
+#      - name: Delete old Docker Hub tags (keep last 5)
+#        env:
+#          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#          REPO: ${{ secrets.DOCKER_IMAGE_NAME }}
+#        run: |
+#          TOKEN=$(curl -s -H "Content-Type: application/json" \
+#          -X POST \
+#          -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" \
+#          https://hub.docker.com/v2/users/login/ | jq -r .token)
+#
+#          TAGS=$(curl -s \
+#          -H "Authorization: JWT $TOKEN" \
+#          "https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags?page_size=100" \
+#          | jq -r '.results | sort_by(.last_updated) | reverse | .[].name')
+#
+#          COUNT=0
+#          for TAG in $TAGS; do
+#            COUNT=$((COUNT+1))
+#
+#            if [ $COUNT -gt 5 ]; then
+#              echo "Deleting tag: $TAG"
+#              curl -s -X DELETE \
+#              -H "Authorization: JWT $TOKEN" \
+#              https://hub.docker.com/v2/repositories/$USERNAME/$REPO/tags/$TAG/
+#            fi
+#          done
 
 #  deploy:
 #    runs-on: self-hosted
