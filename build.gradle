@@ -1,9 +1,9 @@
 plugins {
 	id 'java'
+	id 'jacoco'
 	id "com.diffplug.spotless" version '7.2.1'
 	id 'org.springframework.boot' version '3.5.11'
 	id 'io.spring.dependency-management' version '1.1.7'
-
 }
 
 group = 'com.spring'
@@ -42,6 +42,8 @@ ext {
     jsonwebtokenVersion = '0.13.0'
     dropboxVersion = '7.0.0'
 	springAiVersion = '1.1.2'
+    wireMockVersion = '3.13.0'
+    embeddedRedisVersion = '0.7.3'
 }
 
 dependencies {
@@ -89,6 +91,21 @@ dependencies {
     // test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// test - lombok support
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// test - h2 in-memory database
+	testRuntimeOnly 'com.h2database:h2'
+
+	// test - wiremock for mocking external HTTP APIs (OpenAI, Stripe, AWS S3, etc.)
+	testImplementation "org.wiremock:wiremock-standalone:${wireMockVersion}"
+
+	// test - embedded redis
+	testImplementation("it.ozimov:embedded-redis:${embeddedRedisVersion}") {
+		exclude group: 'org.slf4j', module: 'slf4j-simple'
+	}
 }
 
 dependencyManagement {
@@ -97,6 +114,19 @@ dependencyManagement {
 	}
 }
 
-tasks.named('test') {
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
 }

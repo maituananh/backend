@@ -26,13 +26,13 @@ jobs:
         run: |
           ./gradlew clean
 
-      - name: Gradle build
-        run: |
-          ./gradlew build
-
       - name: Gradle test
         run: |
           ./gradlew test
+
+      - name: Gradle build
+        run: |
+          ./gradlew build
 
 #      - name: Login Dockerhub
 #        env:
