@@ -1,0 +1,97 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: backend-test
+
+  # =========================================================
+  # H2 In-Memory Database (replaces MySQL during tests)
+  # =========================================================
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+
+  # =========================================================
+  # Redis - overridden by EmbeddedRedisConfig
+  # =========================================================
+  data:
+    redis:
+      host: localhost
+      port: 6370   # different port than real Redis to avoid conflicts
+      password:
+      timeout: 5000
+
+  # =========================================================
+  # Security - dummy key for test
+  # =========================================================
+  security:
+    secret-key: test-secret-key-that-is-long-enough-for-hmac-sha-256-algorithm-padding
+
+  # =========================================================
+  # Spring AI - URL overridden by WireMock in tests
+  # =========================================================
+  ai:
+    openai:
+      api-key: test-openai-key
+      base-url: http://localhost:${wiremock.server.port:8089}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+  # =========================================================
+  # Multipart
+  # =========================================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# =========================================================
+# JobRunr - completely disabled during tests
+# =========================================================
+jobrunr:
+  background-job-server:
+    enabled: false
+  job-scheduler:
+    enabled: true
+  dashboard:
+    enabled: false
+  database:
+    type: mem
+
+# =========================================================
+# AWS S3 - URL overridden by WireMock in tests
+# =========================================================
+aws:
+  s3:
+    access-key: test-access-key
+    secret-key: test-secret-key
+    endpoint: http://localhost:${wiremock.server.port:8089}
+    bucket: test-bucket
+
+# =========================================================
+# Stripe - URL overridden by WireMock in tests
+# =========================================================
+stripe:
+  secret-key: sk_test_dummy_key_for_testing
+  webhook-secret: whsec_dummy_webhook_for_testing
+  success-url: http://localhost:3000/payment-success
+  cancel-url: http://localhost:3000/mycart
+
+server:
+  port: 0  # random port khi chạy test
+
+frontend:
+  base-url: http://localhost:3000/
