@@ -102,6 +102,9 @@ dependencies {
 	// test - wiremock for mocking external HTTP APIs (OpenAI, Stripe, AWS S3, etc.)
 	testImplementation "org.wiremock:wiremock-standalone:${wireMockVersion}"
 
+	// test - spring security test
+	testImplementation 'org.springframework.security:spring-security-test'
+	
 	// test - embedded redis
 	testImplementation("it.ozimov:embedded-redis:${embeddedRedisVersion}") {
 		exclude group: 'org.slf4j', module: 'slf4j-simple'
