@@ -178,7 +178,7 @@ public class ProductService {
   }
 
   public Page<ProductResponseDto> searchByType(String type, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("startDay").descending());
+    Pageable pageable = PageRequest.of(page, size, Sort.by("startDate").descending());
     Page<ProductEntity> pageProductEntity =
         productRepository.findByTypeAndIsActivedTrue(type, pageable);
 
