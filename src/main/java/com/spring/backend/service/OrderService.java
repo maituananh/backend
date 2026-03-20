@@ -210,10 +210,11 @@ public class OrderService {
     List<OrderItemEntity> items = orderItemRepository.findByOrderId(order.getId());
     inventoryService.deductStock(items);
 
-    // Xóa các cart items đã thanh toán (xóa theo product id của user)
     List<Long> cartItemProductIds = items.stream().map(OrderItemEntity::getProductId).toList();
-    cartItemRepository.deleteByCartCustomerIdAndProductIdIn(
-        order.getUser().getId(), cartItemProductIds);
+    if (!cartItemProductIds.isEmpty()) {
+      cartItemRepository.deleteByCartCustomerIdAndProductIdIn(
+          order.getUser().getId(), cartItemProductIds);
+    }
 
     // emailService.sendOrderConfirmation(order); // TODO: implement email later
   }

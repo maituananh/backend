@@ -5,8 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spring.backend.config.IntegrationTest;
+import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.entity.CategoryEntity;
@@ -21,15 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 
-@IntegrationTest
 @DisplayName("Category Controller Integration Tests")
-class CategoryControllerIT {
-
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper objectMapper;
+class CategoryControllerIT extends BaseIntegrationTest {
 
   @Autowired private CategoryRepository categoryRepository;
 

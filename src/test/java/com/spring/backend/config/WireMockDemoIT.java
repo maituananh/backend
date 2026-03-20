@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Example illustrating how to use WireMock to mock external API calls (OpenAI, etc.).
@@ -15,11 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
  * <p>This is a DEMO file - you can delete or keep it for reference. In practice, create separate
  * tests for each service/controller that needs testing.
  */
-@IntegrationTest
 @DisplayName("WireMock Demo - Mock External API Calls")
-class WireMockDemoIT {
-
-  @Autowired private MockMvc mockMvc;
+class WireMockDemoIT extends BaseIntegrationTest {
 
   @Autowired private WireMockServer wireMockServer;
 
