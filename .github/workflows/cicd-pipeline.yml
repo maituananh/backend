@@ -26,6 +26,10 @@ jobs:
         run: |
           ./gradlew clean
 
+      - name: Gradle spotlessCheck
+        run: |
+          ./gradlew spotlessCheck
+
       - name: Gradle test
         run: |
           ./gradlew test
