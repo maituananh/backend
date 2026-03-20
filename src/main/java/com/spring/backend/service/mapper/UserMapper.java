@@ -15,6 +15,8 @@ public class UserMapper {
 
   public static UserEntity toEntity(UserDto userDto) {
     return UserEntity.builder()
+        .username(userDto.getUsername())
+        .password("123456")
         .email(userDto.getEmail())
         .name(userDto.getName())
         .age(userDto.getAge())
@@ -28,6 +30,7 @@ public class UserMapper {
         .gender(userDto.getGender())
         .avatar(userDto.getAvatar())
         .role(UserRole.CUSTOMER)
+        .isActive(true)
         .build();
   }
 
