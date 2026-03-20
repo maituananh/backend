@@ -4,8 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spring.backend.config.IntegrationTest;
+import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Integration test for AuthController.
@@ -25,13 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
  * Start WireMock server to mock external APIs - Start Embedded Redis - Activate "test" profile with
  * application-test.yml
  */
-@IntegrationTest
 @DisplayName("Auth Controller Integration Tests")
-class AuthControllerIT {
-
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper objectMapper;
+class AuthControllerIT extends BaseIntegrationTest {
 
   @Autowired private UserRepository userRepository;
 
