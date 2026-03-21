@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Profile;
  * <p>WireMock simulates external HTTP APIs such as OpenAI, Stripe, AWS S3, etc., to allow testing
  * without depending on external services.
  *
+ * <p>Uses a dynamic port to avoid {@code BindException: Address already in use} when multiple
+ * Spring test ApplicationContexts are created (e.g. due to {@code @MockitoBean} producing different
+ * context keys).
+ *
  * <p>Usage in a test class:
  *
  * <pre>{@code
@@ -37,8 +41,15 @@ import org.springframework.context.annotation.Profile;
 @Profile("test")
 public class WireMockConfig {
 
-  @Bean(initMethod = "start", destroyMethod = "stop")
+  @Bean(destroyMethod = "stop")
   public WireMockServer wireMockServer() {
-    return new WireMockServer(WireMockConfiguration.wireMockConfig().port(8089));
+    WireMockServer server =
+        new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
+    // Start eagerly so we can read the dynamic port
+    server.start();
+    // Publish the port as a system property so application-test.yml
+    // can resolve ${wiremock.server.port} in base-url / endpoint configs
+    System.setProperty("wiremock.server.port", String.valueOf(server.port()));
+    return server;
   }
 }
