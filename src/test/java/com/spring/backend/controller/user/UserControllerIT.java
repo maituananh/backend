@@ -10,7 +10,7 @@ import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
 import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.repository.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +20,34 @@ import org.springframework.http.MediaType;
 class UserControllerIT extends BaseIntegrationTest {
 
   @Autowired private UserRepository userRepository;
+  @Autowired private CartItemRepository cartItemRepository;
+  @Autowired private CartRepository cartRepository;
+  @Autowired private OrderItemRepository orderItemRepository;
+  @Autowired private PaymentRepository paymentRepository;
+  @Autowired private OrderRepository orderRepository;
+  @Autowired private ImageRepository imageRepository;
+  @Autowired private ProductRepository productRepository;
+  @Autowired private CardRepository cardRepository;
+  @Autowired private TokenRepository tokenRepository;
+  @Autowired private CategoryRepository categoryRepository;
 
   private UserEntity adminUser;
 
   @BeforeEach
   void setUp() {
+    // Clean up in FK-safe order: children before parents
+    cartItemRepository.deleteAll();
+    cartRepository.deleteAll();
+    orderItemRepository.deleteAll();
+    paymentRepository.deleteAll();
+    orderRepository.deleteAll();
+    imageRepository.deleteAll();
+    productRepository.deleteAll();
+    cardRepository.deleteAll();
+    tokenRepository.deleteAll();
+    categoryRepository.deleteAll();
     userRepository.deleteAll();
+
     adminUser =
         UserEntity.builder()
             .username("admin")
