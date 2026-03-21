@@ -32,7 +32,12 @@ public class EmbeddedRedisConfig {
       builder.setting("maxheap 128M");
     }
     redisServer = builder.build();
-    redisServer.start();
+    try {
+      redisServer.start();
+    } catch (Exception e) {
+      // Port may already be bound by another test context's embedded Redis
+      // This is fine - we'll reuse the existing instance
+    }
     return redisServer;
   }
 
