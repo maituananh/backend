@@ -1,5 +1,6 @@
 package com.spring.backend.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.spring.backend.enums.UserRole;
 import lombok.*;
 
@@ -16,7 +17,10 @@ public class UserDto {
   private Integer age;
   private String birthDate;
   private String phone;
+
+  @JsonProperty("card_id")
   private String cardId;
+
   private String address;
   private String gender;
   private UserRole role;

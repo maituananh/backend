@@ -92,7 +92,9 @@ public class UserService {
     userEntity.setPhone(userDto.getPhone());
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
-    userEntity.setCardId(userDto.getCardId());
+    if (userDto.getCardId() != null) {
+      userEntity.setCardId(userDto.getCardId());
+    }
     userEntity.setAvatar(userDto.getAvatar());
 
     UserEntity updatedUser = userRepository.save(userEntity);

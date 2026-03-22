@@ -25,7 +25,7 @@ public class UserMapper {
                 ? LocalDate.parse(userDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 : null)
         .phone(userDto.getPhone())
-        .cardId(userDto.getCardId())
+        .cardId(userDto.getCardId() != null ? userDto.getCardId() : "")
         .address(userDto.getAddress())
         .gender(userDto.getGender())
         .avatar(userDto.getAvatar())
@@ -43,7 +43,9 @@ public class UserMapper {
           LocalDate.parse(userDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
     }
     userEntity.setPhone(userDto.getPhone());
-    userEntity.setCardId(userDto.getCardId());
+    if (userDto.getCardId() != null) {
+      userEntity.setCardId(userDto.getCardId());
+    }
     userEntity.setAddress(userDto.getAddress());
     userEntity.setGender(userDto.getGender());
     userEntity.setAvatar(userDto.getAvatar());
