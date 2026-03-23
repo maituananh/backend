@@ -35,7 +35,7 @@ services:
       - minio
     restart: always
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
     environment:
 #      - SPRING_PROFILES_ACTIVE=mysql
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/pawn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true

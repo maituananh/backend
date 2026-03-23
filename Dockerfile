@@ -31,6 +31,6 @@ USER app
 
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
 
-EXPOSE 8080
+EXPOSE $PORT
 
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]

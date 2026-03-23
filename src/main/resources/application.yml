@@ -61,6 +61,40 @@ stripe:
   success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/payment-success}
   cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/mycart}
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
+
+management:
+  observations:
+    annotations:
+      enabled: true
+  server:
+    port: ${MANAGEMENT_PORT:9999}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0 # Sample 100% of traces (adjust for production)
+  otlp:
+    tracing:
+      endpoint: http://172.17.0.1:4318/v1/traces
+
 server:
   port: ${BE_PORT:8080}
   tomcat:
