@@ -29,6 +29,7 @@ public class SecurityConfiguration {
     "/swagger-ui/**",
     "/api-docs.yaml",
     "/api-docs",
+    "/actuator/**",
     "/api/chat/**",
   };
 
