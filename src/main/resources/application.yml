@@ -83,6 +83,11 @@ management:
     health:
       show-details: always
   metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
     export:
       prometheus:
         enabled: true
