@@ -1,10 +1,7 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ "anhkiet-branch" ]
   pull_request:
-    branches: [ "*" ]
 
 jobs:
   validate:
@@ -37,6 +34,22 @@ jobs:
       - name: Gradle build
         run: |
           ./gradlew build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle-jdk17@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk.sarif
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
 
 #      - name: Login Dockerhub
 #        env:
