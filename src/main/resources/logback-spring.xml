@@ -13,7 +13,7 @@
                 <pattern>application=${appName},host=${HOSTNAME},level=%level</pattern>
             </label>
             <message>
-                <pattern>level=%level application=${appName} traceId=%X{traceId} spanId=%X{spanId} | %msg%ex</pattern>
+                <pattern>level=%level application=${appName} msg="%msg" %ex</pattern>
             </message>
             <sortByTime>true</sortByTime>
         </format>
