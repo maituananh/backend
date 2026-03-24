@@ -12,10 +12,22 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+  // 🔍 Handle 404 - resource not found (prevent catching SpringDoc/static endpoints as 500)
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(
+      NoResourceFoundException ex) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("status", HttpStatus.NOT_FOUND.value());
+    body.put("error", "🔍 Not Found");
+    body.put("message", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+  }
 
   // 🧩 Handle specific exceptions
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -74,11 +74,11 @@ management:
     annotations:
       enabled: true
   server:
-    port: ${MANAGEMENT_PORT:9999}
+    port: ${BE_PORT:8080}
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus,metrics
+        include: "*"
   endpoint:
     health:
       show-details: always
@@ -93,6 +93,9 @@ management:
         enabled: true
     tags:
       application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
   tracing:
     sampling:
       probability: 1.0 # Sample 100% of traces (adjust for production)

@@ -25,17 +25,25 @@ services:
       MYSQL_ROOT_PASSWORD: r00t
       MYSQL_PASSWORD: r00t
       MYSQL_DATABASE: pawn
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pr00t"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   pawn-service-be:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - mysql
-      - minio
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_started
     restart: always
     ports:
-      - "${PORT}:${PORT}"
+      - "${BE_PORT}:8080"
     environment:
 #      - SPRING_PROFILES_ACTIVE=mysql
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/pawn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
