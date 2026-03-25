@@ -58,8 +58,8 @@ aws:
 stripe:
   secret-key: ${STRIPE_API_KEY:sk_test_xxxxpI0XB5C}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_xxxxxxxxx}
-  success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/payment-success}
-  cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/mycart}
+  success-url: ${STRIPE_SUCCESS_URL:${frontend.base-url}/payment-success}
+  cancel-url: ${STRIPE_CANCEL_URL:${frontend.base-url}/mycart}
 
 springdoc:
   api-docs:
@@ -69,40 +69,6 @@ springdoc:
     config-url: /v3/api-docs/swagger-config
     url: /v3/api-docs
 
-management:
-  observations:
-    annotations:
-      enabled: true
-  server:
-    port: ${BE_PORT:8080}
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-  metrics:
-    web:
-      server:
-        request:
-          autotime:
-            enabled: true
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: ${spring.application.name}
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true
-#  tracing:
-#    sampling:
-#      probability: 1.0 # Sample 100% of traces (adjust for production)
-#  otlp:
-#    tracing:
-#      endpoint: http://172.17.0.1:4318/v1/traces
-
 server:
   port: ${BE_PORT:8080}
   tomcat:
@@ -110,4 +76,4 @@ server:
     max-http-form-post-size: 100MB
 
 frontend:
-  base-url: http://localhost:5173/
+  base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
