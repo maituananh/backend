@@ -1,0 +1,33 @@
+management:
+  observations:
+    annotations:
+      enabled: true
+  server:
+    port: ${BE_PORT:8080}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+#  tracing:
+#    sampling:
+#      probability: 1.0 # Sample 100% of traces (adjust for production)
+#  otlp:
+#    tracing:
+#      endpoint: http://172.17.0.1:4318/v1/traces
