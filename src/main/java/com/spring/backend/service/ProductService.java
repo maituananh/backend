@@ -46,14 +46,14 @@ public class ProductService {
   private final CartItemRepository cartItemRepository;
   private final S3Adapter s3Adapter;
 
-  private void validateProductDate(LocalDate startDate, LocalDate endDate) {
+  private void validateProductDate(LocalDate startDate, LocalDate endDate, boolean isCreate) {
     LocalDate today = LocalDate.now();
 
     if (startDate == null || endDate == null) {
       throw new IllegalArgumentException("Start date and end date must not be null");
     }
 
-    if (startDate.isBefore(today)) {
+    if (isCreate && startDate.isBefore(today)) {
       throw new IllegalArgumentException("Start date must be today or later");
     }
 
@@ -87,7 +87,7 @@ public class ProductService {
   @Transactional
   public ProductResponseDto createProduct(ProductRequestDto dto) {
 
-    validateProductDate(dto.getStartDate(), dto.getEndDate());
+    validateProductDate(dto.getStartDate(), dto.getEndDate(), true);
 
     List<ImageEntity> imageEntities = imageRepository.findAllById(dto.getImageIds());
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -219,12 +219,17 @@ public class ProductService {
   @Transactional
   public ProductResponseDto updateById(Long id, ProductRequestDto dto) {
 
-    validateProductDate(dto.getStartDate(), dto.getEndDate());
+    validateProductDate(dto.getStartDate(), dto.getEndDate(), false);
 
     ProductEntity productEntity = productRepository.findById(id).orElseThrow();
     if (productEntity.getStatus() == ProductStatus.SOLD_OUT) {
       throw new RuntimeException("Cannot update a sold out product");
     }
+
+    if (dto.getStartDate() == null || dto.getEndDate() == null) {
+      throw new IllegalArgumentException("Start date and end date must not be null");
+    }
+
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -245,10 +250,23 @@ public class ProductService {
       }
     }
 
+    LocalDate oldStartDate = productEntity.getStartDate();
+    LocalDate newStartDate = dto.getStartDate();
+
+    if (newStartDate.isBefore(oldStartDate)) {
+      throw new IllegalArgumentException("Start date cannot be earlier than current start date");
+    }
+
+    productEntity.setStartDate(newStartDate);
+
+    if (dto.getEndDate().isBefore(newStartDate)) {
+      throw new IllegalArgumentException("End date must be after or equal start date");
+    }
+
+    productEntity.setEndDate(dto.getEndDate());
+
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
-    productEntity.setStartDate(dto.getStartDate());
-    productEntity.setEndDate(dto.getEndDate());
     productEntity.setType(dto.getType());
     productEntity.setDescription(dto.getDescription());
     productEntity.setStockQty(dto.getStockQty());
