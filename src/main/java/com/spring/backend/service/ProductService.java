@@ -157,6 +157,7 @@ public class ProductService {
             searchDto.getStartDate(),
             searchDto.getEndDate(),
             searchDto.getCode(),
+            searchDto.getCustomerId(),
             searchDto.getCategoryIds());
 
     Sort sort =
