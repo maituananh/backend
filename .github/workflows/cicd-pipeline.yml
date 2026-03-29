@@ -29,11 +29,11 @@ jobs:
 
       - name: Gradle test
         run: |
-          ./gradlew test
+          ./gradlew test -Dspring.profiles.active=test
 
       - name: Gradle build
         run: |
-          ./gradlew build
+          ./gradlew build -Dspring.profiles.active=test
 
   security:
     runs-on: ubuntu-latest
