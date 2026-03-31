@@ -279,6 +279,10 @@ class ProductControllerIT {
             .customer(testUser)
             .status(ProductStatus.NEW)
             .isActived(true)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusMonths(1))
+            .stockQty(50)
+            .availableQty(50)
             .build();
     productRepository.save(product);
 
