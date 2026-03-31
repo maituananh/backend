@@ -15,6 +15,7 @@ public class ProductSearchDto {
   private String name;
   private ProductStatus status;
   private Double price;
+  private Long customerId;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   private LocalDate startDate;

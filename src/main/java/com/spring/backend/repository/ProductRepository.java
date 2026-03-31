@@ -64,7 +64,9 @@ public interface ProductRepository
       LocalDate startDate,
       LocalDate endDate,
       String code,
+      Long customerId,
       List<Integer> categoryIds) {
+
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
@@ -90,6 +92,10 @@ public interface ProductRepository
 
       if (!CollectionUtils.isEmpty(categoryIds)) {
         predicates.add(root.get("category").get("id").in(categoryIds));
+      }
+
+      if (customerId != null) {
+        predicates.add(cb.equal(root.get("customer").get("id"), customerId));
       }
 
       return cb.and(predicates.toArray(new Predicate[0]));

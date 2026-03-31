@@ -22,4 +22,5 @@ public class ProductResponseDto {
   private ProductStatus status;
   private Integer availableQty;
   private Integer stockQty;
+  private Double dailyProfit;
 }
