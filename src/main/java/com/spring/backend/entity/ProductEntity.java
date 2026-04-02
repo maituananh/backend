@@ -33,9 +33,6 @@ public class ProductEntity extends BaseEntity {
   @Column(name = "end_date")
   private LocalDate endDate;
 
-  @Column(name = "type")
-  private String type;
-
   @Column(name = "code")
   private String code;
 

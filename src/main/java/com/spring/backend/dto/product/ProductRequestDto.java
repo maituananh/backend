@@ -23,8 +23,6 @@ public class ProductRequestDto {
   @Min(1)
   private Double price;
 
-  @NotNull private String type;
-
   @Min(1)
   @NotNull
   private Double dailyProfit;
