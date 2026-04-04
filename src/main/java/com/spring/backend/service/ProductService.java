@@ -178,19 +178,6 @@ public class ProductService {
     return PageMapper.toPagination(pageProductEntity, productResponseDtos);
   }
 
-  public Page<ProductResponseDto> searchByType(String type, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("startDate").descending());
-    Page<ProductEntity> pageProductEntity =
-        productRepository.findByTypeAndIsActivedTrue(type, pageable);
-
-    List<ProductResponseDto> productResponseDtos = new ArrayList<>();
-    for (ProductEntity productEntity : pageProductEntity.getContent()) {
-      productResponseDtos.add(ProductMapper.toProductResponse(productEntity, null));
-    }
-
-    return new PageImpl<>(productResponseDtos, pageable, pageProductEntity.getTotalElements());
-  }
-
   public List<ProductResponseDto> getProductsByUserId(Long userId) {
     List<ProductEntity> products = productRepository.findByCustomerIdAndIsActivedTrue(userId);
 
@@ -268,7 +255,6 @@ public class ProductService {
 
     productEntity.setName(dto.getName());
     productEntity.setPrice(dto.getPrice());
-    productEntity.setType(dto.getType());
     productEntity.setDescription(dto.getDescription());
     productEntity.setStockQty(dto.getStockQty());
     productEntity.setCategory(categoryEntity);

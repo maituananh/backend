@@ -33,8 +33,6 @@ public interface ProductRepository
   """)
   List<ProductStatistic> statisticProductByMonth(int year);
 
-  Page<ProductEntity> findByTypeAndIsActivedTrue(String type, Pageable pageable);
-
   List<ProductEntity> findByCustomerIdAndIsActivedTrue(Long customerId);
 
   Page<ProductEntity> findByCategoryIdAndStatusAndIdNotAndIsActivedTrueAndAvailableQtyGreaterThan(

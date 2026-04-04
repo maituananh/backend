@@ -15,7 +15,6 @@ public class ProductResponseDto {
   private Double price;
   private LocalDate startDate;
   private LocalDate endDate;
-  private String type;
   private String image;
   private String code;
   private Boolean isActived;

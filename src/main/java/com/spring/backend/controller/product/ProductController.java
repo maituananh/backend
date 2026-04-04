@@ -9,7 +9,6 @@ import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,12 +44,6 @@ public class ProductController {
   @GetMapping("/search")
   public Pagination<ProductResponseDto> searchProduct(ProductSearchDto searchDto) {
     return productService.search(searchDto);
-  }
-
-  @GetMapping("/search-by-type")
-  public Page<ProductResponseDto> searchByType(
-      @RequestParam String type, @RequestParam int page, @RequestParam int size) {
-    return productService.searchByType(type, page, size);
   }
 
   @DeleteMapping("/{id}")
