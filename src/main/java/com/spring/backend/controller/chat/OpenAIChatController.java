@@ -31,9 +31,4 @@ public class OpenAIChatController {
   public List<ChatHistoryItemDto> getHistory() {
     return chatHistoryService.getHistory(String.valueOf(userHelper.getCurrentUserId()));
   }
-
-  @DeleteMapping("/history")
-  public void clearHistory() {
-    chatHistoryService.clear(String.valueOf(userHelper.getCurrentUserId()));
-  }
 }

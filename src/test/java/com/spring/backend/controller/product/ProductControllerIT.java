@@ -295,4 +295,123 @@ class ProductControllerIT {
         .andDo(print())
         .andExpect(status().isOk());
   }
+
+  @Test
+  @DisplayName("GET /api/products/{id}/related - returns related products with images")
+  void getRelatedProducts_withImages() throws Exception {
+    ProductEntity product1 =
+        ProductEntity.builder()
+            .name("P1")
+            .category(testCategory)
+            .customer(testUser)
+            .status(ProductStatus.NEW)
+            .stockQty(10)
+            .availableQty(10)
+            .isActived(true)
+            .build();
+    product1 = productRepository.save(product1);
+
+    ProductEntity product2 =
+        ProductEntity.builder()
+            .name("P2")
+            .category(testCategory)
+            .customer(testUser)
+            .status(ProductStatus.LIQUIDATION)
+            .stockQty(10)
+            .availableQty(10)
+            .isActived(true)
+            .build();
+    product2 = productRepository.save(product2);
+
+    ImageEntity existingImg = testImages.get(0);
+    product2.setImages(new java.util.ArrayList<>(List.of(existingImg)));
+    product2 = productRepository.save(product2);
+
+    mockMvc
+        .perform(get("/api/products/" + product1.getId() + "/related"))
+        .andExpect(status().isOk());
+  }
+
+  @Autowired private com.spring.backend.service.ProductService productService;
+
+  @Test
+  @DisplayName("Exceptions mapping in ProductService direct checks")
+  void testExceptionsInProductServiceDirect() {
+    ProductRequestDto req = new ProductRequestDto();
+    req.setName("Test");
+    req.setPrice(100.0);
+    req.setDailyProfit(10.0);
+    req.setStockQty(50);
+    req.setCode("TEST01");
+    req.setCategoryId(testCategory.getId());
+    req.setCustomerId(testUser.getId());
+    req.setImageIds(testImages.stream().map(ImageEntity::getId).toList());
+
+    // 1. StartDate/EndDate null
+    req.setStartDate(null);
+    req.setEndDate(null);
+    org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException.class, () -> productService.createProduct(req));
+
+    // 2. StartDate < today
+    req.setStartDate(LocalDate.now().minusDays(1));
+    req.setEndDate(LocalDate.now().plusDays(1));
+    org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException.class, () -> productService.createProduct(req));
+
+    // 3. EndDate < StartDate
+    req.setStartDate(LocalDate.now());
+    req.setEndDate(LocalDate.now().minusDays(1));
+    org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException.class, () -> productService.createProduct(req));
+
+    // Prepare Sold Out Product
+    ProductEntity soldOutProduct =
+        ProductEntity.builder()
+            .name("SOLD OUT PROD")
+            .category(testCategory)
+            .customer(testUser)
+            .status(ProductStatus.SOLD_OUT)
+            .isActived(true)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusMonths(1))
+            .build();
+    soldOutProduct = productRepository.save(soldOutProduct);
+
+    // 4. updateById - SOLD OUT
+    req.setStartDate(LocalDate.now());
+    req.setEndDate(LocalDate.now().plusDays(5));
+    final Long soldOutId = soldOutProduct.getId();
+    org.junit.jupiter.api.Assertions.assertThrows(
+        RuntimeException.class, () -> productService.updateById(soldOutId, req));
+
+    // 5. liquidationProduct - SOLD OUT
+    org.junit.jupiter.api.Assertions.assertThrows(
+        RuntimeException.class, () -> productService.liquidationProduct(soldOutId));
+
+    // Prepare Valid Product
+    ProductEntity validProduct =
+        ProductEntity.builder()
+            .name("VALID")
+            .category(testCategory)
+            .customer(testUser)
+            .status(ProductStatus.NEW)
+            .isActived(true)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusMonths(1))
+            .build();
+    validProduct = productRepository.save(validProduct);
+    final Long validId = validProduct.getId();
+
+    // 6. updateById - invalid image count
+    req.setImageIds(List.of(testImages.get(0).getId()));
+    org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException.class, () -> productService.updateById(validId, req));
+
+    // 7. updateById - newStartDate < oldStartDate
+    req.setImageIds(testImages.stream().map(ImageEntity::getId).toList());
+    req.setStartDate(LocalDate.now().minusDays(1));
+    org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException.class, () -> productService.updateById(validId, req));
+  }
 }

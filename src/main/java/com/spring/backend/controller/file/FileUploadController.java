@@ -18,7 +18,4 @@ public class FileUploadController {
   public ImageResponseDto uploadFile(@RequestPart("file") MultipartFile file) {
     return fileUploadService.upload(file);
   }
-
-  @GetMapping
-  public void getFile() {}
 }

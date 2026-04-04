@@ -32,8 +32,8 @@ public abstract class AbstractChatService {
 
       if (extracted != null && extracted.isObject()) {
         extracted
-            .fields()
-            .forEachRemaining(
+            .properties()
+            .forEach(
                 entry -> {
                   String val = entry.getValue().isNull() ? null : entry.getValue().asText();
                   ctx.getCollectedParams().put(entry.getKey(), val);
