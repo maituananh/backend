@@ -61,7 +61,13 @@ public class InterceptorConfiguration extends OncePerRequestFilter {
       return;
     }
 
-    UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+    var userOptional = userRepository.findByUsername(username);
+    if (userOptional.isEmpty()) {
+      doFilter(request, response, filterChain);
+      return;
+    }
+
+    UserEntity userEntity = userOptional.get();
     UserDetailsCustom userDetailsCustom = toUserDetailsCustom(userEntity);
 
     UsernamePasswordAuthenticationToken authenticationToken =
