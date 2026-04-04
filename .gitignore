@@ -37,3 +37,4 @@ out/
 .vscode/
 
 *.txt
+*.log
