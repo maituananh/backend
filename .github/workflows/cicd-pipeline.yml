@@ -31,6 +31,10 @@ jobs:
         run: |
           ./gradlew test -Dspring.profiles.active=test
 
+      - name: Check Code Coverage
+        run: |
+          ./gradlew jacocoTestCoverageVerification
+
       - name: Gradle build
         run: |
           ./gradlew build -Dspring.profiles.active=test

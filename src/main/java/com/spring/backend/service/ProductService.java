@@ -214,10 +214,6 @@ public class ProductService {
       throw new RuntimeException("Cannot update a sold out product");
     }
 
-    if (dto.getStartDate() == null || dto.getEndDate() == null) {
-      throw new IllegalArgumentException("Start date and end date must not be null");
-    }
-
     CategoryEntity categoryEntity =
         categoryRepository.findByIdAndIsActive(dto.getCategoryId(), true).orElseThrow();
     UserEntity userEntity = userRepository.findById(dto.getCustomerId()).orElseThrow();
@@ -246,10 +242,6 @@ public class ProductService {
     }
 
     productEntity.setStartDate(newStartDate);
-
-    if (dto.getEndDate().isBefore(newStartDate)) {
-      throw new IllegalArgumentException("End date must be after or equal start date");
-    }
 
     productEntity.setEndDate(dto.getEndDate());
 
