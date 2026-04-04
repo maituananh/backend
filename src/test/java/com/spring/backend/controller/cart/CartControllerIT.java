@@ -71,7 +71,6 @@ class CartControllerIT {
         ProductEntity.builder()
             .name("Cart Product")
             .price(100.0)
-            .type("Electronic")
             .code("CARTPROD001")
             .status(ProductStatus.NEW)
             .isActived(true)

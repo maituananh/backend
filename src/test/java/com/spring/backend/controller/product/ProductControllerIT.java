@@ -94,7 +94,6 @@ class ProductControllerIT {
     ProductRequestDto request = new ProductRequestDto();
     request.setName("Smartphone");
     request.setPrice(1000.0);
-    request.setType("Mobile");
     request.setDailyProfit(10.0);
     request.setStockQty(50);
     request.setStartDate(LocalDate.now());
@@ -125,7 +124,6 @@ class ProductControllerIT {
         ProductEntity.builder()
             .name("Laptop")
             .price(1500.0)
-            .type("Electronics")
             .code("LAP001")
             .status(ProductStatus.NEW)
             .isActived(true)
@@ -149,7 +147,6 @@ class ProductControllerIT {
         ProductEntity.builder()
             .name("Tablet")
             .price(500.0)
-            .type("Electronics")
             .code("TAB001")
             .status(ProductStatus.NEW)
             .isActived(true)
@@ -172,7 +169,6 @@ class ProductControllerIT {
     ProductEntity product1 =
         ProductEntity.builder()
             .name("P1")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
@@ -183,7 +179,6 @@ class ProductControllerIT {
     ProductEntity product2 =
         ProductEntity.builder()
             .name("P2")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
@@ -205,7 +200,6 @@ class ProductControllerIT {
     ProductEntity product =
         ProductEntity.builder()
             .name("SearchMe")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
@@ -221,37 +215,11 @@ class ProductControllerIT {
   }
 
   @Test
-  @DisplayName("GET /api/products/search-by-type - returns paged products by type (Public)")
-  void searchByType_returns200() throws Exception {
-    ProductEntity product =
-        ProductEntity.builder()
-            .name("TypeMe")
-            .type("ELECTRONICS")
-            .category(testCategory)
-            .customer(testUser)
-            .status(ProductStatus.NEW)
-            .isActived(true)
-            .startDate(LocalDate.now())
-            .build();
-    productRepository.save(product);
-
-    mockMvc
-        .perform(
-            get("/api/products/search-by-type")
-                .param("type", "ELECTRONICS")
-                .param("page", "0")
-                .param("size", "10"))
-        .andDo(print())
-        .andExpect(status().isOk());
-  }
-
-  @Test
   @DisplayName("DELETE /api/products/{id} - deletes product when authenticated")
   void deleteProduct_authenticated_returns200() throws Exception {
     ProductEntity product =
         ProductEntity.builder()
             .name("To Delete")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
@@ -274,7 +242,6 @@ class ProductControllerIT {
     ProductEntity product =
         ProductEntity.builder()
             .name("Old Name")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
@@ -289,7 +256,6 @@ class ProductControllerIT {
     ProductRequestDto request = new ProductRequestDto();
     request.setName("New Name");
     request.setPrice(1200.0);
-    request.setType("Mobile");
     request.setDailyProfit(15.0);
     request.setStockQty(60);
     request.setStartDate(LocalDate.now());
@@ -316,7 +282,6 @@ class ProductControllerIT {
     ProductEntity product =
         ProductEntity.builder()
             .name("Liquidate Me")
-            .type("T1")
             .category(testCategory)
             .customer(testUser)
             .status(ProductStatus.NEW)
