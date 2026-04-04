@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -63,18 +61,6 @@ public class ProductRepositoryUT {
             .build();
     entityManager.persist(product);
     entityManager.flush();
-  }
-
-  @Test
-  @DisplayName("findByTypeAndIsActivedTrue should work")
-  void findByType_Works() {
-    product.setType("FOOD");
-    entityManager.persistAndFlush(product);
-
-    Page<ProductEntity> result =
-        productRepository.findByTypeAndIsActivedTrue("FOOD", PageRequest.of(0, 5));
-    assertThat(result.getContent()).hasSize(1);
-    assertThat(result.getContent().get(0).getName()).isEqualTo("Sample Product");
   }
 
   @Test

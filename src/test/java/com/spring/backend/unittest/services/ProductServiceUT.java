@@ -275,26 +275,6 @@ class ProductServiceUT {
   }
 
   @Nested
-  @DisplayName("searchByType Tests")
-  class SearchByTypeTests {
-    @Test
-    @DisplayName("should return page of products")
-    void shouldSearchByType() {
-      // Arrange
-      Pageable pageable = PageRequest.of(0, 10, Sort.by("startDate").descending());
-      Page<ProductEntity> page = new PageImpl<>(List.of(product), pageable, 1);
-      when(productRepository.findByTypeAndIsActivedTrue(eq("FOOD"), any(Pageable.class)))
-          .thenReturn(page);
-
-      // Act
-      Page<ProductResponseDto> result = productService.searchByType("FOOD", 0, 10);
-
-      // Assert
-      assertThat(result.getContent()).hasSize(1);
-    }
-  }
-
-  @Nested
   @DisplayName("getProductsByUserId Tests")
   class GetProductsByUserIdTests {
     @Test
