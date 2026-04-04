@@ -50,6 +50,7 @@ public class UserEntity extends BaseEntity {
   private UserRole role;
 
   @Column(name = "is_active", nullable = false)
+  @Builder.Default
   private Boolean isActive = true;
 
   @Column(name = "avatar")
