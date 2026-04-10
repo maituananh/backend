@@ -67,6 +67,11 @@ public class OrderController {
     return ResponseEntity.ok(orderService.getAllOrdersPaginatedForAdmin(page, size, status));
   }
 
+  @GetMapping("/admin/orders/dashboard")
+  public ResponseEntity<?> getDashboardOrders() {
+    return ResponseEntity.ok(orderService.getDashboardOrders());
+  }
+
   /** Lấy chi tiết một order theo ID */
   @GetMapping("/orders/{orderId}")
   public ResponseEntity<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId) {

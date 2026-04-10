@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,17 +51,22 @@ public class OrderChatService extends AbstractChatService {
           .build();
     }
 
+    Pageable pageable = PageRequest.of(0, 5);
+
     // 2. Fetch orders
     List<OrderEntity> orders;
+
     if (statusStr.equalsIgnoreCase("ALL")) {
-      orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+      orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable).getContent();
     } else {
       try {
         OrderStatus status = OrderStatus.valueOf(statusStr.toUpperCase());
-        orders = orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status);
+        orders =
+            orderRepository
+                .findByUserIdAndStatusOrderByCreatedAtDesc(userId, status, pageable)
+                .getContent();
       } catch (IllegalArgumentException e) {
-        log.warn("Invalid status determined: {}. Falling back to ALL.", statusStr);
-        orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable).getContent();
         statusStr = "ALL";
       }
     }
