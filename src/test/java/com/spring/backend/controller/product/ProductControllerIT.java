@@ -297,6 +297,50 @@ class ProductControllerIT {
   }
 
   @Test
+  @DisplayName("POST /api/products - returns 500 when category is inactive")
+  void createProduct_inactiveCategory_returns500() throws Exception {
+    CategoryEntity inactiveCategory =
+        CategoryEntity.builder().name("Inactive").isActive(false).build();
+    categoryRepository.save(inactiveCategory);
+
+    ProductRequestDto request = new ProductRequestDto();
+    request.setName("Smartphone");
+    request.setPrice(1000.0);
+    request.setDailyProfit(10.0);
+    request.setStockQty(50);
+    request.setStartDate(LocalDate.now());
+    request.setEndDate(LocalDate.now().plusMonths(1));
+    request.setCategoryId(inactiveCategory.getId());
+    request.setCustomerId(testUser.getId());
+    request.setCode("PROD001");
+    request.setImageIds(testImages.stream().map(ImageEntity::getId).toList());
+    request.setDescription("A high-end smartphone");
+
+    mockMvc
+        .perform(
+            post("/api/products")
+                .with(user(getUserDetails()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Category is inactive or not found"));
+  }
+
+  @Test
+  @DisplayName("PATCH /api/products/{id}/liquidation - returns 500 when product not found")
+  void liquidationProduct_notFound_returns500() throws Exception {
+    long nonExistentId = 999999L;
+
+    mockMvc
+        .perform(
+            patch("/api/products/" + nonExistentId + "/liquidation").with(user(getUserDetails())))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Product not found with id: " + nonExistentId));
+  }
+
+  @Test
   @DisplayName("GET /api/products/{id}/related - returns related products with images")
   void getRelatedProducts_withImages() throws Exception {
     ProductEntity product1 =

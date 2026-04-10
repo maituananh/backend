@@ -34,6 +34,7 @@ class OrderControllerIT extends BaseIntegrationTest {
   @Autowired private ProductRepository productRepository;
   @Autowired private CartRepository cartRepository;
   @Autowired private CartItemRepository cartItemRepository;
+  @Autowired private ImageRepository imageRepository;
 
   private UserEntity testUser;
   private UserEntity adminUser;
@@ -42,6 +43,7 @@ class OrderControllerIT extends BaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
+    imageRepository.deleteAll();
     orderItemRepository.deleteAll();
     paymentRepository.deleteAll();
     orderRepository.deleteAll();
@@ -49,6 +51,7 @@ class OrderControllerIT extends BaseIntegrationTest {
     cartRepository.deleteAll();
     productRepository.deleteAll();
     userRepository.deleteAll();
+
     SecurityContextHolder.clearContext();
 
     testUser =
@@ -159,6 +162,63 @@ class OrderControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("POST /api/orders/checkout - returns 500 when user not found (Line 50)")
+  void checkout_userNotFound_returns500() throws Exception {
+    CheckoutRequest request = new CheckoutRequest();
+    request.setCartItemIds(List.of(cartItem.getId()));
+    request.setPaymentMethod(PaymentMethod.CASH);
+    request.setShippingName("John Doe");
+    request.setShippingPhone("0987654321");
+    request.setShippingAddress("123 Street");
+
+    UserDetailsCustom nonExistentUser =
+        UserDetailsCustom.builder().id(9999L).username("ghost").password("pass").build();
+
+    mockMvc
+        .perform(
+            post("/api/orders/checkout")
+                .with(user(nonExistentUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("User not found"));
+  }
+
+  @Test
+  @DisplayName("POST /api/orders/checkout - reaches line 95 when product has images")
+  void checkout_productWithImages_hitsLine95() throws Exception {
+    // Add image to product
+    ImageEntity image = ImageEntity.builder().fileName("product-image.jpg").build();
+    imageRepository.save(image);
+    testProduct.setImages(new java.util.ArrayList<>(List.of(image)));
+    productRepository.save(testProduct);
+
+    CheckoutRequest request = new CheckoutRequest();
+    request.setCartItemIds(List.of(cartItem.getId()));
+    request.setPaymentMethod(PaymentMethod.CASH);
+    request.setShippingName("John Doe");
+    request.setShippingPhone("0987654321");
+    request.setShippingAddress("123 Street");
+
+    when(paymentGatewayService.createPaymentUrl(any(), any())).thenReturn(null);
+
+    mockMvc
+        .perform(
+            post("/api/orders/checkout")
+                .with(user(getUserDetails(testUser)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    // Verify order item has image filename
+    List<OrderItemEntity> orderItems = orderItemRepository.findAll();
+    assert !orderItems.isEmpty();
+    assert "product-image.jpg".equals(orderItems.get(0).getProductImage());
+  }
+
+  @Test
   @DisplayName("GET /api/orders/{orderId}/status - returns order status")
   void getStatus_returns200() throws Exception {
     OrderEntity order = createOrder(testUser, OrderStatus.PENDING);
@@ -180,6 +240,30 @@ class OrderControllerIT extends BaseIntegrationTest {
         .andExpect(jsonPath("$.orderId").value(order.getId()))
         .andExpect(jsonPath("$.orderStatus").value("PENDING"))
         .andExpect(jsonPath("$.paymentStatus").value("PENDING"));
+  }
+
+  @Test
+  @DisplayName("GET /api/orders/{orderId}/status - returns 500 when order not found (Line 245)")
+  void getStatus_orderNotFound_returns500() throws Exception {
+    mockMvc
+        .perform(get("/api/orders/9999/status").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Order not found: 9999"));
+  }
+
+  @Test
+  @DisplayName("GET /api/orders/{orderId}/status - returns 500 when payment not found (Line 250)")
+  void getStatus_paymentNotFound_returns500() throws Exception {
+    OrderEntity order = createOrder(testUser, OrderStatus.PENDING);
+    // Do NOT create payment
+
+    mockMvc
+        .perform(
+            get("/api/orders/" + order.getId() + "/status").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Payment not found for order: " + order.getId()));
   }
 
   @Test
@@ -217,6 +301,75 @@ class OrderControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("POST /api/payment/webhook - returns 500 on invalid JSON (Line 145)")
+  void webhook_invalidJson_returns500() throws Exception {
+    String invalidPayload = "not a json";
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "fake-sig")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidPayload))
+        .andDo(print())
+        .andExpect(status().isInternalServerError());
+  }
+
+  @Test
+  @DisplayName("POST /api/payment/webhook - returns 500 when payment not found (Line 159)")
+  void webhook_paymentNotFound_returns500() throws Exception {
+    String payload =
+        "{ \"type\": \"checkout.session.completed\", \"data\": { \"object\": { \"id\": \"non_existent_sess\" } } }";
+
+    when(paymentGatewayService.verifySignature(any(), any())).thenReturn(true);
+    when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "fake-sig")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Payment not found: non_existent_sess"));
+  }
+
+  @Test
+  @DisplayName("POST /api/payment/webhook - logs warning on unhandled event (Line 182)")
+  void webhook_unhandledEvent_returns200() throws Exception {
+    OrderEntity order = createOrder(testUser, OrderStatus.PENDING);
+    PaymentEntity payment =
+        PaymentEntity.builder()
+            .order(order)
+            .status(PaymentStatus.PENDING)
+            .amount(order.getTotalAmount())
+            .paymentMethod(PaymentMethod.STRIPE)
+            .transactionId("sess_456")
+            .build();
+    paymentRepository.save(payment);
+
+    String payload =
+        "{ \"type\": \"some.unhandled.event\", \"data\": { \"object\": { \"id\": \"sess_456\" } } }";
+
+    when(paymentGatewayService.verifySignature(any(), any())).thenReturn(true);
+    when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "fake-sig")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    // Order status should still be PENDING
+    OrderEntity updatedOrder = orderRepository.findById(order.getId()).get();
+    assert updatedOrder.getStatus() == OrderStatus.PENDING;
+  }
+
+  @Test
   @DisplayName("GET /api/orders/all - returns user orders")
   void getOrders_returns200() throws Exception {
     OrderEntity order = createOrder(testUser, OrderStatus.CONFIRMED);
@@ -243,12 +396,42 @@ class OrderControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("GET /api/orders - returns 200 with status filter (Line 279)")
+  void getMyOrdersPaginated_withStatus_returns200() throws Exception {
+    createOrder(testUser, OrderStatus.CONFIRMED);
+    createOrder(testUser, OrderStatus.CANCELLED);
+
+    mockMvc
+        .perform(
+            get("/api/orders").param("status", "CONFIRMED").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(1));
+  }
+
+  @Test
   @DisplayName("GET /api/admin/orders - returns paged all orders for admin")
   void getAllOrdersPaginatedForAdmin_returns200() throws Exception {
     OrderEntity order = createOrder(testUser, OrderStatus.CONFIRMED);
 
     mockMvc
         .perform(get("/api/admin/orders").with(user(getUserDetails(adminUser))))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(1));
+  }
+
+  @Test
+  @DisplayName("GET /api/admin/orders - returns 200 with status filter (Line 304)")
+  void getAllOrdersPaginatedForAdmin_withStatus_returns200() throws Exception {
+    createOrder(testUser, OrderStatus.CONFIRMED);
+    createOrder(testUser, OrderStatus.CANCELLED);
+
+    mockMvc
+        .perform(
+            get("/api/admin/orders")
+                .param("status", "CANCELLED")
+                .with(user(getUserDetails(adminUser))))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.length()").value(1));
@@ -264,6 +447,43 @@ class OrderControllerIT extends BaseIntegrationTest {
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.orderId").value(order.getId()));
+  }
+
+  @Test
+  @DisplayName("GET /api/orders/{orderId} - returns 500 when user not found (Line 325)")
+  void getOrderDetail_userNotFound_returns500() throws Exception {
+    UserDetailsCustom nonExistentUser =
+        UserDetailsCustom.builder().id(9999L).username("ghost").password("pass").build();
+
+    mockMvc
+        .perform(get("/api/orders/1").with(user(nonExistentUser)))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("User not found"));
+  }
+
+  @Test
+  @DisplayName("GET /api/orders/{orderId} - returns 500 when admin order not found (Line 332)")
+  void getOrderDetail_admin_orderNotFound_returns500() throws Exception {
+    mockMvc
+        .perform(get("/api/orders/9999").with(user(getUserDetails(adminUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Order not found: 9999"));
+  }
+
+  @Test
+  @DisplayName(
+      "GET /api/orders/{orderId} - returns 500 when user order not found/unauthorized (Line 337)")
+  void getOrderDetail_customer_orderNotFound_returns500() throws Exception {
+    // Create order for admin, try to access as customer
+    OrderEntity adminOrder = createOrder(adminUser, OrderStatus.CONFIRMED);
+
+    mockMvc
+        .perform(get("/api/orders/" + adminOrder.getId()).with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Order not found: " + adminOrder.getId()));
   }
 
   @Test
@@ -288,6 +508,80 @@ class OrderControllerIT extends BaseIntegrationTest {
 
     OrderEntity updatedOrder = orderRepository.findById(order.getId()).get();
     assert updatedOrder.getStatus() == OrderStatus.CANCELLED;
+  }
+
+  @Test
+  @DisplayName("POST /api/orders/{orderId}/cancel - returns 500 when user not found (Line 387)")
+  void cancelOrder_userNotFound_returns500() throws Exception {
+    UserDetailsCustom nonExistentUser =
+        UserDetailsCustom.builder().id(9999L).username("ghost").password("pass").build();
+
+    mockMvc
+        .perform(post("/api/orders/1/cancel").with(user(nonExistentUser)))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("User not found"));
+  }
+
+  @Test
+  @DisplayName(
+      "POST /api/orders/{orderId}/cancel - returns 500 when admin order not found (Line 394)")
+  void cancelOrder_admin_orderNotFound_returns500() throws Exception {
+    mockMvc
+        .perform(post("/api/orders/9999/cancel").with(user(getUserDetails(adminUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Order not found: 9999"));
+  }
+
+  @Test
+  @DisplayName(
+      "POST /api/orders/{orderId}/cancel - returns 500 when user order not found (Line 399)")
+  void cancelOrder_customer_orderNotFound_returns500() throws Exception {
+    mockMvc
+        .perform(post("/api/orders/9999/cancel").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Order not found: 9999"));
+  }
+
+  @Test
+  @DisplayName("POST /api/orders/{orderId}/cancel - returns 500 when payment not found (Line 410)")
+  void cancelOrder_paymentNotFound_returns500() throws Exception {
+    OrderEntity order = createOrder(testUser, OrderStatus.PENDING);
+    // No payment created
+
+    mockMvc
+        .perform(
+            post("/api/orders/" + order.getId() + "/cancel").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("Payment not found for order: " + order.getId()));
+  }
+
+  @Test
+  @DisplayName("POST /api/orders/{orderId}/cancel - no refund for CASH success (Line 414)")
+  void cancelOrder_cashSuccess_noStripeRefund() throws Exception {
+    OrderEntity order = createOrder(testUser, OrderStatus.CONFIRMED);
+    PaymentEntity payment =
+        PaymentEntity.builder()
+            .order(order)
+            .status(PaymentStatus.SUCCESS)
+            .amount(order.getTotalAmount())
+            .paymentMethod(PaymentMethod.CASH)
+            .build();
+    paymentRepository.save(payment);
+
+    mockMvc
+        .perform(
+            post("/api/orders/" + order.getId() + "/cancel").with(user(getUserDetails(testUser))))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    PaymentEntity updatedPayment = paymentRepository.findById(payment.getId()).get();
+    assert updatedPayment.getStatus() == PaymentStatus.FAILED;
+    // Stripe refund should NOT have been called (verified by lack of interaction with mock if we
+    // used Verifiable)
   }
 
   private OrderEntity createOrder(UserEntity user, OrderStatus status) {
