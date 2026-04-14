@@ -1,7 +1,9 @@
 package com.spring.backend.unittest.services.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.spring.backend.dto.chat.ChatResponseDto;
@@ -28,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class OrderChatServiceUT {
@@ -63,7 +67,8 @@ class OrderChatServiceUT {
             .status(OrderStatus.CONFIRMED)
             .totalAmount(BigDecimal.valueOf(50.0))
             .build();
-    when(orderRepository.findByUserIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(order));
+    when(orderRepository.findByUserIdOrderByCreatedAtDesc(eq(1L), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(order)));
 
     // Act
     ChatResponseDto<?> response = orderChatService.process(ctx, "show me all my orders", null);
@@ -90,8 +95,9 @@ class OrderChatServiceUT {
             .status(OrderStatus.CONFIRMED)
             .totalAmount(BigDecimal.valueOf(100.0))
             .build();
-    when(orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(1L, OrderStatus.CONFIRMED))
-        .thenReturn(List.of(order));
+    when(orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(
+            eq(1L), eq(OrderStatus.CONFIRMED), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(order)));
 
     // Act
     ChatResponseDto<?> response = orderChatService.process(ctx, "show my confirmed orders", null);
@@ -125,7 +131,8 @@ class OrderChatServiceUT {
     // Arrange
     when(userHelper.getCurrentUserId()).thenReturn(1L);
     when(aiClient.chat(anyString(), anyString())).thenReturn("NOT_A_STATUS");
-    when(orderRepository.findByUserIdOrderByCreatedAtDesc(1L)).thenReturn(Collections.emptyList());
+    when(orderRepository.findByUserIdOrderByCreatedAtDesc(eq(1L), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(Collections.emptyList()));
 
     // Act
     ChatResponseDto<?> response = orderChatService.process(ctx, "invalid", null);
