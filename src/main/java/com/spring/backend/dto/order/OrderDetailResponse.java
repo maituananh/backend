@@ -24,6 +24,9 @@ public class OrderDetailResponse {
   private String shippingPhone;
   private String shippingAddress;
 
+  private String customerName;
+  private String cardId;
+
   // Payment info
   private PaymentMethod paymentMethod;
   private PaymentStatus paymentStatus;

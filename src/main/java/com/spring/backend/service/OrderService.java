@@ -402,6 +402,8 @@ public class OrderService {
         .shippingName(order.getShippingName())
         .shippingPhone(order.getShippingPhone())
         .shippingAddress(order.getShippingAddress())
+        .customerName(order.getUser() != null ? order.getUser().getName() : null)
+        .cardId(order.getUser() != null ? order.getUser().getCardId() : null)
         .paymentMethod(payment != null ? payment.getPaymentMethod() : null)
         .paymentStatus(payment != null ? payment.getStatus() : null)
         .paidAt(payment != null ? payment.getPaidAt() : null)
