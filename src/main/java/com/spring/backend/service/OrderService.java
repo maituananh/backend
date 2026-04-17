@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
+import com.spring.backend.dto.order.OrderDashboardResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.order.WebhookPayload;
@@ -40,6 +41,17 @@ public class OrderService {
   private final UserRepository userRepository;
   private final S3Adapter s3Adapter;
   private final ObjectMapper objectMapper;
+
+  private OrderDashboardResponse toDashboardResponse(OrderEntity order) {
+    return OrderDashboardResponse.builder()
+        .orderId(order.getId())
+        .customerName(order.getUser() != null ? order.getUser().getName() : "N/A")
+        .cardId(order.getUser() != null ? order.getUser().getCardId() : "N/A")
+        .totalAmount(order.getTotalAmount())
+        .orderStatus(order.getStatus())
+        .createdAt(order.getCreatedAt())
+        .build();
+  }
 
   // ============================================================
   // 1. CHECKOUT - Tạo order từ các cart item được chọn
@@ -296,7 +308,7 @@ public class OrderService {
   // 4.2 GET ALL ORDERS PAGINATED (ADMIN) - Admin xem toàn bộ đơn hàng
   // ============================================================
   @Transactional(readOnly = true)
-  public Pagination<OrderDetailResponse> getAllOrdersPaginatedForAdmin(
+  public Pagination<OrderDashboardResponse> getAllOrdersPaginatedForAdmin(
       int page, int size, OrderStatus status) {
     Page<OrderEntity> orderPage;
 
@@ -307,8 +319,8 @@ public class OrderService {
       orderPage = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
     }
 
-    return Pagination.<OrderDetailResponse>builder()
-        .data(orderPage.getContent().stream().map(this::toDetailResponse).toList())
+    return Pagination.<OrderDashboardResponse>builder()
+        .data(orderPage.getContent().stream().map(this::toDashboardResponse).toList())
         .totalElements(orderPage.getTotalElements())
         .totalPages(orderPage.getTotalPages())
         .currentPage(page)

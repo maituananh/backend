@@ -2,6 +2,7 @@ package com.spring.backend.controller.order;
 
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
+import com.spring.backend.dto.order.OrderDashboardResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.page.Pagination;
@@ -60,10 +61,11 @@ public class OrderController {
 
   /** (ADMIN) Lấy danh sách toàn bộ đơn hàng của tất cả user có phân trang */
   @GetMapping("/admin/orders")
-  public ResponseEntity<Pagination<OrderDetailResponse>> getAllOrdersPaginatedForAdmin(
+  public ResponseEntity<Pagination<OrderDashboardResponse>> getAllOrdersPaginatedForAdmin(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(required = false) OrderStatus status) {
+
     return ResponseEntity.ok(orderService.getAllOrdersPaginatedForAdmin(page, size, status));
   }
 
