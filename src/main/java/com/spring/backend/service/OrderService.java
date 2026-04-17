@@ -308,7 +308,7 @@ public class OrderService {
   // 4.2 GET ALL ORDERS PAGINATED (ADMIN) - Admin xem toàn bộ đơn hàng
   // ============================================================
   @Transactional(readOnly = true)
-  public Pagination<OrderDashboardResponse> getAllOrdersPaginatedForAdmin(
+  public Pagination<OrderDetailResponse> getAllOrdersPaginatedForAdmin(
       int page, int size, OrderStatus status) {
     Page<OrderEntity> orderPage;
 
@@ -319,8 +319,8 @@ public class OrderService {
       orderPage = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
     }
 
-    return Pagination.<OrderDashboardResponse>builder()
-        .data(orderPage.getContent().stream().map(this::toDashboardResponse).toList())
+    return Pagination.<OrderDetailResponse>builder()
+        .data(orderPage.getContent().stream().map(this::toDetailResponse).toList())
         .totalElements(orderPage.getTotalElements())
         .totalPages(orderPage.getTotalPages())
         .currentPage(page)
