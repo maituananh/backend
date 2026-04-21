@@ -97,6 +97,10 @@ public class CategoryServiceImpl implements CategoryService {
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
 
+    if (Boolean.FALSE.equals(entity.getIsActive())) {
+      throw new RuntimeException("It is not possible to edit deleted categories.");
+    }
+
     entity.setName(dto.getName());
     entity.setNote(dto.getNote());
 
@@ -116,6 +120,10 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
+
+    if (Boolean.FALSE.equals(entity.getIsActive())) {
+      throw new RuntimeException("This category is in the deletion state.");
+    }
 
     entity.setIsActive(false);
     categoryRepository.save(entity);
