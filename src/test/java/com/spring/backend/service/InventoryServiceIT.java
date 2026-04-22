@@ -34,28 +34,29 @@ class InventoryServiceIT {
   }
 
   @Test
-  @DisplayName("validateStock allows orders when inventory is enough")
-  void validateStock_allowsWhenInventorySufficient() {
+  @DisplayName("reserveStock reserves inventory and increases reserved_qty when stock is enough")
+  void reserveStock_reservesWhenInventorySufficient() {
     ProductEntity product = saveProduct(ProductStatus.NEW, 10, 0);
     CartItemEntity cartItem = createCartItem(product, 2);
 
-    assertDoesNotThrow(() -> inventoryService.validateStock(List.of(cartItem)));
+    assertDoesNotThrow(() -> inventoryService.reserveStock(List.of(cartItem)));
 
     ProductEntity refreshed = productRepository.findById(product.getId()).orElseThrow();
-    assertEquals(10, refreshed.getAvailableQty());
+    assertEquals(2, refreshed.getReservedQty());
+    assertEquals(8, refreshed.getAvailableQty());
   }
 
   @Test
-  @DisplayName("validateStock fails when requested quantity exceeds availability")
-  void validateStock_throwsWhenInventoryMissing() {
+  @DisplayName("reserveStock fails when requested quantity exceeds availability")
+  void reserveStock_throwsWhenInventoryMissing() {
     ProductEntity product = saveProduct(ProductStatus.NEW, 1, 0);
     CartItemEntity cartItem = createCartItem(product, 2);
 
     RuntimeException thrown =
         assertThrows(
             RuntimeException.class,
-            () -> inventoryService.validateStock(List.of(cartItem)),
-            "Should block checkout when stock is insufficient");
+            () -> inventoryService.reserveStock(List.of(cartItem)),
+            "Should block reservation when stock is insufficient");
 
     assertEquals(
         "Insufficient stock for product 'Test product': available=1, requested=2",
@@ -91,15 +92,15 @@ class InventoryServiceIT {
   }
 
   @Test
-  @DisplayName("validateStock throws when cart item lacks a product")
-  void validateStock_throwsWhenCartItemHasNoProduct() {
+  @DisplayName("reserveStock throws when cart item lacks a product")
+  void reserveStock_throwsWhenCartItemHasNoProduct() {
     CartItemEntity cartItem = createCartItem(null, 1);
     cartItem.setId(42L);
 
     RuntimeException thrown =
         assertThrows(
             RuntimeException.class,
-            () -> inventoryService.validateStock(List.of(cartItem)),
+            () -> inventoryService.reserveStock(List.of(cartItem)),
             "Should fail when product is missing");
 
     assertEquals("Product not found for cart item id=42", thrown.getMessage());

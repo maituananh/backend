@@ -60,8 +60,7 @@ public class OrderService {
       throw new RuntimeException("Some items are invalid or not yours");
     }
 
-    // Kiểm tra và Giữ chỗ tồn kho (Reserve)
-    inventoryService.validateStock(cartItems);
+    // Kiểm tra và Giữ chỗ tồn kho (Reserve) với Pessimistic Lock
     inventoryService.reserveStock(cartItems);
 
     // Tính tổng tiền

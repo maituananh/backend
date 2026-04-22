@@ -158,6 +158,46 @@ class InventoryFlowControllerIT extends BaseIntegrationTest {
     assertEquals(0, productRepository.findById(product.getId()).orElseThrow().getReservedQty());
   }
 
+  @Test
+  void webhook_success_deductsInventory_andConfirmsOrder() throws Exception {
+    UserEntity customer = createUser("api-webhook-success", UserRole.CUSTOMER);
+    ProductEntity product = saveProduct(ProductStatus.NEW, 10, 2);
+    OrderEntity order = createOrder(customer, OrderStatus.PENDING, BigDecimal.valueOf(200));
+    orderRepository.save(order);
+    OrderItemEntity orderItem = createOrderItem(order, product, 2);
+    orderItemRepository.save(orderItem);
+    PaymentEntity payment =
+        createPayment(
+            order, PaymentMethod.STRIPE, PaymentStatus.PENDING, "webhook-success-sess", null);
+    paymentRepository.save(payment);
+
+    when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+    when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
+
+    Map<String, Object> payload =
+        Map.of(
+            "type",
+            "checkout.session.completed",
+            "data",
+            Map.of("object", Map.of("id", payment.getTransactionId(), "status", "complete")));
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "sig")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+        .andExpect(status().isOk());
+
+    ProductEntity refreshed = productRepository.findById(product.getId()).orElseThrow();
+    assertEquals(8, refreshed.getStockQty());
+    assertEquals(0, refreshed.getReservedQty());
+    assertEquals(8, refreshed.getAvailableQty());
+
+    assertEquals(
+        OrderStatus.CONFIRMED, orderRepository.findById(order.getId()).orElseThrow().getStatus());
+  }
+
   private UserEntity createUser(String username, UserRole role) {
     return userRepository.save(
         UserEntity.builder()

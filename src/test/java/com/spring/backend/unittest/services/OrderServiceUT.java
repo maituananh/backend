@@ -121,7 +121,6 @@ class OrderServiceUT {
       // Assert
       assertThat(result.getPaymentUrl()).isEqualTo("http://checkout.url");
       assertThat(result.getTotalAmount()).isEqualByComparingTo(BigDecimal.valueOf(200.0));
-      verify(inventoryService).validateStock(anyList());
       verify(inventoryService).reserveStock(anyList());
       verify(orderRepository).save(any(OrderEntity.class));
       verify(orderItemRepository).saveAll(anyList());
