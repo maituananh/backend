@@ -22,11 +22,13 @@ import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.enums.PaymentMethod;
 import com.spring.backend.enums.PaymentStatus;
 import com.spring.backend.enums.UserRole;
+import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.*;
 import com.spring.backend.service.InventoryService;
 import com.spring.backend.service.OrderService;
 import com.spring.backend.service.PaymentGatewayService;
+import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,25 +164,34 @@ class OrderServiceUT {
   @Nested
   @DisplayName("handleWebhook Tests")
   class WebhookTests {
+
+    private Event mockEvent;
+    private String payloadStr;
+    private WebhookPayload webhookPayload;
+
+    @BeforeEach
+    void setUp() throws Exception {
+      payloadStr = "{\"id\":\"cs_123\",\"type\":\"checkout.session.completed\"}";
+      mockEvent = mock(Event.class);
+      when(mockEvent.getId()).thenReturn("evt_test123");
+      when(mockEvent.getType()).thenReturn("checkout.session.completed");
+
+      webhookPayload = new WebhookPayload();
+      webhookPayload.setEventType("checkout.session.completed");
+      webhookPayload.setTransactionId("tx_123");
+    }
+
     @Test
     @DisplayName("should handle success payment event")
     void shouldHandleSuccessPayment() throws Exception {
-      // Arrange
-      WebhookPayload payload = new WebhookPayload();
-      payload.setEventType("checkout.session.completed");
-      payload.setTransactionId("tx_123");
-      String payloadStr = "{}";
-
-      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(payload);
-      when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+      when(paymentRepository.findByStripeEventId("evt_test123")).thenReturn(Optional.empty());
+      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(webhookPayload);
       when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
       when(paymentRepository.findByTransactionId("tx_123")).thenReturn(Optional.of(payment));
       when(orderItemRepository.findByOrderId(100L)).thenReturn(List.of(new OrderItemEntity()));
 
-      // Act
-      orderService.handleWebhook("sig", payloadStr);
+      orderService.handleWebhook(mockEvent, payloadStr);
 
-      // Assert
       assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
       assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
       verify(inventoryService).deductStock(anyList());
@@ -190,60 +201,51 @@ class OrderServiceUT {
     @Test
     @DisplayName("should handle failed payment event")
     void shouldHandleFailedPayment() throws Exception {
-      // Arrange
-      WebhookPayload payload = new WebhookPayload();
-      payload.setEventType("payment_intent.payment_failed");
-      payload.setTransactionId("tx_123");
-      String payloadStr = "{}";
+      when(mockEvent.getType()).thenReturn("payment_intent.payment_failed");
+      when(paymentRepository.findByStripeEventId("evt_test123")).thenReturn(Optional.empty());
 
-      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(payload);
-      when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+      WebhookPayload failedPayload = new WebhookPayload();
+      failedPayload.setEventType("payment_intent.payment_failed");
+      failedPayload.setTransactionId("tx_123");
+      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(failedPayload);
       when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
       when(paymentRepository.findByTransactionId("tx_123")).thenReturn(Optional.of(payment));
       when(orderItemRepository.findByOrderId(100L)).thenReturn(List.of(new OrderItemEntity()));
 
-      // Act
-      orderService.handleWebhook("sig", payloadStr);
+      orderService.handleWebhook(mockEvent, payloadStr);
 
-      // Assert
       assertThat(order.getStatus()).isEqualTo(OrderStatus.FAILED);
       assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
       verify(inventoryService).releaseStock(anyList());
     }
 
     @Test
-    @DisplayName("should skip processed orders for idempotency")
+    @DisplayName("should skip processed orders for idempotency (status-level guard)")
     void shouldSkipProcessedOrders() throws Exception {
-      // Arrange
       order.setStatus(OrderStatus.CONFIRMED);
-      WebhookPayload payload = new WebhookPayload();
-      payload.setTransactionId("tx_123");
-      String payloadStr = "{}";
-
-      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(payload);
-      when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+      when(paymentRepository.findByStripeEventId("evt_test123")).thenReturn(Optional.empty());
+      when(objectMapper.readValue(payloadStr, WebhookPayload.class)).thenReturn(webhookPayload);
       when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
       when(paymentRepository.findByTransactionId("tx_123")).thenReturn(Optional.of(payment));
 
-      // Act
-      orderService.handleWebhook("sig", payloadStr);
+      orderService.handleWebhook(mockEvent, payloadStr);
 
-      // Assert
       verify(orderRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("should throw error on invalid signature")
-    void shouldThrowOnInvalidSignature() throws Exception {
-      // Arrange
-      WebhookPayload payload = new WebhookPayload();
-      when(objectMapper.readValue(anyString(), eq(WebhookPayload.class))).thenReturn(payload);
-      when(paymentGatewayService.verifySignature(any(), any())).thenReturn(false);
+    @DisplayName("should throw DuplicateWebhookEventException for duplicate stripe event ID")
+    void shouldThrowOnDuplicateStripeEventId() {
+      PaymentEntity existingPayment = mock(PaymentEntity.class);
+      OrderEntity existingOrder = mock(OrderEntity.class);
+      when(existingPayment.getOrder()).thenReturn(existingOrder);
+      when(existingOrder.getId()).thenReturn(50L);
+      when(paymentRepository.findByStripeEventId("evt_test123"))
+          .thenReturn(Optional.of(existingPayment));
 
-      // Act & Assert
-      assertThatThrownBy(() -> orderService.handleWebhook("sig", "{}"))
-          .isInstanceOf(RuntimeException.class)
-          .hasMessage("Invalid signature");
+      assertThatThrownBy(() -> orderService.handleWebhook(mockEvent, payloadStr))
+          .isInstanceOf(DuplicateWebhookEventException.class)
+          .hasMessageContaining("evt_test123");
     }
   }
 

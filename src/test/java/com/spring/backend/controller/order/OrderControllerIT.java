@@ -1,6 +1,7 @@
 package com.spring.backend.controller.order;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,6 +16,8 @@ import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.entity.*;
 import com.spring.backend.enums.*;
 import com.spring.backend.repository.*;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -284,7 +287,11 @@ class OrderControllerIT extends BaseIntegrationTest {
     String payload =
         "{ \"type\": \"checkout.session.completed\", \"data\": { \"object\": { \"id\": \"sess_123\" } } }";
 
-    when(paymentGatewayService.verifySignature(any(), any())).thenReturn(true);
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_valid_123");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("checkout.session.completed");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
     when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
 
     mockMvc
@@ -301,9 +308,13 @@ class OrderControllerIT extends BaseIntegrationTest {
   }
 
   @Test
-  @DisplayName("POST /api/payment/webhook - returns 500 on invalid JSON (Line 145)")
+  @DisplayName(
+      "POST /api/payment/webhook - returns 400 on invalid JSON (now caught by signature verification)")
   void webhook_invalidJson_returns500() throws Exception {
     String invalidPayload = "not a json";
+
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenThrow(new SignatureVerificationException("bad sig", "sig-header"));
 
     mockMvc
         .perform(
@@ -312,16 +323,20 @@ class OrderControllerIT extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidPayload))
         .andDo(print())
-        .andExpect(status().isInternalServerError());
+        .andExpect(status().isBadRequest());
   }
 
   @Test
-  @DisplayName("POST /api/payment/webhook - returns 500 when payment not found (Line 159)")
+  @DisplayName("POST /api/payment/webhook - returns 500 when payment not found")
   void webhook_paymentNotFound_returns500() throws Exception {
     String payload =
         "{ \"type\": \"checkout.session.completed\", \"data\": { \"object\": { \"id\": \"non_existent_sess\" } } }";
 
-    when(paymentGatewayService.verifySignature(any(), any())).thenReturn(true);
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_xyz");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("checkout.session.completed");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
     when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
 
     mockMvc
@@ -336,7 +351,7 @@ class OrderControllerIT extends BaseIntegrationTest {
   }
 
   @Test
-  @DisplayName("POST /api/payment/webhook - logs warning on unhandled event (Line 182)")
+  @DisplayName("POST /api/payment/webhook - logs warning on unhandled event")
   void webhook_unhandledEvent_returns200() throws Exception {
     OrderEntity order = createOrder(testUser, OrderStatus.PENDING);
     PaymentEntity payment =
@@ -352,7 +367,11 @@ class OrderControllerIT extends BaseIntegrationTest {
     String payload =
         "{ \"type\": \"some.unhandled.event\", \"data\": { \"object\": { \"id\": \"sess_456\" } } }";
 
-    when(paymentGatewayService.verifySignature(any(), any())).thenReturn(true);
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_unhandled_456");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("some.unhandled.event");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
     when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
 
     mockMvc
@@ -367,6 +386,54 @@ class OrderControllerIT extends BaseIntegrationTest {
     // Order status should still be PENDING
     OrderEntity updatedOrder = orderRepository.findById(order.getId()).get();
     assert updatedOrder.getStatus() == OrderStatus.PENDING;
+  }
+
+  @Test
+  @DisplayName("POST /api/payment/webhook returns 400 for invalid Stripe signature")
+  void webhook_invalidSignature_returns400() throws Exception {
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenThrow(new SignatureVerificationException("bad sig", "sig-header"));
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "t=bad,v1=bad")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("{\"id\":\"evt_bad\",\"type\":\"checkout.session.completed\"}"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("POST /api/payment/webhook returns 200 for duplicate event (idempotency)")
+  void webhook_duplicateEvent_returns200() throws Exception {
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_dup123");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
+
+    // The real OrderService will throw DuplicateWebhookEventException when it sees a dup
+    // We test this end-to-end: controller must return 200 not 500
+    // Insert a payment with this stripeEventId to trigger the dup path
+    OrderEntity order = createOrder(testUser, OrderStatus.CONFIRMED);
+    PaymentEntity payment =
+        PaymentEntity.builder()
+            .order(order)
+            .status(PaymentStatus.SUCCESS)
+            .amount(order.getTotalAmount())
+            .paymentMethod(PaymentMethod.STRIPE)
+            .transactionId("sess_dup_123")
+            .stripeEventId("evt_dup123")
+            .build();
+    paymentRepository.save(payment);
+    when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
+
+    mockMvc
+        .perform(
+            post("/api/payment/webhook")
+                .header("Stripe-Signature", "t=1,v1=abc")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("{\"id\":\"evt_dup123\",\"type\":\"checkout.session.completed\"}"))
+        .andExpect(status().isOk());
   }
 
   @Test

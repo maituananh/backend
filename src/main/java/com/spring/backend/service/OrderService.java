@@ -1,6 +1,5 @@
 package com.spring.backend.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
@@ -12,8 +11,10 @@ import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.entity.*;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.enums.PaymentStatus;
+import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.*;
+import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -136,18 +137,32 @@ public class OrderService {
   // ============================================================
   // 2. WEBHOOK - Gateway callback sau khi thanh toán
   // ============================================================
-  public void handleWebhook(String sigHeader, String payload) {
+  public void handleWebhook(Event event, String rawPayload) {
+    String stripeEventId = event.getId();
+    String eventType = event.getType();
+
+    // Application-layer dedup (D-02): fast path for already-processed events
+    paymentRepository
+        .findByStripeEventId(stripeEventId)
+        .ifPresent(
+            existing -> {
+              log.warn(
+                  "Duplicate Stripe event {} for order {} — skipping",
+                  stripeEventId,
+                  existing.getOrder().getId());
+              throw new DuplicateWebhookEventException(stripeEventId);
+            });
+
+    // Parse the session ID from the raw payload (transactionId = Stripe session ID)
     WebhookPayload webhookPayload;
     try {
-      webhookPayload = objectMapper.readValue(payload, WebhookPayload.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      webhookPayload = objectMapper.readValue(rawPayload, WebhookPayload.class);
+    } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+      throw new RuntimeException("Failed to parse webhook payload", e);
     }
 
-    // Verify chữ ký tránh giả mạo
-    if (!paymentGatewayService.verifySignature(sigHeader, payload)
-        || !paymentGatewayService.verifyTransaction(webhookPayload)) {
-      throw new RuntimeException("Invalid signature");
+    if (!paymentGatewayService.verifyTransaction(webhookPayload)) {
+      throw new RuntimeException("Webhook payload missing transactionId");
     }
 
     PaymentEntity payment =
@@ -160,17 +175,17 @@ public class OrderService {
 
     OrderEntity order = payment.getOrder();
 
-    // Idempotency: tránh xử lý 2 lần
+    // Idempotency guard: order already processed (status-level, secondary guard)
     if (order.getStatus() != OrderStatus.PENDING) {
       log.warn(
           "Order {} already processed (status={}), skipping", order.getId(), order.getStatus());
       return;
     }
 
-    // Lưu raw response để debug
-    payment.setGatewayResponse(payload);
+    // Store raw response and event ID for dedup (D-01, D-03)
+    payment.setGatewayResponse(rawPayload);
+    payment.setStripeEventId(stripeEventId);
 
-    String eventType = webhookPayload.getEventType();
     log.info("Processing webhook event: {} for order: {}", eventType, order.getId());
 
     switch (eventType) {
@@ -179,7 +194,7 @@ public class OrderService {
       case "payment_intent.payment_failed" -> handlePaymentFailed(order, payment);
       default -> {
         log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
-        return; // Do not save if we don't know the event
+        return; // Do not save for unknown event types
       }
     }
 

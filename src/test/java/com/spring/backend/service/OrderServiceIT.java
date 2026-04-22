@@ -35,6 +35,7 @@ import com.spring.backend.repository.OrderRepository;
 import com.spring.backend.repository.PaymentRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
+import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -191,8 +192,10 @@ class OrderServiceIT extends BaseIntegrationTest {
         createPayment(order, PaymentMethod.STRIPE, PaymentStatus.PENDING, "exp-sess", null);
     paymentRepository.save(payment);
 
-    when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
-    when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
+    // Build a mock Event — no verifySignature mock needed (controller handles signature)
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_expired_test");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("checkout.session.expired");
 
     String payload =
         objectMapper.writeValueAsString(
@@ -202,7 +205,12 @@ class OrderServiceIT extends BaseIntegrationTest {
                 "data",
                 Map.of("object", Map.of("id", payment.getTransactionId(), "status", "expired"))));
 
-    orderService.handleWebhook("sig", payload);
+    // verifyTransaction is still called by OrderService to validate transactionId in payload
+    org.mockito.Mockito.when(
+            paymentGatewayService.verifyTransaction(org.mockito.ArgumentMatchers.any()))
+        .thenReturn(true);
+
+    orderService.handleWebhook(mockEvent, payload);
 
     assertEquals(
         OrderStatus.CANCELLED, orderRepository.findById(order.getId()).orElseThrow().getStatus());

@@ -98,30 +98,33 @@ class PaymentGatewayServiceUT {
   }
 
   @Test
-  @DisplayName("verifySignature should return true when signature is valid")
-  void verifySignature_Valid_ReturnsTrue() {
+  @DisplayName("verifyAndConstructEvent should return Event when signature is valid")
+  void verifyAndConstructEvent_Valid_ReturnsEvent() throws Exception {
+    com.stripe.model.Event mockEvent = mock(com.stripe.model.Event.class);
     try (MockedStatic<Webhook> mockedWebhook = mockStatic(Webhook.class)) {
       mockedWebhook
           .when(() -> Webhook.constructEvent(anyString(), anyString(), anyString()))
-          .thenReturn(null);
+          .thenReturn(mockEvent);
 
-      boolean result = paymentGatewayService.verifySignature("sig", "payload");
+      com.stripe.model.Event result =
+          paymentGatewayService.verifyAndConstructEvent("sig", "payload");
 
-      assertThat(result).isTrue();
+      assertThat(result).isSameAs(mockEvent);
     }
   }
 
   @Test
-  @DisplayName("verifySignature should return false when signature is invalid")
-  void verifySignature_Invalid_ReturnsFalse() {
+  @DisplayName("verifyAndConstructEvent should throw SignatureVerificationException when invalid")
+  void verifyAndConstructEvent_Invalid_ThrowsSignatureVerificationException() {
     try (MockedStatic<Webhook> mockedWebhook = mockStatic(Webhook.class)) {
       mockedWebhook
           .when(() -> Webhook.constructEvent(anyString(), anyString(), anyString()))
-          .thenThrow(new RuntimeException("invalid"));
+          .thenThrow(
+              new com.stripe.exception.SignatureVerificationException("bad sig", "sig-header"));
 
-      boolean result = paymentGatewayService.verifySignature("sig", "payload");
-
-      assertThat(result).isFalse();
+      org.assertj.core.api.Assertions.assertThatThrownBy(
+              () -> paymentGatewayService.verifyAndConstructEvent("bad", "payload"))
+          .isInstanceOf(com.stripe.exception.SignatureVerificationException.class);
     }
   }
 

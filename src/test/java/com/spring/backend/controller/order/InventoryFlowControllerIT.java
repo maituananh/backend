@@ -33,6 +33,7 @@ import com.spring.backend.repository.OrderRepository;
 import com.spring.backend.repository.PaymentRepository;
 import com.spring.backend.repository.ProductRepository;
 import com.spring.backend.repository.UserRepository;
+import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -135,7 +136,11 @@ class InventoryFlowControllerIT extends BaseIntegrationTest {
         createPayment(order, PaymentMethod.STRIPE, PaymentStatus.PENDING, "webhook-sess", null);
     paymentRepository.save(payment);
 
-    when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_expired_inv");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("checkout.session.expired");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
     when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
 
     Map<String, Object> payload =
@@ -171,7 +176,11 @@ class InventoryFlowControllerIT extends BaseIntegrationTest {
             order, PaymentMethod.STRIPE, PaymentStatus.PENDING, "webhook-success-sess", null);
     paymentRepository.save(payment);
 
-    when(paymentGatewayService.verifySignature(anyString(), anyString())).thenReturn(true);
+    Event mockEvent = org.mockito.Mockito.mock(Event.class);
+    org.mockito.Mockito.when(mockEvent.getId()).thenReturn("evt_success_inv");
+    org.mockito.Mockito.when(mockEvent.getType()).thenReturn("checkout.session.completed");
+    when(paymentGatewayService.verifyAndConstructEvent(anyString(), anyString()))
+        .thenReturn(mockEvent);
     when(paymentGatewayService.verifyTransaction(any())).thenReturn(true);
 
     Map<String, Object> payload =
