@@ -38,6 +38,9 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
           + "JOIN FETCH o.payment p "
           + "WHERE o.status = 'PENDING' "
           + "AND p.transactionId IS NOT NULL "
-          + "AND o.createdAt < :cutoff")
-  List<OrderEntity> findStuckPendingOrders(@Param("cutoff") Instant cutoff);
+          + "AND o.createdAt >= :lookbackCutoff "
+          + "AND o.createdAt < :minAgeCutoff")
+  List<OrderEntity> findStuckPendingOrders(
+      @Param("lookbackCutoff") Instant lookbackCutoff,
+      @Param("minAgeCutoff") Instant minAgeCutoff);
 }

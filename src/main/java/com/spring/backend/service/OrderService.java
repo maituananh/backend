@@ -2,6 +2,7 @@ package com.spring.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.adapter.stripe.StripeAdapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
@@ -15,6 +16,7 @@ import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.*;
 import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -41,6 +44,7 @@ public class OrderService {
   private final UserRepository userRepository;
   private final S3Adapter s3Adapter;
   private final ObjectMapper objectMapper;
+  private final StripeAdapter stripeAdapter;
 
   // ============================================================
   // 1. CHECKOUT - Tạo order từ các cart item được chọn
@@ -441,5 +445,68 @@ public class OrderService {
 
     orderRepository.save(order);
     paymentRepository.save(payment);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void reconcileSingleOrder(Long orderId) {
+    OrderEntity order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(
+                () -> new RuntimeException("Order not found during reconciliation: " + orderId));
+
+    // Guard: re-check status inside the new transaction to avoid race conditions
+    if (order.getStatus() != OrderStatus.PENDING) {
+      log.debug(
+          "Reconciliation: order {} already in status {}, skipping", orderId, order.getStatus());
+      return;
+    }
+
+    PaymentEntity payment = order.getPayment();
+    if (payment == null || payment.getTransactionId() == null) {
+      log.warn("Reconciliation: order {} has no payment/transactionId, skipping", orderId);
+      return;
+    }
+
+    String sessionId = payment.getTransactionId();
+    log.info("Reconciliation: checking Stripe session {} for order {}", sessionId, orderId);
+
+    Session session = stripeAdapter.retrieveSession(sessionId);
+    String status = session.getStatus(); // "complete" | "expired" | "open"
+
+    switch (status) {
+      case "complete" -> {
+        log.info(
+            "Reconciliation: session {} is complete — marking order {} CONFIRMED",
+            sessionId,
+            orderId);
+        order.setStatus(OrderStatus.CONFIRMED);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(Instant.now());
+
+        List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+        inventoryService.deductStock(items);
+
+        orderRepository.save(order);
+        paymentRepository.save(payment);
+      }
+      case "expired" -> {
+        log.warn("Reconciliation: session {} expired — cancelling order {}", sessionId, orderId);
+        order.setStatus(OrderStatus.CANCELLED);
+        payment.setStatus(PaymentStatus.FAILED);
+
+        List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+        inventoryService.releaseStock(items);
+
+        orderRepository.save(order);
+        paymentRepository.save(payment);
+      }
+      default ->
+          log.warn(
+              "Reconciliation: session {} status={} for order {} — no action taken",
+              sessionId,
+              status,
+              orderId);
+    }
   }
 }
