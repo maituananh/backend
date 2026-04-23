@@ -27,8 +27,8 @@ public class CategoryController {
   @GetMapping("/search")
   public Page<CategoryResponseDto> searchCategories(
       @RequestParam(required = false) String name,
-      @RequestParam(required = false) Integer page,
-      @RequestParam(required = false) Integer size) {
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "10") Integer size) {
     return categoryService.searchByName(name, page, size);
   }
 
