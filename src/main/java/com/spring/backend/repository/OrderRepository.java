@@ -41,6 +41,5 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
           + "AND o.createdAt >= :lookbackCutoff "
           + "AND o.createdAt < :minAgeCutoff")
   List<OrderEntity> findStuckPendingOrders(
-      @Param("lookbackCutoff") Instant lookbackCutoff,
-      @Param("minAgeCutoff") Instant minAgeCutoff);
+      @Param("lookbackCutoff") Instant lookbackCutoff, @Param("minAgeCutoff") Instant minAgeCutoff);
 }

@@ -39,7 +39,8 @@ public class ReconciliationJobService {
   public void reconcileStuckOrders() {
     Instant lookbackCutoff = Instant.now().minus(24, ChronoUnit.HOURS);
     Instant minAgeCutoff = Instant.now().minus(STUCK_THRESHOLD_MINUTES, ChronoUnit.MINUTES);
-    List<OrderEntity> stuckOrders = orderRepository.findStuckPendingOrders(lookbackCutoff, minAgeCutoff);
+    List<OrderEntity> stuckOrders =
+        orderRepository.findStuckPendingOrders(lookbackCutoff, minAgeCutoff);
 
     if (stuckOrders.isEmpty()) {
       log.debug("Reconciliation: no stuck orders found");

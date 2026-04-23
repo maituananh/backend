@@ -1,7 +1,6 @@
 package com.spring.backend.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.spring.backend.adapter.stripe.StripeAdapter;
@@ -117,7 +116,8 @@ class ReconciliationJobServiceIT {
     OrderEntity orderComplete = createStuckOrder("cs_test_complete", 10);
     OrderEntity orderExpired = createStuckOrder("cs_test_expired", 10);
     OrderEntity orderTooNew = createStuckOrder("cs_test_new", 2); // Should be ignored (under 5m)
-    OrderEntity orderTooOld = createStuckOrder("cs_test_old", 60 * 25); // Should be ignored (over 24h)
+    OrderEntity orderTooOld =
+        createStuckOrder("cs_test_old", 60 * 25); // Should be ignored (over 24h)
 
     Session sessionComplete = new Session();
     sessionComplete.setStatus("complete");
@@ -130,13 +130,15 @@ class ReconciliationJobServiceIT {
     reconciliationJobService.reconcileStuckOrders();
 
     OrderEntity fetchedComplete = orderRepository.findById(orderComplete.getId()).orElseThrow();
-    PaymentEntity paymentComplete = paymentRepository.findByOrderId(orderComplete.getId()).orElseThrow();
+    PaymentEntity paymentComplete =
+        paymentRepository.findByOrderId(orderComplete.getId()).orElseThrow();
     assertThat(fetchedComplete.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
     assertThat(paymentComplete.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
     assertThat(paymentComplete.getPaidAt()).isNotNull();
 
     OrderEntity fetchedExpired = orderRepository.findById(orderExpired.getId()).orElseThrow();
-    PaymentEntity paymentExpired = paymentRepository.findByOrderId(orderExpired.getId()).orElseThrow();
+    PaymentEntity paymentExpired =
+        paymentRepository.findByOrderId(orderExpired.getId()).orElseThrow();
     assertThat(fetchedExpired.getStatus()).isEqualTo(OrderStatus.CANCELLED);
     assertThat(paymentExpired.getStatus()).isEqualTo(PaymentStatus.FAILED);
 
@@ -148,7 +150,8 @@ class ReconciliationJobServiceIT {
   }
 
   @Test
-  void reconcileStuckOrders_transactionIsolation_oneFailureDoesNotRollbackOthers() throws Exception {
+  void reconcileStuckOrders_transactionIsolation_oneFailureDoesNotRollbackOthers()
+      throws Exception {
     OrderEntity orderFail = createStuckOrder("cs_test_fail", 10);
     OrderEntity orderSuccess = createStuckOrder("cs_test_success", 10);
 
