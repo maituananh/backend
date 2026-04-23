@@ -94,12 +94,8 @@ public class CategoryServiceImpl implements CategoryService {
   public CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto) {
     CategoryEntity entity =
         categoryRepository
-            .findById(id)
+            .findByIdAndIsActiveIsTrue(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
-
-    if (Boolean.FALSE.equals(entity.getIsActive())) {
-      throw new RuntimeException("It is not possible to edit deleted categories.");
-    }
 
     entity.setName(dto.getName());
     entity.setNote(dto.getNote());
@@ -118,12 +114,8 @@ public class CategoryServiceImpl implements CategoryService {
   public void deleteCategory(Long id) {
     CategoryEntity entity =
         categoryRepository
-            .findById(id)
+            .findByIdAndIsActiveIsTrue(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
-
-    if (Boolean.FALSE.equals(entity.getIsActive())) {
-      throw new RuntimeException("This category is in the deletion state.");
-    }
 
     entity.setIsActive(false);
     categoryRepository.save(entity);
