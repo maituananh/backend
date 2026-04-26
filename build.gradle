@@ -126,6 +126,28 @@ dependencies {
 	}
 }
 
+sourceSets {
+	unittest {
+		compileClasspath += main.output
+		runtimeClasspath += main.output
+	}
+	integrationtest {
+		compileClasspath += main.output + unittest.output
+		runtimeClasspath += main.output + unittest.output
+	}
+}
+
+tasks.withType(Copy).configureEach {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+configurations {
+	unittestImplementation.extendsFrom testImplementation
+	unittestRuntimeOnly.extendsFrom testRuntimeOnly
+	integrationtestImplementation.extendsFrom testImplementation
+	integrationtestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
@@ -141,8 +163,28 @@ test {
 	finalizedBy jacocoTestReport
 }
 
+task unittest(type: Test) {
+	description = 'Runs unit tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.unittest.output.classesDirs
+	classpath = sourceSets.unittest.runtimeClasspath
+	useJUnitPlatform()
+}
+
+task integrationtest(type: Test) {
+	description = 'Runs integration tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationtest.output.classesDirs
+	classpath = sourceSets.integrationtest.runtimeClasspath
+	useJUnitPlatform()
+	mustRunAfter unittest
+}
+
+check.dependsOn unittest, integrationtest
+
 jacocoTestReport {
-	dependsOn test
+	executionData(fileTree(project.buildDir).include("jacoco/*.exec"))
+	dependsOn unittest, integrationtest
 	reports {
 		xml.required = true
 		html.required = true

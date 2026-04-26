@@ -13,7 +13,11 @@ import lombok.experimental.SuperBuilder;
     name = "payments",
     indexes = {
       @Index(name = "idx_payment_order", columnList = "order_id"),
-      @Index(name = "idx_payment_transaction", columnList = "transaction_id")
+      @Index(name = "idx_payment_transaction", columnList = "transaction_id"),
+      @Index(name = "idx_payment_stripe_event", columnList = "stripe_event_id")
+    },
+    uniqueConstraints = {
+      @UniqueConstraint(name = "uk_payment_stripe_event_id", columnNames = "stripe_event_id")
     })
 @Getter
 @Setter
@@ -45,6 +49,9 @@ public class PaymentEntity extends BaseEntity {
 
   @Column(name = "gateway_response", columnDefinition = "TEXT")
   private String gatewayResponse;
+
+  @Column(name = "stripe_event_id", unique = true, length = 255)
+  private String stripeEventId;
 
   @Column(name = "paid_at")
   private Instant paidAt;

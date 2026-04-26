@@ -9,24 +9,31 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
 public class InventoryService {
 
   private final ProductRepository productRepository;
 
   /**
-   * Kiểm tra tồn kho trước khi tạo order. Ném exception nếu bất kỳ sản phẩm nào không đủ số lượng
-   * khả dụng (availableQty).
+   * Giữ chỗ (Reserve) tồn kho khi checkout. Sử dụng PESSIMISTIC_WRITE lock để tránh race condition
+   * khi nhiều user cùng checkout.
    */
-  public void validateStock(List<CartItemEntity> cartItems) {
+  public void reserveStock(List<CartItemEntity> cartItems) {
     for (CartItemEntity item : cartItems) {
-      ProductEntity product = item.getProduct();
-      if (product == null) {
+      if (item.getProduct() == null) {
         throw new RuntimeException("Product not found for cart item id=" + item.getId());
       }
+      ProductEntity product =
+          productRepository
+              .findByIdWithLock(item.getProduct().getId())
+              .orElseThrow(
+                  () -> new RuntimeException("Product not found for cart item id=" + item.getId()));
+
       if (product.getAvailableQty() < item.getQuantity()) {
         throw new RuntimeException(
             "Insufficient stock for product '"
@@ -36,13 +43,7 @@ public class InventoryService {
                 + ", requested="
                 + item.getQuantity());
       }
-    }
-  }
 
-  /** Giữ chỗ (Reserve) tồn kho khi checkout. Tăng reserved_qty. */
-  public void reserveStock(List<CartItemEntity> cartItems) {
-    for (CartItemEntity item : cartItems) {
-      ProductEntity product = item.getProduct();
       product.setReservedQty(product.getReservedQty() + item.getQuantity());
       productRepository.save(product);
       log.info(
@@ -56,7 +57,13 @@ public class InventoryService {
   /** Trừ tồn kho thật (Stock) sau khi thanh toán thành công. Giảm stock_qty và reserved_qty. */
   public void deductStock(List<OrderItemEntity> orderItems) {
     for (OrderItemEntity item : orderItems) {
-      ProductEntity product = item.getProduct();
+      if (item.getProduct() == null) {
+        log.warn("Product not found for order item id={}, skipping deduct", item.getId());
+        continue;
+      }
+      ProductEntity product =
+          productRepository.findByIdWithLock(item.getProduct().getId()).orElse(null);
+
       if (product == null) {
         log.warn("Product not found for order item id={}, skipping deduct", item.getId());
         continue;
@@ -81,10 +88,16 @@ public class InventoryService {
     }
   }
 
-  /** Hoàn tồn kho khi hủy đơn hàng. Giảm reserved_qty (available_qty sẽ tự tăng lại). */
+  /** Hoàn tồn kho khi hủy đơn hàng. Giảm reserved_qty. */
   public void releaseStock(List<OrderItemEntity> orderItems) {
     for (OrderItemEntity item : orderItems) {
-      ProductEntity product = item.getProduct();
+      if (item.getProduct() == null) {
+        log.warn("Product not found for order item id={}, skipping release", item.getId());
+        continue;
+      }
+      ProductEntity product =
+          productRepository.findByIdWithLock(item.getProduct().getId()).orElse(null);
+
       if (product == null) {
         log.warn("Product not found for order item id={}, skipping release", item.getId());
         continue;

@@ -1,12 +1,12 @@
 package com.spring.backend.dto.cart;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class CartResponseDto {
   private Long cartId;

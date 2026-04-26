@@ -3,16 +3,19 @@ package com.spring.backend.repository;
 import com.spring.backend.entity.ProductEntity;
 import com.spring.backend.entity.ProductStatistic;
 import com.spring.backend.enums.ProductStatus;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +23,10 @@ import org.springframework.util.CollectionUtils;
 @Repository
 public interface ProductRepository
     extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT p FROM ProductEntity p WHERE p.id = :id")
+  Optional<ProductEntity> findByIdWithLock(Long id);
 
   @Query(
       """

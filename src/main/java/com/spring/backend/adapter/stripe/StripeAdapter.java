@@ -93,4 +93,18 @@ public class StripeAdapter {
       throw new RuntimeException("Stripe refund failed: " + e.getMessage());
     }
   }
+
+  /**
+   * Retrieves a Stripe Checkout Session by session ID. Used by the reconciliation job to check real
+   * payment status.
+   */
+  public Session retrieveSession(String sessionId) {
+    Stripe.apiKey = secretKey;
+    try {
+      return Session.retrieve(sessionId);
+    } catch (Exception e) {
+      log.error("Failed to retrieve Stripe session {}: {}", sessionId, e.getMessage());
+      throw new RuntimeException("Failed to retrieve Stripe session: " + e.getMessage(), e);
+    }
+  }
 }
