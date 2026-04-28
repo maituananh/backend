@@ -82,7 +82,7 @@ class CategoryServiceUT {
   @DisplayName("updateCategory should update and return")
   void updateCategory_Works() {
     CategoryEntity cat = new CategoryEntity();
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat));
+    when(categoryRepository.findByIdAndIsActiveIsTrue(1L)).thenReturn(Optional.of(cat));
 
     CategoryRequestDto dto = new CategoryRequestDto();
     dto.setName("Updated");
@@ -97,7 +97,7 @@ class CategoryServiceUT {
   void deleteCategory_Works() {
     CategoryEntity cat = new CategoryEntity();
     cat.setIsActive(true);
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(cat));
+    when(categoryRepository.findByIdAndIsActiveIsTrue(1L)).thenReturn(Optional.of(cat));
 
     categoryService.deleteCategory(1L);
 
