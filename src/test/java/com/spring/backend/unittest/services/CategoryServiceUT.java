@@ -205,7 +205,8 @@ class CategoryServiceUT {
     @DisplayName("should update when found")
     void shouldUpdate() {
       // Arrange
-      when(categoryRepository.findById(1L)).thenReturn(Optional.of(categoryEntity));
+      when(categoryRepository.findByIdAndIsActiveIsTrue(1L))
+          .thenReturn(Optional.of(categoryEntity));
       when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
       // Act
@@ -220,7 +221,7 @@ class CategoryServiceUT {
     @DisplayName("should throw error when not found")
     void shouldThrowError() {
       // Arrange
-      when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+      when(categoryRepository.findByIdAndIsActiveIsTrue(1L)).thenReturn(Optional.empty());
 
       // Act & Assert
       assertThatThrownBy(() -> categoryService.updateCategory(1L, categoryRequestDto))
@@ -236,7 +237,8 @@ class CategoryServiceUT {
     @DisplayName("should soft delete when found")
     void shouldSoftDelete() {
       // Arrange
-      when(categoryRepository.findById(1L)).thenReturn(Optional.of(categoryEntity));
+      when(categoryRepository.findByIdAndIsActiveIsTrue(1L))
+          .thenReturn(Optional.of(categoryEntity));
 
       // Act
       categoryService.deleteCategory(1L);
@@ -250,7 +252,7 @@ class CategoryServiceUT {
     @DisplayName("should throw error when not found")
     void shouldThrowError() {
       // Arrange
-      when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+      when(categoryRepository.findByIdAndIsActiveIsTrue(1L)).thenReturn(Optional.empty());
 
       // Act & Assert
       assertThatThrownBy(() -> categoryService.deleteCategory(1L))
