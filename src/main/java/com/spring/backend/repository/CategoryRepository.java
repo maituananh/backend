@@ -19,4 +19,6 @@ public interface CategoryRepository
   }
 
   Optional<CategoryEntity> findByIdAndIsActive(Long id, Boolean isActive);
+
+  Optional<CategoryEntity> findByIdAndIsActiveIsTrue(Long id);
 }

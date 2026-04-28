@@ -94,7 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
   public CategoryResponseDto updateCategory(Long id, CategoryRequestDto dto) {
     CategoryEntity entity =
         categoryRepository
-            .findById(id)
+            .findByIdAndIsActiveIsTrue(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
 
     entity.setName(dto.getName());
@@ -114,7 +114,7 @@ public class CategoryServiceImpl implements CategoryService {
   public void deleteCategory(Long id) {
     CategoryEntity entity =
         categoryRepository
-            .findById(id)
+            .findByIdAndIsActiveIsTrue(id)
             .orElseThrow(() -> new RuntimeException("Category not found"));
 
     entity.setIsActive(false);
