@@ -8,6 +8,7 @@ import com.spring.backend.entity.OrderItemEntity;
 import com.spring.backend.entity.PaymentEntity;
 import com.spring.backend.enums.PaymentMethod;
 import com.spring.backend.repository.PaymentRepository;
+import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import java.math.RoundingMode;
 import java.util.stream.Collectors;
@@ -68,19 +69,13 @@ public class PaymentGatewayService {
   }
 
   /**
-   * Xác minh chữ ký webhook từ Stripe. Stripe gửi header "Stripe-Signature" - trong môi trường thực
-   * cần verify bằng Stripe.Webhook.constructEvent(). Hiện tại cho pass qua (cần bổ sung sau).
-   *
-   * <p>TODO: Thêm Stripe-Signature verification khi có webhook secret.
+   * Verifies the Stripe webhook signature and returns the parsed Event object. Throws
+   * SignatureVerificationException if the signature is invalid. The caller (controller) is
+   * responsible for catching this exception and returning 400.
    */
-  public boolean verifySignature(String sigHeader, String payload) {
-    try {
-      Webhook.constructEvent(payload, sigHeader, webhookSecret);
-    } catch (Exception e) {
-      log.error("Invalid signature");
-      return false;
-    }
-    return true;
+  public Event verifyAndConstructEvent(String sigHeader, String payload)
+      throws com.stripe.exception.SignatureVerificationException {
+    return Webhook.constructEvent(payload, sigHeader, webhookSecret);
   }
 
   public boolean verifyTransaction(WebhookPayload payload) {

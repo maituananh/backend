@@ -1,8 +1,8 @@
 package com.spring.backend.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.adapter.stripe.StripeAdapter;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
@@ -12,8 +12,11 @@ import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.entity.*;
 import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.enums.PaymentStatus;
+import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.helper.UserHelper;
 import com.spring.backend.repository.*;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -40,6 +44,7 @@ public class OrderService {
   private final UserRepository userRepository;
   private final S3Adapter s3Adapter;
   private final ObjectMapper objectMapper;
+  private final StripeAdapter stripeAdapter;
 
   // ============================================================
   // 1. CHECKOUT - Tạo order từ các cart item được chọn
@@ -60,8 +65,7 @@ public class OrderService {
       throw new RuntimeException("Some items are invalid or not yours");
     }
 
-    // Kiểm tra và Giữ chỗ tồn kho (Reserve)
-    inventoryService.validateStock(cartItems);
+    // Kiểm tra và Giữ chỗ tồn kho (Reserve) với Pessimistic Lock
     inventoryService.reserveStock(cartItems);
 
     // Tính tổng tiền
@@ -137,18 +141,32 @@ public class OrderService {
   // ============================================================
   // 2. WEBHOOK - Gateway callback sau khi thanh toán
   // ============================================================
-  public void handleWebhook(String sigHeader, String payload) {
+  public void handleWebhook(Event event, String rawPayload) {
+    String stripeEventId = event.getId();
+    String eventType = event.getType();
+
+    // Application-layer dedup (D-02): fast path for already-processed events
+    paymentRepository
+        .findByStripeEventId(stripeEventId)
+        .ifPresent(
+            existing -> {
+              log.warn(
+                  "Duplicate Stripe event {} for order {} — skipping",
+                  stripeEventId,
+                  existing.getOrder().getId());
+              throw new DuplicateWebhookEventException(stripeEventId);
+            });
+
+    // Parse the session ID from the raw payload (transactionId = Stripe session ID)
     WebhookPayload webhookPayload;
     try {
-      webhookPayload = objectMapper.readValue(payload, WebhookPayload.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      webhookPayload = objectMapper.readValue(rawPayload, WebhookPayload.class);
+    } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+      throw new RuntimeException("Failed to parse webhook payload", e);
     }
 
-    // Verify chữ ký tránh giả mạo
-    if (!paymentGatewayService.verifySignature(sigHeader, payload)
-        || !paymentGatewayService.verifyTransaction(webhookPayload)) {
-      throw new RuntimeException("Invalid signature");
+    if (!paymentGatewayService.verifyTransaction(webhookPayload)) {
+      throw new RuntimeException("Webhook payload missing transactionId");
     }
 
     PaymentEntity payment =
@@ -161,17 +179,17 @@ public class OrderService {
 
     OrderEntity order = payment.getOrder();
 
-    // Idempotency: tránh xử lý 2 lần
+    // Idempotency guard: order already processed (status-level, secondary guard)
     if (order.getStatus() != OrderStatus.PENDING) {
       log.warn(
           "Order {} already processed (status={}), skipping", order.getId(), order.getStatus());
       return;
     }
 
-    // Lưu raw response để debug
-    payment.setGatewayResponse(payload);
+    // Store raw response and event ID for dedup (D-01, D-03)
+    payment.setGatewayResponse(rawPayload);
+    payment.setStripeEventId(stripeEventId);
 
-    String eventType = webhookPayload.getEventType();
     log.info("Processing webhook event: {} for order: {}", eventType, order.getId());
 
     switch (eventType) {
@@ -180,7 +198,7 @@ public class OrderService {
       case "payment_intent.payment_failed" -> handlePaymentFailed(order, payment);
       default -> {
         log.warn("Unhandled event type: {} for order: {}", eventType, order.getId());
-        return; // Do not save if we don't know the event
+        return; // Do not save for unknown event types
       }
     }
 
@@ -427,5 +445,68 @@ public class OrderService {
 
     orderRepository.save(order);
     paymentRepository.save(payment);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void reconcileSingleOrder(Long orderId) {
+    OrderEntity order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(
+                () -> new RuntimeException("Order not found during reconciliation: " + orderId));
+
+    // Guard: re-check status inside the new transaction to avoid race conditions
+    if (order.getStatus() != OrderStatus.PENDING) {
+      log.debug(
+          "Reconciliation: order {} already in status {}, skipping", orderId, order.getStatus());
+      return;
+    }
+
+    PaymentEntity payment = order.getPayment();
+    if (payment == null || payment.getTransactionId() == null) {
+      log.warn("Reconciliation: order {} has no payment/transactionId, skipping", orderId);
+      return;
+    }
+
+    String sessionId = payment.getTransactionId();
+    log.info("Reconciliation: checking Stripe session {} for order {}", sessionId, orderId);
+
+    Session session = stripeAdapter.retrieveSession(sessionId);
+    String status = session.getStatus(); // "complete" | "expired" | "open"
+
+    switch (status) {
+      case "complete" -> {
+        log.info(
+            "Reconciliation: session {} is complete — marking order {} CONFIRMED",
+            sessionId,
+            orderId);
+        order.setStatus(OrderStatus.CONFIRMED);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaidAt(Instant.now());
+
+        List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+        inventoryService.deductStock(items);
+
+        orderRepository.save(order);
+        paymentRepository.save(payment);
+      }
+      case "expired" -> {
+        log.warn("Reconciliation: session {} expired — cancelling order {}", sessionId, orderId);
+        order.setStatus(OrderStatus.CANCELLED);
+        payment.setStatus(PaymentStatus.FAILED);
+
+        List<OrderItemEntity> items = orderItemRepository.findByOrderId(orderId);
+        inventoryService.releaseStock(items);
+
+        orderRepository.save(order);
+        paymentRepository.save(payment);
+      }
+      default ->
+          log.warn(
+              "Reconciliation: session {} status={} for order {} — no action taken",
+              sessionId,
+              status,
+              orderId);
+    }
   }
 }
