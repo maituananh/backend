@@ -251,6 +251,7 @@ public class ProductService {
     productEntity.setStockQty(dto.getStockQty());
     productEntity.setCategory(categoryEntity);
     productEntity.setCustomer(userEntity);
+    productEntity.setDailyProfit(dto.getDailyProfit());
 
     if (dto.getCode() != null) {
       productEntity.setCode(dto.getCode());
