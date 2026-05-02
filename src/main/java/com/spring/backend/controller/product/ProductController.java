@@ -5,6 +5,7 @@ import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.product.ProductSearchDto;
+import com.spring.backend.helper.UserHelper;
 import com.spring.backend.service.ProductService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
   private final ProductService productService;
+  private final UserHelper userHelper;
+
+  @GetMapping("/me")
+  public List<ProductResponseDto> getMyProducts() {
+    return productService.getProductsByUserId(userHelper.getCurrentUserId());
+  }
 
   @PostMapping
   public ProductResponseDto createProduct(@RequestBody @Valid ProductRequestDto dto) {
