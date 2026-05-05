@@ -105,6 +105,7 @@ dependencies {
 
 	// domain module — pure Java, no framework deps
 	implementation project(':domain')
+	implementation project(':infrastructure')
 
 	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
