@@ -8,12 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.spring.backend.controller.order.OrderController;
+import com.spring.backend.domain.enums.PaymentMethod;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.page.Pagination;
-import com.spring.backend.enums.PaymentMethod;
 import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.service.OrderService;
 import com.spring.backend.service.PaymentGatewayService;

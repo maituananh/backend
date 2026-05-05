@@ -9,12 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.chat.ChatHistoryItemDto;
 import com.spring.backend.dto.chat.ChatRequestDto;
 import com.spring.backend.dto.chat.ChatResponseDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.AgentService;
 import com.spring.backend.service.ChatHistoryService;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class OpenAIChatControllerIT extends BaseIntegrationTest {
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
   @MockitoBean private AgentService agentService;
   @MockitoBean private ChatHistoryService chatHistoryService;

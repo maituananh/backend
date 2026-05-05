@@ -2,10 +2,10 @@ package com.spring.backend.service;
 
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.mapper.CategoryMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-  private final CategoryRepository categoryRepository;
-  private final UserRepository userRepository;
+  private final CategoryJpaRepository categoryRepository;
+  private final UserJpaRepository userRepository;
 
   @Override
   public CategoryResponseDto createCategory(CategoryRequestDto dto) {
@@ -69,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public Page<CategoryResponseDto> searchByName(String name, int page, int size) {
 
-    Specification<CategoryEntity> spec = CategoryRepository.search(name);
+    Specification<CategoryEntity> spec = CategoryJpaRepository.search(name);
 
     Pageable pageable = PageRequest.of(page, size);
 

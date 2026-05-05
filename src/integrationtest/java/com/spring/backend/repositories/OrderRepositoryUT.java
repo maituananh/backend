@@ -2,13 +2,13 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.entity.PaymentEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.OrderRepository;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentMethod;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -30,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class OrderRepositoryUT {
 
-  @Autowired private OrderRepository orderRepository;
+  @Autowired private OrderJpaRepository orderRepository;
   @Autowired private TestEntityManager entityManager;
 
   private UserEntity user;

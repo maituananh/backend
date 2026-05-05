@@ -12,10 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.*;
 import com.spring.backend.dto.checkout.CheckoutRequest;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.*;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.*;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import java.math.BigDecimal;
@@ -30,14 +30,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @DisplayName("Order Controller Integration Tests")
 class OrderControllerIT extends BaseIntegrationTest {
 
-  @Autowired private OrderRepository orderRepository;
-  @Autowired private OrderItemRepository orderItemRepository;
-  @Autowired private PaymentRepository paymentRepository;
-  @Autowired private UserRepository userRepository;
-  @Autowired private ProductRepository productRepository;
-  @Autowired private CartRepository cartRepository;
-  @Autowired private CartItemRepository cartItemRepository;
-  @Autowired private ImageRepository imageRepository;
+  @Autowired private OrderJpaRepository orderRepository;
+  @Autowired private OrderItemJpaRepository orderItemRepository;
+  @Autowired private PaymentJpaRepository paymentRepository;
+  @Autowired private UserJpaRepository userRepository;
+  @Autowired private ProductJpaRepository productRepository;
+  @Autowired private CartJpaRepository cartRepository;
+  @Autowired private CartItemJpaRepository cartItemRepository;
+  @Autowired private ImageJpaRepository imageRepository;
 
   private UserEntity testUser;
   private UserEntity adminUser;

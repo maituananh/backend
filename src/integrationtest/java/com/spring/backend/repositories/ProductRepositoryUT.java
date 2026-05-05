@@ -2,12 +2,12 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class ProductRepositoryUT {
 
-  @Autowired private ProductRepository productRepository;
+  @Autowired private ProductJpaRepository productRepository;
   @Autowired private TestEntityManager entityManager;
 
   private ProductEntity product;
@@ -67,12 +67,13 @@ public class ProductRepositoryUT {
   @DisplayName("search specification should filter complexes")
   void search_Works() {
     Specification<ProductEntity> spec =
-        ProductRepository.search("Sample", ProductStatus.NEW, 100.0, null, null, null, null, null);
+        ProductJpaRepository.search(
+            "Sample", ProductStatus.NEW, 100.0, null, null, null, null, null);
     List<ProductEntity> result = productRepository.findAll(spec);
     assertThat(result).hasSize(1);
 
     spec =
-        ProductRepository.search(
+        ProductJpaRepository.search(
             "Sample", ProductStatus.SOLD_OUT, null, null, null, null, null, null);
     result = productRepository.findAll(spec);
     assertThat(result).isEmpty();
@@ -82,7 +83,7 @@ public class ProductRepositoryUT {
   @DisplayName("findByDateAndStatus should filter for scheduled tasks")
   void findByDateAndStatus_Works() {
     Specification<ProductEntity> spec =
-        ProductRepository.findByDateAndStatus("startDate", LocalDate.now(), ProductStatus.NEW);
+        ProductJpaRepository.findByDateAndStatus("startDate", LocalDate.now(), ProductStatus.NEW);
     List<ProductEntity> result = productRepository.findAll(spec);
     assertThat(result).hasSize(1);
   }

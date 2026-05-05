@@ -1,10 +1,10 @@
 package com.spring.backend.service;
 
-import com.spring.backend.entity.CartItemEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class InventoryService {
 
-  private final ProductRepository productRepository;
+  private final ProductJpaRepository productRepository;
 
   /**
    * Giữ chỗ (Reserve) tồn kho khi checkout. Sử dụng PESSIMISTIC_WRITE lock để tránh race condition
@@ -45,12 +45,14 @@ public class InventoryService {
       }
 
       product.setReservedQty(product.getReservedQty() + item.getQuantity());
+      product.setAvailableQty(product.getAvailableQty() - item.getQuantity());
       productRepository.save(product);
       log.info(
-          "Reserved {} units for product '{}', new reserved_qty={}",
+          "Reserved {} units for product '{}', new reserved_qty={}, new available_qty={}",
           item.getQuantity(),
           product.getName(),
-          product.getReservedQty());
+          product.getReservedQty(),
+          product.getAvailableQty());
     }
   }
 
@@ -103,10 +105,12 @@ public class InventoryService {
         continue;
       }
       product.setReservedQty(product.getReservedQty() - item.getQuantity());
+      product.setAvailableQty(product.getAvailableQty() + item.getQuantity());
       productRepository.save(product);
       log.info(
-          "Released reserve for product '{}', new available_qty={}",
+          "Released reserve for product '{}', new reserved_qty={}, new available_qty={}",
           product.getName(),
+          product.getReservedQty(),
           product.getAvailableQty());
     }
   }

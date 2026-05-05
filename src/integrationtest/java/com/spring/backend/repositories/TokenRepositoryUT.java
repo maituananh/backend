@@ -2,8 +2,8 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.TokenEntity;
-import com.spring.backend.repository.TokenRepository;
+import com.spring.backend.infrastructure.entity.TokenEntity;
+import com.spring.backend.infrastructure.repository.TokenJpaRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class TokenRepositoryUT {
 
-  @Autowired private TokenRepository tokenRepository;
+  @Autowired private TokenJpaRepository tokenRepository;
   @Autowired private TestEntityManager entityManager;
 
   private TokenEntity token;

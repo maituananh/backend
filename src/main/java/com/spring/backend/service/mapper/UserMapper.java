@@ -1,10 +1,10 @@
 package com.spring.backend.service.mapper;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.chat.ProfileResultDto;
 import com.spring.backend.dto.user.UserDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
+import com.spring.backend.infrastructure.entity.UserEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.AccessLevel;

@@ -7,11 +7,11 @@ import static org.mockito.Mockito.*;
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.dto.auth.AuthResponseDto;
 import com.spring.backend.dto.auth.RenewTokenRequestDto;
-import com.spring.backend.entity.TokenEntity;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.JwtTokenHelper;
-import com.spring.backend.repository.TokenRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.TokenEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.TokenJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.apache.coyote.BadRequestException;
@@ -26,10 +26,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceUT {
 
-  @Mock private TokenRepository tokenRepository;
+  @Mock private TokenJpaRepository tokenRepository;
   @Mock private AuthenticationManager authenticationManager;
   @Mock private JwtTokenHelper jwtTokenHelper;
-  @Mock private UserRepository userRepository;
+  @Mock private UserJpaRepository userRepository;
 
   @InjectMocks private AuthService authService;
 

@@ -2,8 +2,8 @@ package com.spring.backend.service.mapper;
 
 import com.spring.backend.dto.cart.CartItemResponseDto;
 import com.spring.backend.dto.cart.CartResponseDto;
-import com.spring.backend.entity.CartEntity;
-import com.spring.backend.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
 
 public class CartMapper {
 

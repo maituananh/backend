@@ -10,10 +10,10 @@ import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.dto.chat.ProfileResultDto;
 import com.spring.backend.dto.classifier.AgentContext;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.AgentAIStep;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.AIClient;
 import com.spring.backend.service.chat.AIIntent;
 import com.spring.backend.service.chat.ProfileService;
@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceUT {
 
-  @Mock private UserRepository userRepository;
+  @Mock private UserJpaRepository userRepository;
   @Mock private UserHelper userHelper;
   @Mock private S3Adapter s3Adapter;
   @Mock private AIClient aiClient;

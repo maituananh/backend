@@ -5,13 +5,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.product.ProductRepository;
 import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.product.ProductSearchDto;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +31,12 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceUT {
 
-  @Mock private CategoryRepository categoryRepository;
-  @Mock private UserRepository userRepository;
-  @Mock private ProductRepository productRepository;
-  @Mock private ImageRepository imageRepository;
-  @Mock private CartItemRepository cartItemRepository;
+  @Mock private CategoryJpaRepository categoryRepository;
+  @Mock private UserJpaRepository userRepository;
+  @Mock private ProductRepository productRepository; // domain port — D-06
+  @Mock private ProductJpaRepository productJpaRepository; // JPA repo for entity-level operations
+  @Mock private ImageJpaRepository imageRepository;
+  @Mock private CartItemJpaRepository cartItemRepository;
   @Mock private S3Adapter s3Adapter;
 
   @InjectMocks private ProductService productService;
@@ -48,7 +50,7 @@ class ProductServiceUT {
     img.setFileName("test.jpg");
     p1.setImages(List.of(img));
 
-    when(productRepository.findAll()).thenReturn(List.of(p1));
+    when(productJpaRepository.findAll()).thenReturn(List.of(p1));
     when(s3Adapter.getUrl("test.jpg")).thenReturn("http://url");
 
     List<ProductResponseDto> result = productService.getAll();
@@ -82,10 +84,10 @@ class ProductServiceUT {
     when(imageRepository.findAllById(anyList())).thenReturn(List.of(img));
     when(userRepository.findById(10L)).thenReturn(Optional.of(user));
     when(categoryRepository.findByIdAndIsActive(20L, true)).thenReturn(Optional.of(category));
-    when(productRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+    when(productJpaRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
     productService.createProduct(dto);
-    verify(productRepository).save(any());
+    verify(productJpaRepository).save(any());
   }
 
   @Test
@@ -93,7 +95,7 @@ class ProductServiceUT {
   void deleteById_SoldOut() {
     ProductEntity product = new ProductEntity();
     product.setStatus(ProductStatus.SOLD_OUT);
-    when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+    when(productJpaRepository.findById(1L)).thenReturn(Optional.of(product));
 
     assertThatThrownBy(() -> productService.deleteById(1L))
         .isInstanceOf(RuntimeException.class)
@@ -109,7 +111,7 @@ class ProductServiceUT {
 
     Page<ProductEntity> page =
         new PageImpl<>(List.of(new ProductEntity()), PageRequest.of(0, 10), 1);
-    when(productRepository.findAll(any(Specification.class), any(PageRequest.class)))
+    when(productJpaRepository.findAll(any(Specification.class), any(PageRequest.class)))
         .thenReturn(page);
 
     Pagination<ProductResponseDto> result = productService.search(dto);
@@ -122,8 +124,8 @@ class ProductServiceUT {
     ProductEntity product = new ProductEntity();
     product.setStatus(ProductStatus.NEW);
     product.setImages(new ArrayList<>());
-    when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-    when(productRepository.save(any())).thenReturn(product);
+    when(productJpaRepository.findById(1L)).thenReturn(Optional.of(product));
+    when(productJpaRepository.save(any())).thenReturn(product);
 
     productService.liquidationProduct(1L);
     assertThat(product.getStatus()).isEqualTo(ProductStatus.LIQUIDATION);
@@ -134,10 +136,10 @@ class ProductServiceUT {
   void updateStatusIsProgress_Works() {
     ProductEntity p = new ProductEntity();
     p.setStatus(ProductStatus.NEW);
-    when(productRepository.findAll(any(Specification.class))).thenReturn(List.of(p));
+    when(productJpaRepository.findAll(any(Specification.class))).thenReturn(List.of(p));
 
     productService.updateStatusIsProgress();
     assertThat(p.getStatus()).isEqualTo(ProductStatus.IN_PROGRESS);
-    verify(productRepository).saveAll(any());
+    verify(productJpaRepository).saveAll(any());
   }
 }

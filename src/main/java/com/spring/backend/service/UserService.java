@@ -4,8 +4,8 @@ import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.adapter.s3.dto.UploadFileDto;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
   private final S3Adapter s3Adapter;
 
   public List<UserDto> getAll() {
@@ -60,7 +60,7 @@ public class UserService {
 
   public Page<UserDto> searchUser(
       String name, String email, String phone, String cardId, String username, int page, int size) {
-    Specification<UserEntity> spec = UserRepository.search(name, email, phone, cardId, username);
+    Specification<UserEntity> spec = UserJpaRepository.search(name, email, phone, cardId, username);
     Pageable pageable = PageRequest.of(page, size);
 
     Page<UserEntity> usersEntities = userRepository.findAll(spec, pageable);

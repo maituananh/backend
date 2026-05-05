@@ -2,11 +2,11 @@ package com.spring.backend.service;
 
 import com.spring.backend.dto.card.CardRequestDto;
 import com.spring.backend.dto.card.CardResponseDto;
-import com.spring.backend.entity.CardEntity;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.CardRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CardEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CardJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CardService {
 
-  private final CardRepository cardRepository;
-  private final UserRepository userRepository;
+  private final CardJpaRepository cardRepository;
+  private final UserJpaRepository userRepository;
   private final UserHelper userHelper;
 
   @Transactional

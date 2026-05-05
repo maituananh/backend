@@ -1,11 +1,11 @@
 package com.spring.backend.controller.order;
 
+import com.spring.backend.domain.enums.OrderStatus;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.page.Pagination;
-import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.service.OrderService;
 import com.spring.backend.service.PaymentGatewayService;

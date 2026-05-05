@@ -5,10 +5,10 @@ import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.ProfileChatResponseDto;
 import com.spring.backend.dto.chat.ProfileResultDto;
 import com.spring.backend.dto.classifier.AgentContext;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.AgentAIStep;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.AIClient;
 import com.spring.backend.service.mapper.UserMapper;
 import java.util.Map;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProfileService extends AbstractChatService {
 
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
   private final UserHelper userHelper;
   private final S3Adapter s3Adapter;
   private final AIClient aiClient;

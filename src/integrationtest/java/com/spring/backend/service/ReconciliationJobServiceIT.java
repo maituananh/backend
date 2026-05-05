@@ -4,21 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.spring.backend.adapter.stripe.StripeAdapter;
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.PaymentEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.enums.PaymentStatus;
-import com.spring.backend.enums.UserRole;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentMethod;
+import com.spring.backend.domain.enums.PaymentStatus;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.OrderItemJpaRepository;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
+import com.spring.backend.infrastructure.repository.PaymentJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.job.ReconciliationJobService;
-import com.spring.backend.repository.OrderItemRepository;
-import com.spring.backend.repository.OrderRepository;
-import com.spring.backend.repository.PaymentRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
 import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -39,15 +39,15 @@ class ReconciliationJobServiceIT {
 
   @Autowired private ReconciliationJobService reconciliationJobService;
 
-  @Autowired private OrderRepository orderRepository;
+  @Autowired private OrderJpaRepository orderRepository;
 
-  @Autowired private PaymentRepository paymentRepository;
+  @Autowired private PaymentJpaRepository paymentRepository;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
-  @Autowired private ProductRepository productRepository;
+  @Autowired private ProductJpaRepository productRepository;
 
-  @Autowired private OrderItemRepository orderItemRepository;
+  @Autowired private OrderItemJpaRepository orderItemRepository;
 
   @Autowired private JdbcTemplate jdbcTemplate;
 

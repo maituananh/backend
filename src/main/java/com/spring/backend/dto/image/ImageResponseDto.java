@@ -1,6 +1,6 @@
 package com.spring.backend.dto.image;
 
-import com.spring.backend.entity.ImageEntity;
+import com.spring.backend.infrastructure.entity.ImageEntity;
 import lombok.*;
 
 @Getter

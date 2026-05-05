@@ -1,14 +1,14 @@
 package com.spring.backend.service.chat;
 
+import com.spring.backend.domain.enums.OrderStatus;
 import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.OrderChatResponseDto;
 import com.spring.backend.dto.chat.OrderResultDto;
 import com.spring.backend.dto.classifier.AgentContext;
-import com.spring.backend.entity.OrderEntity;
 import com.spring.backend.enums.AgentAIStep;
-import com.spring.backend.enums.OrderStatus;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.OrderRepository;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
 import com.spring.backend.service.AIClient;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class OrderChatService extends AbstractChatService {
 
   private final AIClient aiClient;
-  private final OrderRepository orderRepository;
+  private final OrderJpaRepository orderRepository;
   private final UserHelper userHelper;
 
   @Override

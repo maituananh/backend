@@ -1,8 +1,8 @@
 package com.spring.backend.configuration.database;
 
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class InitDB implements CommandLineRunner {
 
   private final PasswordEncoder passwordEncoder;
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
 
   @Override
   public void run(String... args) {

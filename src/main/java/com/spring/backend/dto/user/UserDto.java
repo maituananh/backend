@@ -1,6 +1,6 @@
 package com.spring.backend.dto.user;
 
-import com.spring.backend.enums.UserRole;
+import com.spring.backend.domain.enums.UserRole;
 import lombok.*;
 
 @Setter

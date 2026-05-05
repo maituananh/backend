@@ -2,12 +2,12 @@ package com.spring.backend.service;
 
 import com.spring.backend.adapter.stripe.StripeAdapter;
 import com.spring.backend.adapter.stripe.dto.request.PaymentRequest;
+import com.spring.backend.domain.enums.PaymentMethod;
 import com.spring.backend.dto.order.WebhookPayload;
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.PaymentEntity;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.repository.PaymentRepository;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.repository.PaymentJpaRepository;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import java.math.RoundingMode;
@@ -26,7 +26,7 @@ public class PaymentGatewayService {
   private String webhookSecret;
 
   private final StripeAdapter stripeAdapter;
-  private final PaymentRepository paymentRepository;
+  private final PaymentJpaRepository paymentRepository;
 
   /**
    * Tạo payment URL cho order. - STRIPE: tạo Stripe Checkout Session và trả session URL - CASH:

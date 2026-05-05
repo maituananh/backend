@@ -9,10 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.image.ImageResponseDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.FileUploadService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 class FileUploadControllerIT extends BaseIntegrationTest {
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
   @MockitoBean private FileUploadService fileUploadService;
 

@@ -2,11 +2,11 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.CartItemStatus;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.CartItemRepository;
+import com.spring.backend.domain.enums.CartItemStatus;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class CartItemRepositoryUT {
 
-  @Autowired private CartItemRepository cartItemRepository;
+  @Autowired private CartItemJpaRepository cartItemRepository;
   @Autowired private TestEntityManager entityManager;
 
   private CartEntity cart;

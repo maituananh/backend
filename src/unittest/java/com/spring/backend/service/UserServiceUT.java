@@ -8,8 +8,8 @@ import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.adapter.s3.dto.UploadFileDto;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
 import com.spring.backend.dto.user.UserDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class UserServiceUT {
 
-  @Mock private UserRepository userRepository;
+  @Mock private UserJpaRepository userRepository;
   @Mock private S3Adapter s3Adapter;
 
   @InjectMocks private UserService userService;

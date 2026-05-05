@@ -2,9 +2,9 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class UserRepositoryUT {
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
   @Autowired private TestEntityManager entityManager;
 
   private UserEntity user;
@@ -70,11 +70,11 @@ public class UserRepositoryUT {
   @DisplayName("search specification should filter by various fields")
   void search_Works() {
     Specification<UserEntity> spec =
-        UserRepository.search("Test", "test@gmail.com", null, null, "test");
+        UserJpaRepository.search("Test", "test@gmail.com", null, null, "test");
     List<UserEntity> results = userRepository.findAll(spec);
     assertThat(results).hasSize(1);
 
-    spec = UserRepository.search("Nonexistent", null, null, null, null);
+    spec = UserJpaRepository.search("Nonexistent", null, null, null, null);
     results = userRepository.findAll(spec);
     assertThat(results).isEmpty();
   }
