@@ -1,29 +1,57 @@
 package com.spring.backend.infrastructure.adapter;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
-/**
- * Unit tests for ProductRepositoryAdapter — covers INFRA-01. Stubs filled in after Plan 09-04
- * creates the adapter class.
- */
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.product.Product;
+import com.spring.backend.domain.product.ProductQuantity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.mapper.ProductMapper;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 class ProductRepositoryAdapterUT {
 
-  @Test
-  @Disabled("Stub — implemented after ProductRepositoryAdapter is created in Plan 09-04")
-  void findById_delegatesToJpaRepositoryAndMapsResult() {
-    // TODO: mock ProductJpaRepository and ProductMapper
-    // given: jpaRepository.findById(1L) returns Optional.of(productEntity)
-    //        mapper.toDomain(productEntity) returns domainProduct
-    // when: adapter.findById(1L)
-    // then: Optional containing domainProduct is returned
+  @Mock private ProductJpaRepository jpaRepository;
+
+  @Mock private ProductMapper mapper;
+
+  private ProductRepositoryAdapter adapter;
+
+  @BeforeEach
+  void setUp() {
+    adapter = new ProductRepositoryAdapter(jpaRepository, mapper);
   }
 
   @Test
-  @Disabled("Stub — implemented after ProductRepositoryAdapter is created in Plan 09-04")
+  void findById_delegatesToJpaRepositoryAndMapsResult() {
+    ProductEntity entity = new ProductEntity();
+    Product domainProduct =
+        Product.reconstitute(
+            1L, "Test", 100.0, new ProductQuantity(10, 2), ProductStatus.NEW, true, null, null);
+
+    when(jpaRepository.findById(1L)).thenReturn(Optional.of(entity));
+    when(mapper.toDomain(entity)).thenReturn(domainProduct);
+
+    Optional<Product> result = adapter.findById(1L);
+
+    assertThat(result).isPresent();
+    assertThat(result.get().getName()).isEqualTo("Test");
+  }
+
+  @Test
   void findById_returnsEmptyWhenNotFound() {
-    // TODO: jpaRepository.findById returns Optional.empty()
-    // when: adapter.findById(99L)
-    // then: Optional.empty() returned
+    when(jpaRepository.findById(99L)).thenReturn(Optional.empty());
+
+    Optional<Product> result = adapter.findById(99L);
+
+    assertThat(result).isEmpty();
   }
 }
