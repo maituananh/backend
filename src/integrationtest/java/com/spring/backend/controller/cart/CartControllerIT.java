@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.config.IntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.cart.AddToCartRequestDto;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.*;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,15 +30,15 @@ class CartControllerIT {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Autowired private CartRepository cartRepository;
+  @Autowired private CartJpaRepository cartRepository;
 
-  @Autowired private CartItemRepository cartItemRepository;
+  @Autowired private CartItemJpaRepository cartItemRepository;
 
-  @Autowired private ProductRepository productRepository;
+  @Autowired private ProductJpaRepository productRepository;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired private CategoryJpaRepository categoryRepository;
 
   private UserEntity testUser;
   private ProductEntity testProduct;

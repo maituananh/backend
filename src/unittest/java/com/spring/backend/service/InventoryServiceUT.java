@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.spring.backend.entity.CartItemEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class InventoryServiceUT {
 
-  @Mock private ProductRepository productRepository;
+  @Mock private ProductJpaRepository productRepository;
 
   @InjectMocks private InventoryService inventoryService;
 

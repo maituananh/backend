@@ -8,9 +8,9 @@ import static org.mockito.Mockito.*;
 import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.CreateAccountChatResponseDto;
 import com.spring.backend.dto.classifier.AgentContext;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.AgentAIStep;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.AIClient;
 import com.spring.backend.service.chat.AIIntent;
 import com.spring.backend.service.chat.CreateAccountService;
@@ -28,7 +28,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 class CreateAccountServiceUT {
 
   @Mock private AIClient aiClient;
-  @Mock private UserRepository userRepository;
+  @Mock private UserJpaRepository userRepository;
   @Mock private BCryptPasswordEncoder passwordEncoder;
 
   @InjectMocks private CreateAccountService createAccountService;

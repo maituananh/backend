@@ -2,8 +2,8 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.repository.CategoryRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class CategoryRepositoryUT {
 
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired private CategoryJpaRepository categoryRepository;
   @Autowired private TestEntityManager entityManager;
 
   private CategoryEntity active;

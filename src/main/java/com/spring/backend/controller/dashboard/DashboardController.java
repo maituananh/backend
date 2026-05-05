@@ -1,7 +1,7 @@
 package com.spring.backend.controller.dashboard;
 
 import com.spring.backend.dto.dashboard.DashboardResponseDto;
-import com.spring.backend.entity.ProductStatistic;
+import com.spring.backend.infrastructure.entity.ProductStatistic;
 import com.spring.backend.service.DashboardService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

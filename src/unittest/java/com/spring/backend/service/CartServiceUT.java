@@ -7,12 +7,12 @@ import static org.mockito.Mockito.*;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.dto.cart.AddToCartRequestDto;
 import com.spring.backend.dto.cart.CartResponseDto;
-import com.spring.backend.entity.*;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.CartItemRepository;
-import com.spring.backend.repository.CartRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.CartJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +26,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CartServiceUT {
 
-  @Mock private CartRepository cartRepository;
-  @Mock private CartItemRepository cartItemRepository;
-  @Mock private ProductRepository productRepository;
-  @Mock private UserRepository userRepository;
+  @Mock private CartJpaRepository cartRepository;
+  @Mock private CartItemJpaRepository cartItemRepository;
+  @Mock private ProductJpaRepository productRepository;
+  @Mock private UserJpaRepository userRepository;
   @Mock private UserHelper userHelper;
   @Mock private S3Adapter s3Adapter;
 
@@ -89,7 +89,8 @@ class CartServiceUT {
     product.setPrice(100.0);
     product.setIsActived(true);
     existing.setProduct(product);
-    existing.setStatus(com.spring.backend.enums.CartItemStatus.PENDING); // Required by mapper
+    existing.setStatus(
+        com.spring.backend.domain.enums.CartItemStatus.PENDING); // Required by mapper
 
     when(userHelper.getCurrentUserId()).thenReturn(userId);
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));

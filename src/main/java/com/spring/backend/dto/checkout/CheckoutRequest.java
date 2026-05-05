@@ -1,6 +1,6 @@
 package com.spring.backend.dto.checkout;
 
-import com.spring.backend.enums.PaymentMethod;
+import com.spring.backend.domain.enums.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

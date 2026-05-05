@@ -7,8 +7,8 @@ import static org.mockito.Mockito.*;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.adapter.s3.dto.UploadFileDto;
 import com.spring.backend.dto.image.ImageResponseDto;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.repository.ImageRepository;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.repository.ImageJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class FileUploadServiceUT {
 
-  @Mock private ImageRepository imageRepository;
+  @Mock private ImageJpaRepository imageRepository;
   @Mock private S3Adapter s3Adapter;
 
   @InjectMocks private FileUploadService fileUploadService;

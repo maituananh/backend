@@ -4,10 +4,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.enums.OrderStatus;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
 import com.spring.backend.job.ReconciliationJobService;
-import com.spring.backend.repository.OrderRepository;
 import com.spring.backend.service.OrderService;
 import java.time.Instant;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("ReconciliationJobService Unit Tests")
 class ReconciliationJobServiceUT {
 
-  @Mock private OrderRepository orderRepository;
+  @Mock private OrderJpaRepository orderRepository;
   @Mock private OrderService orderService;
   @InjectMocks private ReconciliationJobService reconciliationJobService;
 

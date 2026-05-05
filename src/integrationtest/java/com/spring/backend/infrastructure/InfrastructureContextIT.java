@@ -15,9 +15,9 @@ class InfrastructureContextIT {
   @Test
   @Disabled("Stub — implemented after all adapters created in Plan 09-04")
   void contextLoads_allDomainRepositoryAdaptersAreWired() {
-    // TODO: @Autowired ProductRepository productRepo (domain interface)
-    // TODO: @Autowired CartRepository cartRepo
-    // TODO: @Autowired OrderRepository orderRepo
+    // TODO: @Autowired ProductJpaRepository productRepo (domain interface)
+    // TODO: @Autowired CartJpaRepository cartRepo
+    // TODO: @Autowired OrderJpaRepository orderRepo
     // then: all are non-null (adapter beans resolved)
   }
 }

@@ -12,27 +12,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.CartItemStatus;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentMethod;
+import com.spring.backend.domain.enums.PaymentStatus;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.checkout.CheckoutRequest;
-import com.spring.backend.entity.CartEntity;
-import com.spring.backend.entity.CartItemEntity;
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.PaymentEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.CartItemStatus;
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.enums.PaymentStatus;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.CartItemRepository;
-import com.spring.backend.repository.CartRepository;
-import com.spring.backend.repository.OrderItemRepository;
-import com.spring.backend.repository.OrderRepository;
-import com.spring.backend.repository.PaymentRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.CartJpaRepository;
+import com.spring.backend.infrastructure.repository.OrderItemJpaRepository;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
+import com.spring.backend.infrastructure.repository.PaymentJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.stripe.model.Event;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -52,13 +52,13 @@ class InventoryFlowControllerIT extends BaseIntegrationTest {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
-  @Autowired private ProductRepository productRepository;
-  @Autowired private CartRepository cartRepository;
-  @Autowired private CartItemRepository cartItemRepository;
-  @Autowired private UserRepository userRepository;
-  @Autowired private OrderRepository orderRepository;
-  @Autowired private OrderItemRepository orderItemRepository;
-  @Autowired private PaymentRepository paymentRepository;
+  @Autowired private ProductJpaRepository productRepository;
+  @Autowired private CartJpaRepository cartRepository;
+  @Autowired private CartItemJpaRepository cartItemRepository;
+  @Autowired private UserJpaRepository userRepository;
+  @Autowired private OrderJpaRepository orderRepository;
+  @Autowired private OrderItemJpaRepository orderItemRepository;
+  @Autowired private PaymentJpaRepository paymentRepository;
 
   @BeforeEach
   void setUp() {

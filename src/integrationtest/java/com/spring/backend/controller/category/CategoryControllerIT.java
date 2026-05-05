@@ -7,12 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.category.CategoryRequestDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,9 +24,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @DisplayName("Category Controller Integration Tests")
 class CategoryControllerIT extends BaseIntegrationTest {
 
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired private CategoryJpaRepository categoryRepository;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
   private UserEntity testUser;
 

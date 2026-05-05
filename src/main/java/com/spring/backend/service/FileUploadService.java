@@ -3,8 +3,8 @@ package com.spring.backend.service;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.adapter.s3.dto.UploadFileDto;
 import com.spring.backend.dto.image.ImageResponseDto;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.repository.ImageRepository;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.repository.ImageJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class FileUploadService {
 
-  private final ImageRepository imageRepository;
+  private final ImageJpaRepository imageRepository;
   private final S3Adapter s3Adapter;
 
   @Transactional

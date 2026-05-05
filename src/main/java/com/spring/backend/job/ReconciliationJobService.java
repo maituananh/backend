@@ -1,7 +1,7 @@
 package com.spring.backend.job;
 
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.repository.OrderRepository;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
 import com.spring.backend.service.OrderService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -30,7 +30,7 @@ public class ReconciliationJobService {
    */
   private static final int STUCK_THRESHOLD_MINUTES = 5;
 
-  private final OrderRepository orderRepository;
+  private final OrderJpaRepository orderRepository;
   private final OrderService orderService;
 
   @Recurring(id = "reconcile-stuck-pending-orders", cron = "0 */15 * * * *")

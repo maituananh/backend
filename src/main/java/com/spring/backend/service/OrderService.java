@@ -3,18 +3,29 @@ package com.spring.backend.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.adapter.stripe.StripeAdapter;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentMethod;
+import com.spring.backend.domain.enums.PaymentStatus;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.checkout.CheckoutRequest;
 import com.spring.backend.dto.checkout.CheckoutResponse;
 import com.spring.backend.dto.order.OrderDetailResponse;
 import com.spring.backend.dto.order.OrderStatusResponse;
 import com.spring.backend.dto.order.WebhookPayload;
 import com.spring.backend.dto.page.Pagination;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentStatus;
 import com.spring.backend.exception.DuplicateWebhookEventException;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.OrderItemJpaRepository;
+import com.spring.backend.infrastructure.repository.OrderJpaRepository;
+import com.spring.backend.infrastructure.repository.PaymentJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
@@ -34,14 +45,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class OrderService {
 
-  private final OrderRepository orderRepository;
-  private final OrderItemRepository orderItemRepository;
-  private final PaymentRepository paymentRepository;
-  private final CartItemRepository cartItemRepository;
+  private final OrderJpaRepository orderRepository;
+  private final OrderItemJpaRepository orderItemRepository;
+  private final PaymentJpaRepository paymentRepository;
+  private final CartItemJpaRepository cartItemRepository;
   private final PaymentGatewayService paymentGatewayService;
   private final InventoryService inventoryService;
   private final UserHelper userHelper;
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
   private final S3Adapter s3Adapter;
   private final ObjectMapper objectMapper;
   private final StripeAdapter stripeAdapter;
@@ -343,7 +354,7 @@ public class OrderService {
         userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
     OrderEntity order;
-    if (user.getRole() == com.spring.backend.enums.UserRole.ADMIN) {
+    if (user.getRole() == UserRole.ADMIN) {
       order =
           orderRepository
               .findById(orderId)
@@ -405,7 +416,7 @@ public class OrderService {
         userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
     OrderEntity order;
-    if (user.getRole() == com.spring.backend.enums.UserRole.ADMIN) {
+    if (user.getRole() == UserRole.ADMIN) {
       order =
           orderRepository
               .findById(orderId)
@@ -429,7 +440,7 @@ public class OrderService {
 
     // Nếu đã thanh toán thành công, thực hiện hoàn tiền trên Stripe
     if (payment.getStatus() == PaymentStatus.SUCCESS
-        && payment.getPaymentMethod() != com.spring.backend.enums.PaymentMethod.CASH) {
+        && payment.getPaymentMethod() != PaymentMethod.CASH) {
       log.info("Initiating refund for order: {}", orderId);
       paymentGatewayService.refund(payment.getTransactionId());
       payment.setStatus(PaymentStatus.REFUNDED);

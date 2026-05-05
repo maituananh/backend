@@ -1,7 +1,7 @@
 package com.spring.backend.dto.order;
 
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentStatus;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentStatus;
 import lombok.Builder;
 import lombok.Data;
 

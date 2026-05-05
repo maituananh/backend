@@ -6,11 +6,11 @@ import static org.mockito.Mockito.*;
 
 import com.spring.backend.dto.card.CardRequestDto;
 import com.spring.backend.dto.card.CardResponseDto;
-import com.spring.backend.entity.CardEntity;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.CardRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CardEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CardJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CardServiceUT {
 
-  @Mock private CardRepository cardRepository;
-  @Mock private UserRepository userRepository;
+  @Mock private CardJpaRepository cardRepository;
+  @Mock private UserJpaRepository userRepository;
   @Mock private UserHelper userHelper;
 
   @InjectMocks private CardService cardService;

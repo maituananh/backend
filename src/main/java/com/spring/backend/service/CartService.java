@@ -1,15 +1,18 @@
 package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.CartItemStatus;
 import com.spring.backend.dto.cart.AddToCartRequestDto;
 import com.spring.backend.dto.cart.CartResponseDto;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.CartItemStatus;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.CartItemRepository;
-import com.spring.backend.repository.CartRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.CartJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.mapper.CartMapper;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,10 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CartService {
 
-  private final CartRepository cartRepository;
-  private final CartItemRepository cartItemRepository;
-  private final ProductRepository productRepository;
-  private final UserRepository userRepository;
+  private final CartJpaRepository cartRepository;
+  private final CartItemJpaRepository cartItemRepository;
+  private final ProductJpaRepository productRepository;
+  private final UserJpaRepository userRepository;
   private final UserHelper userHelper;
   private final S3Adapter s3Adapter;
 

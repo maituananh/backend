@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.spring.backend.config.IntegrationTest;
-import com.spring.backend.entity.CartEntity;
-import com.spring.backend.entity.CartItemEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.CartItemStatus;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.ProductRepository;
+import com.spring.backend.domain.enums.CartItemStatus;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class InventoryServiceIT {
 
   @Autowired private InventoryService inventoryService;
-  @Autowired private ProductRepository productRepository;
+  @Autowired private ProductJpaRepository productRepository;
 
   @BeforeEach
   void cleanUp() {

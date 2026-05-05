@@ -1,22 +1,22 @@
 package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.ProductStatus;
 import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.product.ProductSearchDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.repository.CartItemRepository;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.ImageRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
+import com.spring.backend.infrastructure.repository.ImageJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.mapper.PageMapper;
 import com.spring.backend.service.mapper.ProductMapper;
 import java.math.BigDecimal;
@@ -39,11 +39,11 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class ProductService {
 
-  private final CategoryRepository categoryRepository;
-  private final UserRepository userRepository;
-  private final ProductRepository productRepository;
-  private final ImageRepository imageRepository;
-  private final CartItemRepository cartItemRepository;
+  private final CategoryJpaRepository categoryRepository;
+  private final UserJpaRepository userRepository;
+  private final ProductJpaRepository productRepository;
+  private final ImageJpaRepository imageRepository;
+  private final CartItemJpaRepository cartItemRepository;
   private final S3Adapter s3Adapter;
 
   private void validateProductDate(LocalDate startDate, LocalDate endDate, boolean isCreate) {
@@ -150,7 +150,7 @@ public class ProductService {
 
   public Pagination<ProductResponseDto> search(ProductSearchDto searchDto) {
     Specification<ProductEntity> spec =
-        ProductRepository.search(
+        ProductJpaRepository.search(
             searchDto.getName(),
             searchDto.getStatus(),
             searchDto.getPrice(),
@@ -291,7 +291,7 @@ public class ProductService {
 
     List<ProductEntity> productEntities =
         productRepository.findAll(
-            ProductRepository.findByDateAndStatus(
+            ProductJpaRepository.findByDateAndStatus(
                 "startDate", today.minusDays(2), ProductStatus.NEW));
 
     productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.IN_PROGRESS));
@@ -305,7 +305,7 @@ public class ProductService {
 
     List<ProductEntity> productEntities =
         productRepository.findAll(
-            ProductRepository.findByDateAndStatus("endDate", today, ProductStatus.IN_PROGRESS));
+            ProductJpaRepository.findByDateAndStatus("endDate", today, ProductStatus.IN_PROGRESS));
 
     productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.EXPIRED));
 

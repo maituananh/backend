@@ -1,15 +1,15 @@
 package com.spring.backend.service.mapper;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.ProductStatus;
 import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.ProductStatus;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
 import java.util.List;
 
 public class ProductMapper {

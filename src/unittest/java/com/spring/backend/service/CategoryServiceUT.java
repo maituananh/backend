@@ -6,10 +6,10 @@ import static org.mockito.Mockito.*;
 
 import com.spring.backend.dto.category.CategoryRequestDto;
 import com.spring.backend.dto.category.CategoryResponseDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +26,8 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceUT {
 
-  @Mock private CategoryRepository categoryRepository;
-  @Mock private UserRepository userRepository;
+  @Mock private CategoryJpaRepository categoryRepository;
+  @Mock private UserJpaRepository userRepository;
 
   @InjectMocks private CategoryServiceImpl categoryService;
 

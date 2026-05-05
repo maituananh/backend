@@ -2,10 +2,10 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.OrderItemRepository;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.OrderItemJpaRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class OrderItemRepositoryUT {
 
-  @Autowired private OrderItemRepository orderItemRepository;
+  @Autowired private OrderItemJpaRepository orderItemRepository;
   @Autowired private TestEntityManager entityManager;
 
   private OrderEntity order;

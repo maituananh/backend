@@ -5,13 +5,13 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.enums.ProductStatus;
 import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductRequestDto;
 import com.spring.backend.dto.product.ProductResponseDto;
 import com.spring.backend.dto.product.ProductSearchDto;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.*;
+import com.spring.backend.infrastructure.repository.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +30,11 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceUT {
 
-  @Mock private CategoryRepository categoryRepository;
-  @Mock private UserRepository userRepository;
-  @Mock private ProductRepository productRepository;
-  @Mock private ImageRepository imageRepository;
-  @Mock private CartItemRepository cartItemRepository;
+  @Mock private CategoryJpaRepository categoryRepository;
+  @Mock private UserJpaRepository userRepository;
+  @Mock private ProductJpaRepository productRepository;
+  @Mock private ImageJpaRepository imageRepository;
+  @Mock private CartItemJpaRepository cartItemRepository;
   @Mock private S3Adapter s3Adapter;
 
   @InjectMocks private ProductService productService;

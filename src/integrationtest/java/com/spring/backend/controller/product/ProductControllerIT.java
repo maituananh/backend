@@ -8,17 +8,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.backend.config.IntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.product.ProductRequestDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.entity.ProductEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.ProductStatus;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.CategoryRepository;
-import com.spring.backend.repository.ImageRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CategoryJpaRepository;
+import com.spring.backend.infrastructure.repository.ImageJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +38,13 @@ class ProductControllerIT {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Autowired private ProductRepository productRepository;
+  @Autowired private ProductJpaRepository productRepository;
 
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired private CategoryJpaRepository categoryRepository;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired private UserJpaRepository userRepository;
 
-  @Autowired private ImageRepository imageRepository;
+  @Autowired private ImageJpaRepository imageRepository;
 
   private UserEntity testUser;
   private CategoryEntity testCategory;

@@ -1,6 +1,6 @@
 package com.spring.backend.dto.product;
 
-import com.spring.backend.enums.ProductStatus;
+import com.spring.backend.domain.enums.ProductStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
