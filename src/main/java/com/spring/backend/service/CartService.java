@@ -1,15 +1,20 @@
 package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
+import com.spring.backend.domain.cart.CartRepository;
+import com.spring.backend.domain.enums.CartItemStatus;
+import com.spring.backend.domain.product.ProductRepository;
 import com.spring.backend.dto.cart.AddToCartRequestDto;
 import com.spring.backend.dto.cart.CartResponseDto;
-import com.spring.backend.entity.*;
-import com.spring.backend.enums.CartItemStatus;
 import com.spring.backend.helper.UserHelper;
-import com.spring.backend.repository.CartItemRepository;
-import com.spring.backend.repository.CartRepository;
-import com.spring.backend.repository.ProductRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.CartItemEntity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartItemJpaRepository;
+import com.spring.backend.infrastructure.repository.CartJpaRepository;
+import com.spring.backend.infrastructure.repository.ProductJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.mapper.CartMapper;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,10 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CartService {
 
-  private final CartRepository cartRepository;
-  private final CartItemRepository cartItemRepository;
-  private final ProductRepository productRepository;
-  private final UserRepository userRepository;
+  private final CartRepository cartRepository; // domain port — D-06
+  private final CartJpaRepository
+      cartJpaRepository; // ALL reads/saves route here (CartEntity required by CartMapper.toCartDto)
+  private final CartItemJpaRepository cartItemRepository;
+  private final ProductRepository productRepository; // domain port — D-06
+  private final ProductJpaRepository
+      productJpaRepository; // product entity reads (images needed in addToCart)
+  private final UserJpaRepository userRepository;
   private final UserHelper userHelper;
   private final S3Adapter s3Adapter;
 
@@ -52,12 +61,13 @@ public class CartService {
             .orElseThrow(() -> new RuntimeException("Customer not found"));
 
     CartEntity cart =
-        cartRepository
+        cartJpaRepository
             .findByCustomerId(customerId)
-            .orElseGet(() -> cartRepository.save(CartEntity.builder().customer(customer).build()));
+            .orElseGet(
+                () -> cartJpaRepository.save(CartEntity.builder().customer(customer).build()));
 
     ProductEntity product =
-        productRepository
+        productJpaRepository
             .findById(dto.getProductId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -85,7 +95,7 @@ public class CartService {
   public CartResponseDto getMyCart() {
     Long customerId = userHelper.getCurrentUserId();
 
-    CartEntity cart = cartRepository.findByCustomerId(customerId).orElse(null);
+    CartEntity cart = cartJpaRepository.findByCustomerId(customerId).orElse(null);
 
     return cart == null ? null : CartMapper.toCartDto(cart, this::getImage);
   }
@@ -95,7 +105,7 @@ public class CartService {
     Long customerId = userHelper.getCurrentUserId();
 
     CartEntity cart =
-        cartRepository
+        cartJpaRepository
             .findByCustomerId(customerId)
             .orElseThrow(() -> new RuntimeException("Cart not found"));
 

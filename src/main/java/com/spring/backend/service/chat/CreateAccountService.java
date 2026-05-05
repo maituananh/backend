@@ -1,13 +1,13 @@
 package com.spring.backend.service.chat;
 
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.chat.ChatResponseDto;
 import com.spring.backend.dto.chat.CreateAccountChatResponseDto;
 import com.spring.backend.dto.chat.CreateAccountResultDto;
 import com.spring.backend.dto.classifier.AgentContext;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.enums.AgentAIStep;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import com.spring.backend.service.AIClient;
 import java.time.LocalDate;
 import java.time.Period;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class CreateAccountService extends AbstractChatService {
 
   private final AIClient aiClient;
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override

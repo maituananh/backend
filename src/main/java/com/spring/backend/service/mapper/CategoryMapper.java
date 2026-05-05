@@ -1,8 +1,8 @@
 package com.spring.backend.service.mapper;
 
 import com.spring.backend.dto.category.CategoryResponseDto;
-import com.spring.backend.entity.CategoryEntity;
-import com.spring.backend.entity.UserEntity;
+import com.spring.backend.infrastructure.entity.CategoryEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

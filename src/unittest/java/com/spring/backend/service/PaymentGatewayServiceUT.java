@@ -7,12 +7,12 @@ import static org.mockito.Mockito.*;
 import com.spring.backend.adapter.stripe.StripeAdapter;
 import com.spring.backend.adapter.stripe.dto.request.PaymentRequest;
 import com.spring.backend.adapter.stripe.dto.response.PaymentResponse;
+import com.spring.backend.domain.enums.PaymentMethod;
 import com.spring.backend.dto.order.WebhookPayload;
-import com.spring.backend.entity.OrderEntity;
-import com.spring.backend.entity.OrderItemEntity;
-import com.spring.backend.entity.PaymentEntity;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.repository.PaymentRepository;
+import com.spring.backend.infrastructure.entity.OrderEntity;
+import com.spring.backend.infrastructure.entity.OrderItemEntity;
+import com.spring.backend.infrastructure.entity.PaymentEntity;
+import com.spring.backend.infrastructure.repository.PaymentJpaRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class PaymentGatewayServiceUT {
 
   @Mock private StripeAdapter stripeAdapter;
-  @Mock private PaymentRepository paymentRepository;
+  @Mock private PaymentJpaRepository paymentRepository;
 
   @InjectMocks private PaymentGatewayService paymentGatewayService;
 

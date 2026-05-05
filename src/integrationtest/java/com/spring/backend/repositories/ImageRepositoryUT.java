@@ -2,8 +2,8 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.ImageEntity;
-import com.spring.backend.repository.ImageRepository;
+import com.spring.backend.infrastructure.entity.ImageEntity;
+import com.spring.backend.infrastructure.repository.ImageJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class ImageRepositoryUT {
 
-  @Autowired private ImageRepository imageRepository;
+  @Autowired private ImageJpaRepository imageRepository;
   @Autowired private TestEntityManager entityManager;
 
   @Test
-  @DisplayName("ImageRepository should save and retrieve images")
+  @DisplayName("ImageJpaRepository should save and retrieve images")
   void saveAndRetrieve_Works() {
     ImageEntity image = ImageEntity.builder().fileName("test.png").build();
     ImageEntity saved = imageRepository.save(image);

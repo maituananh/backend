@@ -7,10 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.UserRole;
 import com.spring.backend.dto.user.UserDto;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.*;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,17 +19,17 @@ import org.springframework.http.MediaType;
 
 class UserControllerIT extends BaseIntegrationTest {
 
-  @Autowired private UserRepository userRepository;
-  @Autowired private CartItemRepository cartItemRepository;
-  @Autowired private CartRepository cartRepository;
-  @Autowired private OrderItemRepository orderItemRepository;
-  @Autowired private PaymentRepository paymentRepository;
-  @Autowired private OrderRepository orderRepository;
-  @Autowired private ImageRepository imageRepository;
-  @Autowired private ProductRepository productRepository;
-  @Autowired private CardRepository cardRepository;
-  @Autowired private TokenRepository tokenRepository;
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired private UserJpaRepository userRepository;
+  @Autowired private CartItemJpaRepository cartItemRepository;
+  @Autowired private CartJpaRepository cartRepository;
+  @Autowired private OrderItemJpaRepository orderItemRepository;
+  @Autowired private PaymentJpaRepository paymentRepository;
+  @Autowired private OrderJpaRepository orderRepository;
+  @Autowired private ImageJpaRepository imageRepository;
+  @Autowired private ProductJpaRepository productRepository;
+  @Autowired private CardJpaRepository cardRepository;
+  @Autowired private TokenJpaRepository tokenRepository;
+  @Autowired private CategoryJpaRepository categoryRepository;
 
   private UserEntity adminUser;
 

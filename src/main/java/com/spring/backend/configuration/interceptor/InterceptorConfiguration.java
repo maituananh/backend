@@ -3,10 +3,10 @@ package com.spring.backend.configuration.interceptor;
 import static com.spring.backend.helper.JwtTokenHelper.*;
 
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.JwtTokenHelper;
-import com.spring.backend.repository.TokenRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.TokenJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +24,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class InterceptorConfiguration extends OncePerRequestFilter {
 
-  private final UserRepository userRepository;
-  private final TokenRepository tokenRepository;
+  private final UserJpaRepository userRepository;
+  private final TokenJpaRepository tokenRepository;
   private final JwtTokenHelper jwtTokenHelper;
 
   @Override

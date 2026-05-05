@@ -1,7 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Skill(gsd-code-review)",
+      "Bash(gsd-sdk query *)",
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs audit-open --json)",
+      "Skill(gsd-execute-phase)",
+      "PowerShell(Stop-Process *)",
+      "Bash(git status -s)",
+      "Bash(ls -a)",
+      "Bash(git diff HEAD~1)",
+      "Bash(./gradlew test *)",
+      "Bash(xargs grep *)",
+      "Skill(gsd-discuss-phase)",
+      "Skill(gsd-plan-phase)",
+      "Bash(rtk gain *)",
+      "Bash(rtk git *)",
+      "Bash(git filter-repo *)",
+      "Bash(git filter-branch *)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch .planning/' HEAD~11..HEAD)"
     ]
   }
 }

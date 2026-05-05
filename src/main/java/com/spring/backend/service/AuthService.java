@@ -3,11 +3,11 @@ package com.spring.backend.service;
 import com.spring.backend.dto.auth.AuthRequestDto;
 import com.spring.backend.dto.auth.AuthResponseDto;
 import com.spring.backend.dto.auth.RenewTokenRequestDto;
-import com.spring.backend.entity.TokenEntity;
-import com.spring.backend.entity.UserEntity;
 import com.spring.backend.helper.JwtTokenHelper;
-import com.spring.backend.repository.TokenRepository;
-import com.spring.backend.repository.UserRepository;
+import com.spring.backend.infrastructure.entity.TokenEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.TokenJpaRepository;
+import com.spring.backend.infrastructure.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-  private final TokenRepository tokenRepository;
+  private final TokenJpaRepository tokenRepository;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenHelper jwtTokenHelper;
-  private final UserRepository userRepository;
+  private final UserJpaRepository userRepository;
 
   public AuthResponseDto createToken(AuthRequestDto authRequestDto) {
     authenticationManager.authenticate(

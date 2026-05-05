@@ -2,10 +2,10 @@ package com.spring.backend.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.backend.entity.CartEntity;
-import com.spring.backend.entity.UserEntity;
-import com.spring.backend.enums.UserRole;
-import com.spring.backend.repository.CartRepository;
+import com.spring.backend.domain.enums.UserRole;
+import com.spring.backend.infrastructure.entity.CartEntity;
+import com.spring.backend.infrastructure.entity.UserEntity;
+import com.spring.backend.infrastructure.repository.CartJpaRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class CartRepositoryUT {
 
-  @Autowired private CartRepository cartRepository;
+  @Autowired private CartJpaRepository cartRepository;
   @Autowired private TestEntityManager entityManager;
 
   private UserEntity user;

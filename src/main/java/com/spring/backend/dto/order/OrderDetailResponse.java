@@ -1,8 +1,8 @@
 package com.spring.backend.dto.order;
 
-import com.spring.backend.enums.OrderStatus;
-import com.spring.backend.enums.PaymentMethod;
-import com.spring.backend.enums.PaymentStatus;
+import com.spring.backend.domain.enums.OrderStatus;
+import com.spring.backend.domain.enums.PaymentMethod;
+import com.spring.backend.domain.enums.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
