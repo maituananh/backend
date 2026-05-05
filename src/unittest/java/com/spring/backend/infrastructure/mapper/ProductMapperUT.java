@@ -1,32 +1,60 @@
 package com.spring.backend.infrastructure.mapper;
 
-import org.junit.jupiter.api.Disabled;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.product.Product;
+import com.spring.backend.domain.product.ProductQuantity;
+import com.spring.backend.infrastructure.entity.ProductEntity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for ProductMapper — covers INFRA-01 mapping correctness. Stubs filled in after Plan
- * 09-03 creates the mapper.
- */
 class ProductMapperUT {
 
+  private ProductMapper mapper;
+
+  @BeforeEach
+  void setUp() {
+    mapper = new ProductMapperImpl();
+  }
+
   @Test
-  @Disabled("Stub — implemented after ProductMapper is created in Plan 09-03")
   void toDomain_constructsProductQuantityFromStockAndReservedQty() {
-    // TODO: build a ProductEntity with stockQty=10, reservedQty=3
-    // when: mapper.toDomain(entity)
-    // then: domain Product has quantity.stockQty==10, quantity.reservedQty==3,
-    //       quantity.availableQty()==7
+    ProductEntity entity = new ProductEntity();
+    entity.setStockQty(10);
+    entity.setReservedQty(3);
+    entity.setName("Test");
+    entity.setPrice(100.0);
+
+    Product product = mapper.toDomain(entity);
+
+    assertThat(product.getQuantity().getStockQty()).isEqualTo(10);
+    assertThat(product.getQuantity().getReservedQty()).isEqualTo(3);
+    assertThat(product.getQuantity().availableQty()).isEqualTo(7);
   }
 
   @Test
-  @Disabled("Stub — implemented after ProductMapper is created in Plan 09-03")
   void toDomain_convertsProductStatusEnum() {
-    // TODO: entity with ProductStatus.AVAILABLE → domain ProductStatus.AVAILABLE
+    ProductEntity entity = new ProductEntity();
+    entity.setStatus(ProductStatus.NEW);
+    entity.setStockQty(1);
+    entity.setReservedQty(0);
+
+    Product product = mapper.toDomain(entity);
+
+    assertThat(product.getStatus()).isEqualTo(ProductStatus.NEW);
   }
 
   @Test
-  @Disabled("Stub — implemented after ProductMapper is created in Plan 09-03")
   void toEntity_setsAvailableQtyFromQuantityComputed() {
-    // TODO: domain product with quantity(8, 2) → entity.availableQty == 6
+    ProductQuantity quantity = new ProductQuantity(8, 2);
+    Product product =
+        Product.reconstitute(1L, "Test", 99.0, quantity, ProductStatus.NEW, true, null, null);
+
+    ProductEntity entity = mapper.toEntity(product);
+
+    assertThat(entity.getAvailableQty()).isEqualTo(6);
+    assertThat(entity.getStockQty()).isEqualTo(8);
+    assertThat(entity.getReservedQty()).isEqualTo(2);
   }
 }
