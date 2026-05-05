@@ -2,6 +2,7 @@ package com.spring.backend.service;
 
 import com.spring.backend.adapter.s3.S3Adapter;
 import com.spring.backend.domain.enums.ProductStatus;
+import com.spring.backend.domain.product.ProductRepository;
 import com.spring.backend.dto.image.ImageResponseDto;
 import com.spring.backend.dto.page.Pagination;
 import com.spring.backend.dto.product.ProductDetailResponseDto;
@@ -41,7 +42,9 @@ public class ProductService {
 
   private final CategoryJpaRepository categoryRepository;
   private final UserJpaRepository userRepository;
-  private final ProductJpaRepository productRepository;
+  private final ProductRepository productRepository; // domain port — D-06
+  private final ProductJpaRepository
+      productJpaRepository; // JPA repo: entity-level operations + search()
   private final ImageJpaRepository imageRepository;
   private final CartItemJpaRepository cartItemRepository;
   private final S3Adapter s3Adapter;
@@ -64,7 +67,7 @@ public class ProductService {
 
   public List<ProductResponseDto> getAll() {
     List<ProductEntity> entities =
-        productRepository.findAll().stream()
+        productJpaRepository.findAll().stream()
             .filter(p -> Boolean.TRUE.equals(p.getIsActived()))
             .toList();
 
@@ -101,14 +104,14 @@ public class ProductService {
         ProductMapper.toProductEntity(dto, imageEntities, categoryEntity, userEntity);
     productEntity.setAvailableQty(productEntity.getStockQty());
 
-    ProductEntity productUpdated = productRepository.save(productEntity);
+    ProductEntity productUpdated = productJpaRepository.save(productEntity);
 
     return ProductMapper.toProductResponse(
         productUpdated, getImage(imageEntities.getFirst().getFileName()));
   }
 
   public ProductDetailResponseDto getById(Long id) {
-    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+    ProductEntity productEntity = productJpaRepository.findById(id).orElseThrow();
 
     List<ImageResponseDto> images =
         productEntity.getImages().stream()
@@ -124,12 +127,12 @@ public class ProductService {
   }
 
   public Pagination<ProductResponseDto> getRelatedProducts(Long id, Integer page, Integer size) {
-    ProductEntity product = productRepository.findById(id).orElseThrow();
+    ProductEntity product = productJpaRepository.findById(id).orElseThrow();
     Pageable pageable =
         PageMapper.getPageable(page, size, Sort.by(Sort.Direction.DESC, "startDate"));
 
     Page<ProductEntity> pageRelatedProducts =
-        productRepository
+        productJpaRepository
             .findByCategoryIdAndStatusAndIdNotAndIsActivedTrueAndAvailableQtyGreaterThan(
                 product.getCategory().getId(), ProductStatus.LIQUIDATION, id, 0, pageable);
 
@@ -164,7 +167,7 @@ public class ProductService {
         Sort.by(Sort.Direction.DESC, "isActived").and(Sort.by(Sort.Direction.DESC, "createdAt"));
     Pageable pageable = PageMapper.getPageable(searchDto.getPage(), searchDto.getSize(), sort);
 
-    Page<ProductEntity> pageProductEntity = productRepository.findAll(spec, pageable);
+    Page<ProductEntity> pageProductEntity = productJpaRepository.findAll(spec, pageable);
 
     List<ProductResponseDto> productResponseDtos = new ArrayList<>();
     for (ProductEntity productEntity : pageProductEntity.getContent()) {
@@ -179,7 +182,7 @@ public class ProductService {
   }
 
   public List<ProductResponseDto> getProductsByUserId(Long userId) {
-    List<ProductEntity> products = productRepository.findByCustomerIdAndIsActivedTrue(userId);
+    List<ProductEntity> products = productJpaRepository.findByCustomerIdAndIsActivedTrue(userId);
 
     List<ProductResponseDto> product = new ArrayList<>();
 
@@ -196,12 +199,12 @@ public class ProductService {
 
   @Transactional
   public void deleteById(Long id) {
-    ProductEntity product = productRepository.findById(id).orElseThrow();
+    ProductEntity product = productJpaRepository.findById(id).orElseThrow();
     if (product.getStatus() == ProductStatus.SOLD_OUT) {
       throw new RuntimeException("Cannot delete a sold out product");
     }
     product.setIsActived(false);
-    productRepository.save(product);
+    productJpaRepository.save(product);
   }
 
   @Transactional
@@ -209,7 +212,7 @@ public class ProductService {
 
     validateProductDate(dto.getStartDate(), dto.getEndDate(), false);
 
-    ProductEntity productEntity = productRepository.findById(id).orElseThrow();
+    ProductEntity productEntity = productJpaRepository.findById(id).orElseThrow();
     if (productEntity.getStatus() == ProductStatus.SOLD_OUT) {
       throw new RuntimeException("Cannot update a sold out product");
     }
@@ -257,7 +260,7 @@ public class ProductService {
       productEntity.setCode(dto.getCode());
     }
 
-    ProductEntity saved = productRepository.save(productEntity);
+    ProductEntity saved = productJpaRepository.save(productEntity);
     cartItemRepository.updatePriceByProductId(id, BigDecimal.valueOf(saved.getPrice()));
     return ProductMapper.toProductResponse(saved, null);
   }
@@ -265,7 +268,7 @@ public class ProductService {
   @Transactional
   public ProductResponseDto liquidationProduct(Long id) {
     ProductEntity productEntity =
-        productRepository
+        productJpaRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
@@ -275,7 +278,7 @@ public class ProductService {
 
     productEntity.setStatus(ProductStatus.LIQUIDATION);
 
-    ProductEntity updated = productRepository.save(productEntity);
+    ProductEntity updated = productJpaRepository.save(productEntity);
 
     String imageUrl = null;
     if (!updated.getImages().isEmpty()) {
@@ -290,13 +293,13 @@ public class ProductService {
     LocalDate today = LocalDate.now();
 
     List<ProductEntity> productEntities =
-        productRepository.findAll(
+        productJpaRepository.findAll(
             ProductJpaRepository.findByDateAndStatus(
                 "startDate", today.minusDays(2), ProductStatus.NEW));
 
     productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.IN_PROGRESS));
 
-    productRepository.saveAll(productEntities);
+    productJpaRepository.saveAll(productEntities);
   }
 
   @Transactional
@@ -304,12 +307,12 @@ public class ProductService {
     LocalDate today = LocalDate.now();
 
     List<ProductEntity> productEntities =
-        productRepository.findAll(
+        productJpaRepository.findAll(
             ProductJpaRepository.findByDateAndStatus("endDate", today, ProductStatus.IN_PROGRESS));
 
     productEntities.forEach(productEntity -> productEntity.setStatus(ProductStatus.EXPIRED));
 
-    productRepository.saveAll(productEntities);
+    productJpaRepository.saveAll(productEntities);
   }
 
   private String getImage(String fileName) {
