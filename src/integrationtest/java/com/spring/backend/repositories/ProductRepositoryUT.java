@@ -67,12 +67,13 @@ public class ProductRepositoryUT {
   @DisplayName("search specification should filter complexes")
   void search_Works() {
     Specification<ProductEntity> spec =
-        ProductRepository.search("Sample", ProductStatus.NEW, 100.0, null, null, null, null, null);
+        ProductJpaRepository.search(
+            "Sample", ProductStatus.NEW, 100.0, null, null, null, null, null);
     List<ProductEntity> result = productRepository.findAll(spec);
     assertThat(result).hasSize(1);
 
     spec =
-        ProductRepository.search(
+        ProductJpaRepository.search(
             "Sample", ProductStatus.SOLD_OUT, null, null, null, null, null, null);
     result = productRepository.findAll(spec);
     assertThat(result).isEmpty();
@@ -82,7 +83,7 @@ public class ProductRepositoryUT {
   @DisplayName("findByDateAndStatus should filter for scheduled tasks")
   void findByDateAndStatus_Works() {
     Specification<ProductEntity> spec =
-        ProductRepository.findByDateAndStatus("startDate", LocalDate.now(), ProductStatus.NEW);
+        ProductJpaRepository.findByDateAndStatus("startDate", LocalDate.now(), ProductStatus.NEW);
     List<ProductEntity> result = productRepository.findAll(spec);
     assertThat(result).hasSize(1);
   }

@@ -48,7 +48,7 @@ public class CategoryRepositoryUT {
   @Test
   @DisplayName("search specification should filter by name")
   void search_Works() {
-    var spec = CategoryRepository.search("Active");
+    var spec = CategoryJpaRepository.search("Active");
     var results = categoryRepository.findAll(spec);
     assertThat(results).hasSize(1);
     assertThat(results.get(0).getName()).isEqualTo("Active Cat");

@@ -70,11 +70,11 @@ public class UserRepositoryUT {
   @DisplayName("search specification should filter by various fields")
   void search_Works() {
     Specification<UserEntity> spec =
-        UserRepository.search("Test", "test@gmail.com", null, null, "test");
+        UserJpaRepository.search("Test", "test@gmail.com", null, null, "test");
     List<UserEntity> results = userRepository.findAll(spec);
     assertThat(results).hasSize(1);
 
-    spec = UserRepository.search("Nonexistent", null, null, null, null);
+    spec = UserJpaRepository.search("Nonexistent", null, null, null, null);
     results = userRepository.findAll(spec);
     assertThat(results).isEmpty();
   }

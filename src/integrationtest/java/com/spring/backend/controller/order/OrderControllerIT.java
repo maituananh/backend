@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.backend.config.BaseIntegrationTest;
 import com.spring.backend.configuration.user_details.UserDetailsCustom;
+import com.spring.backend.domain.enums.*;
 import com.spring.backend.dto.checkout.CheckoutRequest;
-import com.spring.backend.enums.*;
 import com.spring.backend.infrastructure.entity.*;
 import com.spring.backend.infrastructure.repository.*;
 import com.stripe.exception.SignatureVerificationException;

@@ -31,7 +31,8 @@ class InventoryServiceUT {
     ProductEntity product = new ProductEntity();
     product.setId(1L);
     product.setStockQty(10);
-    product.setReservedQty(2); // available = 8
+    product.setReservedQty(2);
+    product.setAvailableQty(8);
 
     CartItemEntity item = new CartItemEntity();
     item.setProduct(product);
@@ -42,6 +43,7 @@ class InventoryServiceUT {
     inventoryService.reserveStock(List.of(item));
 
     assertThat(product.getReservedQty()).isEqualTo(7);
+    assertThat(product.getAvailableQty()).isEqualTo(3);
     verify(productRepository).save(product);
   }
 
@@ -77,7 +79,8 @@ class InventoryServiceUT {
     ProductEntity product = new ProductEntity();
     product.setId(1L);
     product.setStockQty(5);
-    product.setReservedQty(0); // available = 5
+    product.setReservedQty(0);
+    product.setAvailableQty(5);
 
     CartItemEntity item = new CartItemEntity();
     item.setProduct(product);
@@ -97,6 +100,7 @@ class InventoryServiceUT {
     product.setId(1L);
     product.setStockQty(10);
     product.setReservedQty(5);
+    product.setAvailableQty(5);
 
     OrderItemEntity item = new OrderItemEntity();
     item.setProduct(product);
@@ -118,6 +122,7 @@ class InventoryServiceUT {
     product.setId(1L);
     product.setStockQty(5);
     product.setReservedQty(5);
+    product.setAvailableQty(0);
     product.setStatus(ProductStatus.NEW);
 
     OrderItemEntity item = new OrderItemEntity();
@@ -157,6 +162,7 @@ class InventoryServiceUT {
     ProductEntity product = new ProductEntity();
     product.setId(1L);
     product.setReservedQty(5);
+    product.setAvailableQty(0);
 
     OrderItemEntity item = new OrderItemEntity();
     item.setProduct(product);
@@ -167,6 +173,7 @@ class InventoryServiceUT {
     inventoryService.releaseStock(List.of(item));
 
     assertThat(product.getReservedQty()).isEqualTo(0);
+    assertThat(product.getAvailableQty()).isEqualTo(5);
     verify(productRepository).save(product);
   }
 

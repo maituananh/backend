@@ -45,12 +45,14 @@ public class InventoryService {
       }
 
       product.setReservedQty(product.getReservedQty() + item.getQuantity());
+      product.setAvailableQty(product.getAvailableQty() - item.getQuantity());
       productRepository.save(product);
       log.info(
-          "Reserved {} units for product '{}', new reserved_qty={}",
+          "Reserved {} units for product '{}', new reserved_qty={}, new available_qty={}",
           item.getQuantity(),
           product.getName(),
-          product.getReservedQty());
+          product.getReservedQty(),
+          product.getAvailableQty());
     }
   }
 
@@ -103,10 +105,12 @@ public class InventoryService {
         continue;
       }
       product.setReservedQty(product.getReservedQty() - item.getQuantity());
+      product.setAvailableQty(product.getAvailableQty() + item.getQuantity());
       productRepository.save(product);
       log.info(
-          "Released reserve for product '{}', new available_qty={}",
+          "Released reserve for product '{}', new reserved_qty={}, new available_qty={}",
           product.getName(),
+          product.getReservedQty(),
           product.getAvailableQty());
     }
   }
