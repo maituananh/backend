@@ -190,7 +190,7 @@ class OrderControllerUT {
   void getAllOrdersPaginatedForAdmin_Works() throws Exception {
     Pagination<OrderDetailResponse> response =
         Pagination.<OrderDetailResponse>builder().totalPages(1).build();
-    when(orderService.getAllOrdersPaginatedForAdmin(anyInt(), anyInt(), any()))
+    when(orderService.getAllOrdersPaginatedForAdmin(anyInt(), anyInt(), any(), any()))
         .thenReturn(response);
 
     mockMvc

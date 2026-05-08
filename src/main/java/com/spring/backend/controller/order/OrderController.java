@@ -94,8 +94,10 @@ public class OrderController {
   public ResponseEntity<Pagination<OrderDetailResponse>> getAllOrdersPaginatedForAdmin(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
-      @RequestParam(required = false) OrderStatus status) {
-    return ResponseEntity.ok(orderService.getAllOrdersPaginatedForAdmin(page, size, status));
+      @RequestParam(required = false) OrderStatus status,
+      @RequestParam(required = false) Long orderId) {
+    return ResponseEntity.ok(
+        orderService.getAllOrdersPaginatedForAdmin(page, size, status, orderId));
   }
 
   /** Lấy chi tiết một order theo ID */

@@ -34,6 +34,15 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
    * Uses JOIN FETCH on payment to avoid N+1 queries in the reconciliation job.
    */
   @Query(
+      """
+    SELECT o
+    FROM OrderEntity o
+    WHERE o.id = :orderId
+    ORDER BY o.createdAt DESC
+""")
+  Page<OrderEntity> findOrderById(@Param("orderId") Long orderId, Pageable pageable);
+
+  @Query(
       "SELECT DISTINCT o FROM OrderEntity o "
           + "JOIN FETCH o.payment p "
           + "WHERE o.status = 'PENDING' "
