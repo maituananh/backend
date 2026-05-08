@@ -230,6 +230,7 @@ public class ProductService {
       if (!new HashSet<>(currentImages).containsAll(newImages)
           || currentImages.size() != newImages.size()) {
         currentImages.clear();
+        newImages.forEach(image -> image.setProduct(productEntity));
         currentImages.addAll(newImages);
       }
     }
