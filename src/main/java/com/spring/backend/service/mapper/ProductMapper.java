@@ -52,6 +52,10 @@ public class ProductMapper {
         .availableQty(entity.getAvailableQty())
         .stockQty(entity.getStockQty())
         .dailyProfit(entity.getDailyProfit() != null ? entity.getDailyProfit() : 0)
+        .category(
+            entity.getCategory() != null
+                ? CategoryMapper.toCategoryDto(entity.getCategory())
+                : null)
         .build();
   }
 

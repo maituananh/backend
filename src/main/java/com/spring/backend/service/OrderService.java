@@ -315,10 +315,12 @@ public class OrderService {
   // ============================================================
   @Transactional(readOnly = true)
   public Pagination<OrderDetailResponse> getAllOrdersPaginatedForAdmin(
-      int page, int size, OrderStatus status) {
+      int page, int size, OrderStatus status, Long orderId) {
     Page<OrderEntity> orderPage;
 
-    if (status != null) {
+    if (orderId != null) {
+      orderPage = orderRepository.findOrderById(orderId, PageRequest.of(page, size));
+    } else if (status != null) {
       orderPage =
           orderRepository.findByStatusOrderByCreatedAtDesc(status, PageRequest.of(page, size));
     } else {

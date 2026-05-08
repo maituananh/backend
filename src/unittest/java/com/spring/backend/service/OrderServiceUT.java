@@ -443,7 +443,7 @@ class OrderServiceUT {
           .thenReturn(new PageImpl<>(List.of(new OrderEntity())));
 
       Pagination<OrderDetailResponse> response =
-          orderService.getAllOrdersPaginatedForAdmin(0, 10, OrderStatus.PENDING);
+          orderService.getAllOrdersPaginatedForAdmin(0, 10, OrderStatus.PENDING, null);
       assertThat(response.getData()).hasSize(1);
     }
 
@@ -453,7 +453,7 @@ class OrderServiceUT {
           .thenReturn(new PageImpl<>(List.of(new OrderEntity())));
 
       Pagination<OrderDetailResponse> response =
-          orderService.getAllOrdersPaginatedForAdmin(0, 10, null);
+          orderService.getAllOrdersPaginatedForAdmin(0, 10, null, null);
       assertThat(response.getData()).hasSize(1);
     }
   }

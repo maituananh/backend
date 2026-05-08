@@ -1,5 +1,6 @@
 package com.spring.backend.dto.product;
 
+import com.spring.backend.dto.category.CategoryResponseDto;
 import com.spring.backend.enums.ProductStatus;
 import java.time.LocalDate;
 import lombok.*;
@@ -16,6 +17,7 @@ public class ProductResponseDto {
   private LocalDate startDate;
   private LocalDate endDate;
   private String image;
+  private CategoryResponseDto category;
   private String code;
   private Boolean isActived;
   private ProductStatus status;
