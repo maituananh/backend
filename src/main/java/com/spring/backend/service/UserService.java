@@ -28,7 +28,7 @@ public class UserService {
   private final S3Adapter s3Adapter;
 
   public List<UserDto> getAll() {
-    List<UserEntity> userEntity = userRepository.findAll();
+    List<UserEntity> userEntity = userRepository.findByIsActiveTrue();
 
     List<UserDto> userDto = new ArrayList<>();
     for (UserEntity user : userEntity) {
@@ -40,6 +40,7 @@ public class UserService {
   @Transactional
   public UserDto createUser(UserDto userDto) {
     UserEntity userEntity = UserMapper.toEntity(userDto);
+    userEntity.setIsActive(true);
     UserEntity saveUser = userRepository.save(userEntity);
 
     return UserMapper.toUserDto(saveUser, s3Adapter);
@@ -73,7 +74,13 @@ public class UserService {
 
   @Transactional
   public void delete(Long id) {
-    userRepository.deleteById(id);
+
+    UserEntity userEntity =
+        userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+    userEntity.setIsActive(false);
+
+    userRepository.save(userEntity);
   }
 
   @Transactional

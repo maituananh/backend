@@ -232,7 +232,9 @@ class UserControllerIT extends BaseIntegrationTest {
         .perform(delete("/api/users/" + user.getId()).with(user(toUserDetails(adminUser))))
         .andExpect(status().isOk());
 
-    assertThat(userRepository.existsById(user.getId())).isFalse();
+    UserEntity deletedUser = userRepository.findById(user.getId()).orElseThrow();
+
+    assertThat(deletedUser.getIsActive()).isFalse();
   }
 
   @Test
