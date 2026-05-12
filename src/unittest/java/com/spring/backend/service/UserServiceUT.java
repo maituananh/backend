@@ -39,7 +39,7 @@ class UserServiceUT {
   @Test
   @DisplayName("getAll should return list")
   void getAll_Works() {
-    when(userRepository.findAll()).thenReturn(List.of(new UserEntity()));
+    when(userRepository.findByIsActiveTrue()).thenReturn(List.of(new UserEntity()));
     List<UserDto> result = userService.getAll();
     assertThat(result).hasSize(1);
   }
@@ -96,8 +96,13 @@ class UserServiceUT {
   @Test
   @DisplayName("delete should call repository")
   void delete_Works() {
+    UserEntity entity = new UserEntity();
+    entity.setId(1L);
+    entity.setIsActive(true);
+    when(userRepository.findById(1L)).thenReturn(Optional.of(entity));
     userService.delete(1L);
-    verify(userRepository).deleteById(1L);
+    assertThat(entity.getIsActive()).isFalse();
+    verify(userRepository).save(any(UserEntity.class));
   }
 
   @Test

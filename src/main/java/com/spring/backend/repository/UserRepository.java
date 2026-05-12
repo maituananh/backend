@@ -26,11 +26,15 @@ public interface UserRepository
 
   long countByIsActiveIsTrue();
 
+  List<UserEntity> findByIsActiveTrue();
+
   static Specification<UserEntity> search(
       String name, String email, String phone, String cardId, String username) {
 
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
+
+      predicates.add(cb.isTrue(root.get("isActive")));
 
       if (name != null) {
         predicates.add(cb.like(root.get("name"), "%" + name + "%"));
